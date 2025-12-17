@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "Distributor Panel",
+    "slug": "ecommerce_baofeng_radios",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/playstore-icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "bundleIdentifier": "com.baofengradios.distributorpanel",
+      "buildNumber": "1.0.0",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.baofengradios.distributorpanel",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/playstore-icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "modules": [
+      "expo-firebase-core"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "21eeda7f-e283-4640-87b9-4caedd92769a"
+      }
+    }
+  }
+}

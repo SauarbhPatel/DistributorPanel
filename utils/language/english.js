@@ -1,0 +1,4 @@
+export default {
+    greeting: "Hello, World!",
+    welcome: "Welcome to our app.",
+};

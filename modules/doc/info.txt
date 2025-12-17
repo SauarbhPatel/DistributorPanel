@@ -1,0 +1,99 @@
+** Packages To Install ** 
+    icon - @expo/vector-icons
+    model - @rneui/themed & @rneui/base
+    date-time - @react-native-community/datetimepicker
+
+~~ cmd ~~
+    yarn add  @react-native-community/datetimepicker
+    yarn add  @rneui/themed  @rneui/base
+    yarn add  @expo/vector-icons
+
+
+**Usages Instruction**
+
+TextAreaBox =>
+    
+    **basic usage =>
+        <TextAreaBox
+            title="Title Name"
+            placeholder="placeholder" 
+            value={phone} 
+            onChangeText={updateState} 
+            valuekey={"phone"} 
+        />
+
+    **paramters =>
+        title - "Title Name"
+        placeholder - "placeholder Name"
+        value - "value"
+        onChangeText - "function for every change "
+        valuekey - "state value key name"
+        required - "it mark a "*" on top of title"
+        customStyle - "its for text box outer style"
+        keyboardType - "keyboard type "
+        titleCustomStyle - "title custom style "
+        inputCustomStyle - "input box custom style "
+        customTitleProps - "title custom props"
+        customInputProps - "Input box custom props"
+    
+    / Then you can use TextAreaBox in your JavaScript code
+    <TextAreaBox
+        title="Example Title"
+        placeholder="Enter text here"
+        value=""
+        onChangeText={(text) => console.log(text)}
+        valuekey="exampleKey"
+        required={true}
+        customStyle={{ /* Custom styles here */ }}
+        keyboardType="default"
+        titleCustomStyle={{ /* Custom styles here */ }}
+        inputCustomStyle={{ /* Custom styles here */ }}
+        customInputProps={{ /* Custom input props here */ }}
+        customTitleProps={{ /* Custom title props here */ }}
+        leftIcon={<YourLeftIconComponent />}
+        rightIcon={<YourRightIconComponent />}
+    />
+
+
+
+Loader =>
+
+    **basic usage =>
+        <Loader isShow={true} />
+
+    **paramters =>
+        isShow="" boolean 
+        backgroundColor=""  
+        position="" center,flex-end,flex-start
+        customStyle={{ /* Custom styles here */ }}
+        size=""
+        color=""
+        changeLoader={<Wave/>}
+
+    / Then you can use TextAreaBox in your JavaScript code
+
+    <Loader
+        isShow={true}
+        backgroundColor=""
+        position=""
+        size=""
+        color=""
+        customStyle={{}}
+        changeLoader={}
+    />
+
+FlatListBox =>
+    **basic usage =>
+
+        <FlatListBox
+            isLoading={isLoading}
+            data={list}
+            renderComponent={({ item }) => (
+                <View style={{ height: 200, borderWidth: 1 }}>
+                    <Text>{item.name}</Text>
+                </View>
+            )}
+            uniqueKey={"name"}
+            autoCall={() => genrateList()}
+            uniqueKeyValue={()=>""}
+        />
