@@ -9,8 +9,8 @@ const ReportsData = () => {
         <>
             <View
                 style={{
-                    // flexDirection: "row",
-                    // flexWrap: "wrap",
+                    flexDirection: "row",
+                    flexWrap: "wrap",
                     gap: 10,
                     marginHorizontal: 15,
                 }}
@@ -68,10 +68,11 @@ const OverViewCard = ({ data }) => {
             >
                 <View
                     style={{
-                        padding: 20,
+                        padding: 15,
                         borderRadius: 10,
                         // backgroundColor: bg,
                         gap: 10,
+                        width: (width - 40) / 2,
                     }}
                 >
                     <Text
@@ -86,7 +87,7 @@ const OverViewCard = ({ data }) => {
                         style={{
                             ...Fonts.blackColor18Bold,
                             color: Colors.whiteColor,
-                            fontSize: 25,
+                            fontSize: typeof count === "number" ? 25 : 18,
                         }}
                     >
                         {count}
