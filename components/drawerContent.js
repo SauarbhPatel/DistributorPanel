@@ -186,7 +186,7 @@ const CustomDrawer = (props) => {
                         {category({ categoryName: "BEAUTY" })}
                     </View>
                     {drawerDivider()} */}
-                    {loginStatus && (
+                    {/* {loginStatus && (
                         <TouchableOpacity
                             activeOpacity={0.9}
                             onPress={() => props.navigation.push("Account")}
@@ -306,7 +306,7 @@ const CustomDrawer = (props) => {
                                 title: "RMA",
                             })}
                         </TouchableOpacity>
-                    )}
+                    )} */}
                     {drawerDivider()}
                     <View style={{ marginHorizontal: Sizes.fixPadding + 5.0 }}>
                         {/* <TouchableOpacity
@@ -335,7 +335,7 @@ const CustomDrawer = (props) => {
                                 {getLocalizedString("Change Language")}
                             </Text>
                         </TouchableOpacity> */}
-                        {loginStatus && (
+                        {/* {loginStatus && (
                             <TouchableOpacity
                                 onPress={() =>
                                     props.navigation.push("trackOrder")
@@ -364,8 +364,22 @@ const CustomDrawer = (props) => {
                                     {getLocalizedString("Support Ticket")}
                                 </Text>
                             </TouchableOpacity>
-                        )}
+                        )} */}
                         <TouchableOpacity
+                            onPress={() =>
+                                props.navigation.push("SalesAndPurchase")
+                            }
+                        >
+                            <Text
+                                style={{
+                                    marginVertical: Sizes.fixPadding - 5.0,
+                                    ...Fonts.grayColor14SemiBold,
+                                }}
+                            >
+                                {getLocalizedString("Sales & Purchase")}
+                            </Text>
+                        </TouchableOpacity>
+                        {/* <TouchableOpacity
                             onPress={() => props.navigation.push("Faq")}
                         >
                             <Text
@@ -416,8 +430,8 @@ const CustomDrawer = (props) => {
                             >
                                 {getLocalizedString("Privacy Policy")}
                             </Text>
-                        </TouchableOpacity>
-                        {drawerDivider()}
+                        </TouchableOpacity> */}
+                        {/* {drawerDivider()} */}
 
                         {!loginStatus && (
                             <TouchableOpacity

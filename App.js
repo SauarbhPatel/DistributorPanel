@@ -50,6 +50,8 @@ import PrivacyPolicy from "./screens/termAndpolicey/privacyPolicy";
 import ReturnOrderScreen from "./screens/orders/returnOrderScreen";
 import RMAScreen from "./screens/rma/rmaScreen";
 import KycScreen from "./screens/kyc/kycScreen";
+import SalesAndPurchaseScreen from "./screens/salesAndPurchase/salesAndPurchaseScreen";
+import PurchaseOrderScreen from "./screens/purchaseOrder/purchaseOrderScreen";
 
 LogBox.ignoreAllLogs();
 
@@ -163,6 +165,15 @@ function App() {
                 <Stack.Screen name="privacyPolicy" component={PrivacyPolicy} />
                 <Stack.Screen name="return" component={ReturnOrderScreen} />
                 <Stack.Screen name="rmascreen" component={RMAScreen} />
+                {/*  */}
+                <Stack.Screen
+                    name="SalesAndPurchase"
+                    component={SalesAndPurchaseScreen}
+                />
+                <Stack.Screen
+                    name="PurchaseOrder"
+                    component={PurchaseOrderScreen}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );

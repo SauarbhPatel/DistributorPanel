@@ -124,7 +124,7 @@ const PersonalDetailsForm = ({
                 type="select"
                 title={"Select Country"}
                 placeholder={"Select Country"}
-                list={["Years", "Months", "Weeks", "Days"].map((num) => ({
+                list={[].map((num) => ({
                     id: num,
                     name: num,
                 }))}
