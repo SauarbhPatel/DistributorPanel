@@ -52,6 +52,10 @@ import RMAScreen from "./screens/rma/rmaScreen";
 import KycScreen from "./screens/kyc/kycScreen";
 import SalesAndPurchaseScreen from "./screens/salesAndPurchase/salesAndPurchaseScreen";
 import PurchaseOrderScreen from "./screens/purchaseOrder/purchaseOrderScreen";
+import PurchaseDetailsScreen from "./screens/purchaseOrder/purchaseDetailsScreen";
+import InwardDocumentScreen from "./screens/inwardDocument/inwardDocumentScreen";
+import InwardDetailsScreen from "./screens/inwardDocument/inwardDetailsScreen";
+import InventoryMasterScreen from "./screens/inventoryMaster/inventoryMasterScreen";
 
 LogBox.ignoreAllLogs();
 
@@ -173,6 +177,22 @@ function App() {
                 <Stack.Screen
                     name="PurchaseOrder"
                     component={PurchaseOrderScreen}
+                />
+                <Stack.Screen
+                    name="PurchaseDetails"
+                    component={PurchaseDetailsScreen}
+                />
+                <Stack.Screen
+                    name="InwardDocument"
+                    component={InwardDocumentScreen}
+                />
+                <Stack.Screen
+                    name="InwardDetails"
+                    component={InwardDetailsScreen}
+                />
+                <Stack.Screen
+                    name="InventoryMaster"
+                    component={InventoryMasterScreen}
                 />
             </Stack.Navigator>
         </NavigationContainer>

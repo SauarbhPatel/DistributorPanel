@@ -15,36 +15,14 @@ import { FlatList } from "react-native-gesture-handler";
 import { __generateRandomString } from "../../utils/funtion";
 import { TouchableOpacity } from "react-native";
 import { __makeGetBlogGetRequest } from "../../utils/api";
-import { useEffect } from "react";
 import { useState } from "react";
-import { TextAreaBox } from "../../modules";
-import CreateDocuments from "../../components/salesAndPurchase/CreateDocuments";
 import AddressDetailsCard from "../../components/purchaseOrder/AddressDetailsCard";
-import PlaceOfSupply from "../../components/purchaseOrder/PlaceOfSupply";
-import PrimaryDocumentDetails from "../../components/purchaseOrder/PrimaryDocumentDetails";
 import ProductList from "../../components/purchaseOrder/ProductList";
-import BillingBox from "../../components/purchaseOrder/BillingBox";
+import PrimaryDocumentDetails from "../../components/inwardDocument/PrimaryDocumentDetails";
 const { width } = Dimensions.get("window");
 
-const PurchaseOrderScreen = ({ navigation }) => {
-    const [list, setlist] = useState([
-        {
-            companyName: "Surya Demo Supplier",
-            documentNumber: "PO-00003",
-            transactionDetails: "Purchase Order dated 12/12/2025",
-            invoiceStatus: "Invoice Pending",
-            goodsStatus: "Not Received",
-            lastModified: "18/12/2025 18:10",
-        },
-        {
-            companyName: "Surya Demo Supplier",
-            documentNumber: "PO-00004",
-            transactionDetails: "Purchase Order for Raw Material 1 (Dummy)",
-            invoiceStatus: "Invoice Created",
-            goodsStatus: "Received",
-            lastModified: "11/12/2025 08:57",
-        },
-    ]);
+const InwardDocumentScreen = ({ navigation }) => {
+    const [list, setlist] = useState([]);
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
@@ -73,12 +51,13 @@ const PurchaseOrderScreen = ({ navigation }) => {
                                         }}
                                     >
                                         <AddressDetailsCard
-                                            title={"Buyer Details"}
+                                            title={"Goods Received By"}
                                             lable={"Abaris Products"}
                                             address="98 B, II Floor, NFC, Near JMI"
                                             address2="South Delhi (Delhi)"
                                             address3="India - 110025"
                                             gstin="07AAECA1234Q1ZV"
+                                            isHideButton={true}
                                         />
                                         <AddressDetailsCard
                                             title={"Delivery Location"}
@@ -87,29 +66,27 @@ const PurchaseOrderScreen = ({ navigation }) => {
                                             address2="South Delhi (Delhi)"
                                             address3="India - 110025"
                                             gstin="07AAECA1234Q1ZV"
+                                            isHideButton={true}
                                         />
                                         <AddressDetailsCard
-                                            title={"Supplier Details"}
+                                            title={"Goods Sent By"}
                                             lable={"Surya Demo Supplier"}
                                             address="26/3, 30, Nanik Niwas, Dr.D.D Sathe Marg, Near Girgaon Church, Opera House"
                                             address2="Mumbai (Maharashtra)"
                                             address3="India - 400004"
                                             gstin="27AACCF7457K1Z7"
+                                            isHideButton={true}
                                         />
                                     </View>
                                 }
                             />
-                            <PlaceOfSupply title={"Place Of Supply"} />
                             <PrimaryDocumentDetails
                                 title={"Primary Document Details"}
                             />
                             <ProductList title={"Product List"} />
-                            <BillingBox />
 
                             <TouchableOpacity
-                                onPress={() =>
-                                    navigation.push("PurchaseDetails")
-                                }
+                                onPress={() => navigation.push("InwardDetails")}
                                 style={{
                                     alignSelf: "center",
                                     padding: 10,
@@ -150,7 +127,7 @@ const PurchaseOrderScreen = ({ navigation }) => {
                         flex: 1,
                     }}
                 >
-                    Purchase Order
+                    Inward Document
                 </Text>
             </View>
         );
@@ -179,7 +156,7 @@ const styles = StyleSheet.create({
     },
 });
 
-export default PurchaseOrderScreen;
+export default InwardDocumentScreen;
 
 const CardBox = ({ item }) => {
     return (

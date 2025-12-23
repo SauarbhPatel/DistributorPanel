@@ -11,6 +11,8 @@ const AddressDetailsCard = ({
     address2,
     address3,
     gstin,
+    isHideButton = false,
+    isHideEditButton = false,
 }) => {
     return (
         <View
@@ -39,7 +41,13 @@ const AddressDetailsCard = ({
                 >
                     {title}
                 </Text>
-                <Feather name="edit-2" size={22} color={Colors.whiteColor} />
+                {!isHideEditButton && (
+                    <Feather
+                        name="edit-2"
+                        size={22}
+                        color={Colors.whiteColor}
+                    />
+                )}
             </View>
 
             <View style={{ padding: 15, gap: 5 }}>
@@ -94,25 +102,27 @@ const AddressDetailsCard = ({
                     {gstin}
                 </Text>
 
-                <View
-                    style={{
-                        borderWidth: 1.5,
-                        padding: 5,
-                        marginTop: "auto",
-                        borderRadius: 5,
-                        borderColor: Colors.lightGrayColor,
-                    }}
-                >
-                    <Text
+                {!isHideButton ? (
+                    <View
                         style={{
-                            ...Fonts.blackColor13Bold,
-                            textAlign: "center",
-                            color: Colors.primaryColor,
+                            borderWidth: 1.5,
+                            padding: 5,
+                            marginTop: "auto",
+                            borderRadius: 5,
+                            borderColor: Colors.lightGrayColor,
                         }}
                     >
-                        Place Of Supply
-                    </Text>
-                </View>
+                        <Text
+                            style={{
+                                ...Fonts.blackColor13Bold,
+                                textAlign: "center",
+                                color: Colors.primaryColor,
+                            }}
+                        >
+                            Place Of Supply
+                        </Text>
+                    </View>
+                ) : null}
             </View>
         </View>
     );

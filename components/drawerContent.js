@@ -379,6 +379,20 @@ const CustomDrawer = (props) => {
                                 {getLocalizedString("Sales & Purchase")}
                             </Text>
                         </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() =>
+                                props.navigation.push("InventoryMaster")
+                            }
+                        >
+                            <Text
+                                style={{
+                                    marginVertical: Sizes.fixPadding - 5.0,
+                                    ...Fonts.grayColor14SemiBold,
+                                }}
+                            >
+                                {getLocalizedString("Inventory")}
+                            </Text>
+                        </TouchableOpacity>
                         {/* <TouchableOpacity
                             onPress={() => props.navigation.push("Faq")}
                         >

@@ -17,16 +17,11 @@ import { TouchableOpacity } from "react-native";
 import { __makeGetBlogGetRequest } from "../../utils/api";
 import { useEffect } from "react";
 import { useState } from "react";
+import ProductList from "../../components/inventoryMaster/ProductList";
 import { TextAreaBox } from "../../modules";
-import CreateDocuments from "../../components/salesAndPurchase/CreateDocuments";
-import AddressDetailsCard from "../../components/purchaseOrder/AddressDetailsCard";
-import PlaceOfSupply from "../../components/purchaseOrder/PlaceOfSupply";
-import PrimaryDocumentDetails from "../../components/purchaseOrder/PrimaryDocumentDetails";
-import ProductList from "../../components/purchaseOrder/ProductList";
-import BillingBox from "../../components/purchaseOrder/BillingBox";
 const { width } = Dimensions.get("window");
 
-const PurchaseOrderScreen = ({ navigation }) => {
+const InventoryMasterScreen = ({ navigation }) => {
     const [list, setlist] = useState([
         {
             companyName: "Surya Demo Supplier",
@@ -51,7 +46,40 @@ const PurchaseOrderScreen = ({ navigation }) => {
             <StatusBar backgroundColor={Colors.primaryColor} />
             <View style={{ flex: 1 }}>
                 {header()}
-
+                <TextAreaBox
+                    value={""}
+                    onChangeText={(value) => {
+                        // updateState(value);
+                    }}
+                    placeholder={"Search"}
+                    valuekey={"res"}
+                    titleCustomStyle={{
+                        marginHorizontal: 0,
+                    }}
+                    inputCustomStyle={{
+                        marginHorizontal: 10,
+                        borderWidth: 1,
+                        borderColor: "#c1c1c1ff",
+                        elevation: 0,
+                        backgroundColor: Colors.whiteColor,
+                        paddingVertical: 5,
+                    }}
+                    leftIcon={
+                        <Feather
+                            name="search"
+                            size={20}
+                            color={Colors.lightGrayColor}
+                        />
+                    }
+                    rightIcon={
+                        <FontAwesome
+                            name="filter"
+                            size={20}
+                            color={Colors.primaryColor}
+                        />
+                    }
+                    customStyle={{ marginBottom: 5, marginTop: 10 }}
+                />
                 <FlatList
                     contentContainerStyle={{
                         gap: 10,
@@ -60,73 +88,7 @@ const PurchaseOrderScreen = ({ navigation }) => {
                     }}
                     ListHeaderComponent={
                         <View style={{ gap: 10 }}>
-                            <FlatList
-                                horizontal
-                                showsHorizontalScrollIndicator={false}
-                                ListHeaderComponent={
-                                    <View
-                                        style={{
-                                            flexDirection: "row",
-                                            // alignItems: "center",
-                                            gap: 10,
-                                            paddingHorizontal: 10,
-                                        }}
-                                    >
-                                        <AddressDetailsCard
-                                            title={"Buyer Details"}
-                                            lable={"Abaris Products"}
-                                            address="98 B, II Floor, NFC, Near JMI"
-                                            address2="South Delhi (Delhi)"
-                                            address3="India - 110025"
-                                            gstin="07AAECA1234Q1ZV"
-                                        />
-                                        <AddressDetailsCard
-                                            title={"Delivery Location"}
-                                            lable={"Main"}
-                                            address="98 B, II Floor, NFC, Near JMI"
-                                            address2="South Delhi (Delhi)"
-                                            address3="India - 110025"
-                                            gstin="07AAECA1234Q1ZV"
-                                        />
-                                        <AddressDetailsCard
-                                            title={"Supplier Details"}
-                                            lable={"Surya Demo Supplier"}
-                                            address="26/3, 30, Nanik Niwas, Dr.D.D Sathe Marg, Near Girgaon Church, Opera House"
-                                            address2="Mumbai (Maharashtra)"
-                                            address3="India - 400004"
-                                            gstin="27AACCF7457K1Z7"
-                                        />
-                                    </View>
-                                }
-                            />
-                            <PlaceOfSupply title={"Place Of Supply"} />
-                            <PrimaryDocumentDetails
-                                title={"Primary Document Details"}
-                            />
-                            <ProductList title={"Product List"} />
-                            <BillingBox />
-
-                            <TouchableOpacity
-                                onPress={() =>
-                                    navigation.push("PurchaseDetails")
-                                }
-                                style={{
-                                    alignSelf: "center",
-                                    padding: 10,
-                                    paddingHorizontal: 20,
-                                    backgroundColor: Colors.primaryColor,
-                                    borderRadius: 30,
-                                }}
-                            >
-                                <Text
-                                    style={{
-                                        ...Fonts.blackColor15Medium,
-                                        color: Colors.whiteColor,
-                                    }}
-                                >
-                                    Save And Send
-                                </Text>
-                            </TouchableOpacity>
+                            <ProductList />
                         </View>
                     }
                 />
@@ -150,8 +112,32 @@ const PurchaseOrderScreen = ({ navigation }) => {
                         flex: 1,
                     }}
                 >
-                    Purchase Order
-                </Text>
+                    Inventory
+                </Text>{" "}
+                <TouchableOpacity
+                    onPress={() => {
+                        // updateState({ isShowAdd: true });
+                    }}
+                    style={{
+                        flexDirection: "row",
+                        gap: 5,
+                        alignItems: "center",
+                    }}
+                >
+                    <Text
+                        style={{
+                            ...Fonts.blackColor13Medium,
+                            color: Colors.primaryColor,
+                        }}
+                    >
+                        Add Item
+                    </Text>
+                    <Feather
+                        name="plus"
+                        size={18}
+                        color={Colors.primaryColor}
+                    />
+                </TouchableOpacity>
             </View>
         );
     }
@@ -178,8 +164,6 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
     },
 });
-
-export default PurchaseOrderScreen;
 
 const CardBox = ({ item }) => {
     return (
@@ -275,3 +259,5 @@ const CardBox = ({ item }) => {
         );
     }
 };
+
+export default InventoryMasterScreen;

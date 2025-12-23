@@ -3,48 +3,25 @@ import {
     SafeAreaView,
     View,
     StatusBar,
-    ScrollView,
     StyleSheet,
     Text,
-    Image,
     Dimensions,
 } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
-import { Feather, FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { FlatList } from "react-native-gesture-handler";
 import { __generateRandomString } from "../../utils/funtion";
 import { TouchableOpacity } from "react-native";
 import { __makeGetBlogGetRequest } from "../../utils/api";
-import { useEffect } from "react";
 import { useState } from "react";
-import { TextAreaBox } from "../../modules";
-import CreateDocuments from "../../components/salesAndPurchase/CreateDocuments";
-import AddressDetailsCard from "../../components/purchaseOrder/AddressDetailsCard";
-import PlaceOfSupply from "../../components/purchaseOrder/PlaceOfSupply";
-import PrimaryDocumentDetails from "../../components/purchaseOrder/PrimaryDocumentDetails";
-import ProductList from "../../components/purchaseOrder/ProductList";
-import BillingBox from "../../components/purchaseOrder/BillingBox";
 const { width } = Dimensions.get("window");
+import AddressDetailsCard from "../../components/purchaseOrder/AddressDetailsCard";
+import PODetails from "../../components/purchaseOrder/PODetails";
+import ProductList2 from "../../components/purchaseOrder/ProductList2";
+import TaxDetails from "../../components/purchaseOrder/TaxDetails";
 
-const PurchaseOrderScreen = ({ navigation }) => {
-    const [list, setlist] = useState([
-        {
-            companyName: "Surya Demo Supplier",
-            documentNumber: "PO-00003",
-            transactionDetails: "Purchase Order dated 12/12/2025",
-            invoiceStatus: "Invoice Pending",
-            goodsStatus: "Not Received",
-            lastModified: "18/12/2025 18:10",
-        },
-        {
-            companyName: "Surya Demo Supplier",
-            documentNumber: "PO-00004",
-            transactionDetails: "Purchase Order for Raw Material 1 (Dummy)",
-            invoiceStatus: "Invoice Created",
-            goodsStatus: "Received",
-            lastModified: "11/12/2025 08:57",
-        },
-    ]);
+const PurchaseDetailsScreen = ({ navigation }) => {
+    const [list, setlist] = useState([]);
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
@@ -60,6 +37,14 @@ const PurchaseOrderScreen = ({ navigation }) => {
                     }}
                     ListHeaderComponent={
                         <View style={{ gap: 10 }}>
+                            <Text
+                                style={{
+                                    marginLeft: Sizes.fixPadding + 5.0,
+                                    ...Fonts.blackColor16Bold,
+                                }}
+                            >
+                                Purchase Order
+                            </Text>
                             <FlatList
                                 horizontal
                                 showsHorizontalScrollIndicator={false}
@@ -73,42 +58,46 @@ const PurchaseOrderScreen = ({ navigation }) => {
                                         }}
                                     >
                                         <AddressDetailsCard
-                                            title={"Buyer Details"}
+                                            title={"Name and Address of Buyer"}
                                             lable={"Abaris Products"}
                                             address="98 B, II Floor, NFC, Near JMI"
                                             address2="South Delhi (Delhi)"
                                             address3="India - 110025"
                                             gstin="07AAECA1234Q1ZV"
+                                            isHideButton={true}
+                                            isHideEditButton={true}
                                         />
                                         <AddressDetailsCard
-                                            title={"Delivery Location"}
-                                            lable={"Main"}
-                                            address="98 B, II Floor, NFC, Near JMI"
-                                            address2="South Delhi (Delhi)"
-                                            address3="India - 110025"
-                                            gstin="07AAECA1234Q1ZV"
-                                        />
-                                        <AddressDetailsCard
-                                            title={"Supplier Details"}
+                                            title={
+                                                "Name and Address of Supplier"
+                                            }
                                             lable={"Surya Demo Supplier"}
                                             address="26/3, 30, Nanik Niwas, Dr.D.D Sathe Marg, Near Girgaon Church, Opera House"
                                             address2="Mumbai (Maharashtra)"
                                             address3="India - 400004"
                                             gstin="27AACCF7457K1Z7"
+                                            isHideButton={true}
+                                            isHideEditButton={true}
+                                        />
+                                        <AddressDetailsCard
+                                            title={"Shipping Details"}
+                                            lable={"Main"}
+                                            address="98 B, II Floor, NFC, Near JMI"
+                                            address2="South Delhi (Delhi)"
+                                            address3="India - 110025"
+                                            gstin="07AAECA1234Q1ZV"
+                                            isHideButton={true}
+                                            isHideEditButton={true}
                                         />
                                     </View>
                                 }
                             />
-                            <PlaceOfSupply title={"Place Of Supply"} />
-                            <PrimaryDocumentDetails
-                                title={"Primary Document Details"}
-                            />
-                            <ProductList title={"Product List"} />
-                            <BillingBox />
-
+                            <PODetails />
+                            <ProductList2 />
+                            <TaxDetails />
                             <TouchableOpacity
                                 onPress={() =>
-                                    navigation.push("PurchaseDetails")
+                                    navigation.push("InwardDocument")
                                 }
                                 style={{
                                     alignSelf: "center",
@@ -124,7 +113,7 @@ const PurchaseOrderScreen = ({ navigation }) => {
                                         color: Colors.whiteColor,
                                     }}
                                 >
-                                    Save And Send
+                                    Create Inward
                                 </Text>
                             </TouchableOpacity>
                         </View>
@@ -150,7 +139,7 @@ const PurchaseOrderScreen = ({ navigation }) => {
                         flex: 1,
                     }}
                 >
-                    Purchase Order
+                    PO00004
                 </Text>
             </View>
         );
@@ -179,7 +168,7 @@ const styles = StyleSheet.create({
     },
 });
 
-export default PurchaseOrderScreen;
+export default PurchaseDetailsScreen;
 
 const CardBox = ({ item }) => {
     return (
