@@ -379,6 +379,37 @@ const CustomDrawer = (props) => {
                                 {getLocalizedString("Sales & Purchase")}
                             </Text>
                         </TouchableOpacity>
+                        <TouchableOpacity>
+                            <Text
+                                style={{
+                                    marginVertical: Sizes.fixPadding - 5.0,
+                                    ...Fonts.grayColor14SemiBold,
+                                }}
+                            >
+                                {getLocalizedString("Business Intelligence")}
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity>
+                            <Text
+                                style={{
+                                    marginVertical: Sizes.fixPadding - 5.0,
+                                    ...Fonts.grayColor14SemiBold,
+                                }}
+                            >
+                                {getLocalizedString("Approvals")}
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity>
+                            <Text
+                                style={{
+                                    marginVertical: Sizes.fixPadding - 5.0,
+                                    ...Fonts.grayColor14SemiBold,
+                                }}
+                            >
+                                {getLocalizedString("Buyers & Suppliers")}
+                            </Text>
+                        </TouchableOpacity>
+
                         <TouchableOpacity
                             onPress={() =>
                                 props.navigation.push("InventoryMaster")
@@ -391,6 +422,48 @@ const CustomDrawer = (props) => {
                                 }}
                             >
                                 {getLocalizedString("Inventory")}
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => props.navigation.push("Reports")}
+                        >
+                            <Text
+                                style={{
+                                    marginVertical: Sizes.fixPadding - 5.0,
+                                    ...Fonts.grayColor14SemiBold,
+                                }}
+                            >
+                                {getLocalizedString("Reports & Intelligence")}
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity>
+                            <Text
+                                style={{
+                                    marginVertical: Sizes.fixPadding - 5.0,
+                                    ...Fonts.grayColor14SemiBold,
+                                }}
+                            >
+                                {getLocalizedString("AI Marketing Studio")}
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity>
+                            <Text
+                                style={{
+                                    marginVertical: Sizes.fixPadding - 5.0,
+                                    ...Fonts.grayColor14SemiBold,
+                                }}
+                            >
+                                {getLocalizedString("Task Dashboard")}
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity>
+                            <Text
+                                style={{
+                                    marginVertical: Sizes.fixPadding - 5.0,
+                                    ...Fonts.grayColor14SemiBold,
+                                }}
+                            >
+                                {getLocalizedString("Setting")}
                             </Text>
                         </TouchableOpacity>
                         {/* <TouchableOpacity

@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { Colors, Fonts } from "../../constants/styles";
 import { Text } from "react-native";
 
@@ -9,10 +9,13 @@ const MainCards = ({
     title,
     sub_title,
     inputForm = <></>,
+    onPress = () => {},
 }) => {
     return (
         <View>
-            <View
+            <TouchableOpacity
+                onPress={onPress}
+                activeOpacity={1}
                 style={{
                     borderWidth: 1.5,
                     borderColor: isActive
@@ -45,11 +48,13 @@ const MainCards = ({
                     >
                         {title}
                     </Text>
-                    <Text style={{ ...Fonts.blackColor12Medium }}>
-                        {sub_title}
-                    </Text>
+                    {sub_title ? (
+                        <Text style={{ ...Fonts.blackColor12Medium }}>
+                            {sub_title}
+                        </Text>
+                    ) : null}
                 </View>
-            </View>
+            </TouchableOpacity>
             {isActive ? inputForm : <></>}
         </View>
     );

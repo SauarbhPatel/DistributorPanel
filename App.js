@@ -56,6 +56,8 @@ import PurchaseDetailsScreen from "./screens/purchaseOrder/purchaseDetailsScreen
 import InwardDocumentScreen from "./screens/inwardDocument/inwardDocumentScreen";
 import InwardDetailsScreen from "./screens/inwardDocument/inwardDetailsScreen";
 import InventoryMasterScreen from "./screens/inventoryMaster/inventoryMasterScreen";
+import ReportScreen from "./screens/report/reportScreen";
+import ReportDetailsScreen from "./screens/reportDetails/reportDetailsScreen";
 
 LogBox.ignoreAllLogs();
 
@@ -193,6 +195,11 @@ function App() {
                 <Stack.Screen
                     name="InventoryMaster"
                     component={InventoryMasterScreen}
+                />
+                <Stack.Screen name="Reports" component={ReportScreen} />
+                <Stack.Screen
+                    name="ReportDetails"
+                    component={ReportDetailsScreen}
                 />
             </Stack.Navigator>
         </NavigationContainer>

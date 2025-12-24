@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     SafeAreaView,
     View,
@@ -15,32 +15,18 @@ import { FlatList } from "react-native-gesture-handler";
 import { __generateRandomString } from "../../utils/funtion";
 import { TouchableOpacity } from "react-native";
 import { __makeGetBlogGetRequest } from "../../utils/api";
-import { useEffect } from "react";
-import { useState } from "react";
 import ProductList from "../../components/inventoryMaster/ProductList";
 import { TextAreaBox } from "../../modules";
+import BottomPopup from "../../components/common/BottomPopup";
+import AddItem from "../../components/inventoryMaster/AddItem";
 const { width } = Dimensions.get("window");
 
 const InventoryMasterScreen = ({ navigation }) => {
-    const [list, setlist] = useState([
-        {
-            companyName: "Surya Demo Supplier",
-            documentNumber: "PO-00003",
-            transactionDetails: "Purchase Order dated 12/12/2025",
-            invoiceStatus: "Invoice Pending",
-            goodsStatus: "Not Received",
-            lastModified: "18/12/2025 18:10",
-        },
-        {
-            companyName: "Surya Demo Supplier",
-            documentNumber: "PO-00004",
-            transactionDetails: "Purchase Order for Raw Material 1 (Dummy)",
-            invoiceStatus: "Invoice Created",
-            goodsStatus: "Received",
-            lastModified: "11/12/2025 08:57",
-        },
-    ]);
-
+    const [state, setState] = useState({
+        isShowAdd: false,
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+    const { list, isShowAdd } = state;
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
             <StatusBar backgroundColor={Colors.primaryColor} />
@@ -92,6 +78,26 @@ const InventoryMasterScreen = ({ navigation }) => {
                         </View>
                     }
                 />
+                <BottomPopup
+                    isShow={isShowAdd}
+                    title="Add Item"
+                    onClose={() => {
+                        updateState({ isShowAdd: false });
+                    }}
+                    component={
+                        <View
+                            style={{
+                                paddingBottom: 100,
+                                backgroundColor: Colors.whiteColor,
+                                gap: 10,
+                                paddingHorizontal: 10,
+                                paddingTop: 10,
+                            }}
+                        >
+                            <AddItem />
+                        </View>
+                    }
+                />
             </View>
         </SafeAreaView>
     );
@@ -116,7 +122,7 @@ const InventoryMasterScreen = ({ navigation }) => {
                 </Text>{" "}
                 <TouchableOpacity
                     onPress={() => {
-                        // updateState({ isShowAdd: true });
+                        updateState({ isShowAdd: true });
                     }}
                     style={{
                         flexDirection: "row",

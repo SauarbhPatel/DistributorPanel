@@ -49,7 +49,9 @@ const BottomPopup = ({
                             ...Fonts.blackColor16Medium,
                             color: Colors.whiteColor,
                             fontWeight: 600,
+                            maxWidth: "75%",
                         }}
+                        numberOfLines={1}
                     >
                         {title}
                     </Text>
