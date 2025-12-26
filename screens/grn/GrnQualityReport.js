@@ -19,9 +19,11 @@ import { useState } from "react";
 import AddressDetailsCard from "../../components/purchaseOrder/AddressDetailsCard";
 import InwardDetails from "../../components/inwardDocument/InwardDetails";
 import ProductList from "../../components/inwardDocument/ProductList";
+import GRNdetails from "../../components/grn/GRNdetails";
+import ProductList2 from "../../components/grn/ProductList2";
 const { width } = Dimensions.get("window");
 
-const InwardDetailsScreen = ({ navigation }) => {
+const GrnQualityReport = ({ navigation }) => {
     const [list, setlist] = useState([]);
 
     return (
@@ -44,7 +46,7 @@ const InwardDetailsScreen = ({ navigation }) => {
                                     ...Fonts.blackColor16Bold,
                                 }}
                             >
-                                Inward Document
+                                GRN Document
                             </Text>
                             <FlatList
                                 horizontal
@@ -53,7 +55,6 @@ const InwardDetailsScreen = ({ navigation }) => {
                                     <View
                                         style={{
                                             flexDirection: "row",
-                                            // alignItems: "center",
                                             gap: 10,
                                             paddingHorizontal: 10,
                                         }}
@@ -92,28 +93,8 @@ const InwardDetailsScreen = ({ navigation }) => {
                                 }
                             />
 
-                            <InwardDetails />
-                            <ProductList title={"Product List"} />
-
-                            <TouchableOpacity
-                                onPress={() => navigation.push("CreateGRN")}
-                                style={{
-                                    alignSelf: "center",
-                                    padding: 10,
-                                    paddingHorizontal: 20,
-                                    backgroundColor: Colors.primaryColor,
-                                    borderRadius: 30,
-                                }}
-                            >
-                                <Text
-                                    style={{
-                                        ...Fonts.blackColor15Medium,
-                                        color: Colors.whiteColor,
-                                    }}
-                                >
-                                    Create GRN
-                                </Text>
-                            </TouchableOpacity>
+                            <GRNdetails />
+                            <ProductList2 title={"Product List"} />
                         </View>
                     }
                 />
@@ -137,13 +118,13 @@ const InwardDetailsScreen = ({ navigation }) => {
                         flex: 1,
                     }}
                 >
-                    WR00003{" "}
+                    GRN0078{" "}
                     <Text
                         style={{
                             ...Fonts.blackColor11Medium,
                         }}
                     >
-                        Inward Document Details
+                        GRN Document Details
                     </Text>
                 </Text>
             </View>
@@ -173,7 +154,7 @@ const styles = StyleSheet.create({
     },
 });
 
-export default InwardDetailsScreen;
+export default GrnQualityReport;
 
 const CardBox = ({ item }) => {
     return (

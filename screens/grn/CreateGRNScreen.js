@@ -17,11 +17,11 @@ import { TouchableOpacity } from "react-native";
 import { __makeGetBlogGetRequest } from "../../utils/api";
 import { useState } from "react";
 import AddressDetailsCard from "../../components/purchaseOrder/AddressDetailsCard";
-import InwardDetails from "../../components/inwardDocument/InwardDetails";
-import ProductList from "../../components/inwardDocument/ProductList";
+import PrimaryDocumentDetails from "../../components/grn/PrimaryDocumentDetails";
+import ProductList from "../../components/grn/ProductList";
 const { width } = Dimensions.get("window");
 
-const InwardDetailsScreen = ({ navigation }) => {
+const CreateGRNScreen = ({ navigation }) => {
     const [list, setlist] = useState([]);
 
     return (
@@ -38,14 +38,6 @@ const InwardDetailsScreen = ({ navigation }) => {
                     }}
                     ListHeaderComponent={
                         <View style={{ gap: 10 }}>
-                            <Text
-                                style={{
-                                    marginLeft: Sizes.fixPadding + 5.0,
-                                    ...Fonts.blackColor16Bold,
-                                }}
-                            >
-                                Inward Document
-                            </Text>
                             <FlatList
                                 horizontal
                                 showsHorizontalScrollIndicator={false}
@@ -66,7 +58,15 @@ const InwardDetailsScreen = ({ navigation }) => {
                                             address3="India - 110025"
                                             gstin="07AAECA1234Q1ZV"
                                             isHideButton={true}
-                                            isHideEditButton={true}
+                                        />
+                                        <AddressDetailsCard
+                                            title={"Delivery Location"}
+                                            lable={"Main"}
+                                            address="98 B, II Floor, NFC, Near JMI"
+                                            address2="South Delhi (Delhi)"
+                                            address3="India - 110025"
+                                            gstin="07AAECA1234Q1ZV"
+                                            isHideButton={true}
                                         />
                                         <AddressDetailsCard
                                             title={"Goods Sent By"}
@@ -76,27 +76,19 @@ const InwardDetailsScreen = ({ navigation }) => {
                                             address3="India - 400004"
                                             gstin="27AACCF7457K1Z7"
                                             isHideButton={true}
-                                            isHideEditButton={true}
-                                        />
-                                        <AddressDetailsCard
-                                            title={"Shipped To"}
-                                            lable={"Main"}
-                                            address="98 B, II Floor, NFC, Near JMI"
-                                            address2="South Delhi (Delhi)"
-                                            address3="India - 110025"
-                                            gstin="07AAECA1234Q1ZV"
-                                            isHideButton={true}
-                                            isHideEditButton={true}
                                         />
                                     </View>
                                 }
                             />
-
-                            <InwardDetails />
-                            <ProductList title={"Product List"} />
+                            <PrimaryDocumentDetails
+                                title={"Primary Document Details"}
+                            />
+                            <ProductList title={"Product List"} isHideAdd />
 
                             <TouchableOpacity
-                                onPress={() => navigation.push("CreateGRN")}
+                                onPress={() =>
+                                    navigation.push("GrnQualityReport")
+                                }
                                 style={{
                                     alignSelf: "center",
                                     padding: 10,
@@ -111,7 +103,7 @@ const InwardDetailsScreen = ({ navigation }) => {
                                         color: Colors.whiteColor,
                                     }}
                                 >
-                                    Create GRN
+                                    Save And Send
                                 </Text>
                             </TouchableOpacity>
                         </View>
@@ -137,14 +129,7 @@ const InwardDetailsScreen = ({ navigation }) => {
                         flex: 1,
                     }}
                 >
-                    WR00003{" "}
-                    <Text
-                        style={{
-                            ...Fonts.blackColor11Medium,
-                        }}
-                    >
-                        Inward Document Details
-                    </Text>
+                    GRN/QIR Documents
                 </Text>
             </View>
         );
@@ -173,99 +158,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default InwardDetailsScreen;
-
-const CardBox = ({ item }) => {
-    return (
-        <TouchableOpacity
-            activeOpacity={0.8}
-            style={styles.returnAndExchangeItemInfoWrapStyle}
-        >
-            {boxContainer(
-                <>
-                    {leftTextBox("Company Name", item?.companyName)}
-                    {rightTextBox("Document Number", item?.documentNumber)}
-                </>
-            )}
-            {boxContainer(
-                <>
-                    {leftTextBox(
-                        "Transaction Details",
-                        item?.transactionDetails
-                    )}
-                    {rightTextBox("Invoice Status", item?.invoiceStatus)}
-                </>
-            )}
-            {boxContainer(
-                <>
-                    {leftTextBox("Goods Status", item?.goodsStatus)}
-                    {rightTextBox("Last Modified", item?.lastModified)}
-                </>
-            )}
-        </TouchableOpacity>
-    );
-    function boxContainer(com) {
-        return (
-            <View
-                style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 10,
-                    marginTop: 10,
-                    justifyContent: "space-between",
-                }}
-            >
-                {com}
-            </View>
-        );
-    }
-    function leftTextBox(title, res) {
-        return (
-            <View style={{ maxWidth: width / 2 - 30 }}>
-                <Text
-                    style={{
-                        fontSize: 12,
-                        lineHeight: 15,
-                        color: Colors.lightGrayColor,
-                    }}
-                >
-                    {title}
-                </Text>
-                <Text
-                    style={{
-                        ...Fonts.blackColor15Medium,
-                        fontSize: 13,
-                        lineHeight: 15,
-                    }}
-                >
-                    {res}
-                </Text>
-            </View>
-        );
-    }
-    function rightTextBox(title, res) {
-        return (
-            <View style={{ alignItems: "flex-end" }}>
-                <Text
-                    style={{
-                        fontSize: 12,
-                        lineHeight: 15,
-                        color: Colors.lightGrayColor,
-                    }}
-                >
-                    {title}
-                </Text>
-                <Text
-                    style={{
-                        ...Fonts.blackColor15Medium,
-                        fontSize: 13,
-                        lineHeight: 15,
-                        textAlign: "right",
-                    }}
-                >
-                    {res}
-                </Text>
-            </View>
-        );
-    }
-};
+export default CreateGRNScreen;

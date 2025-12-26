@@ -8,12 +8,9 @@ import {
 } from "react-native";
 import { Colors, Fonts } from "../../constants/styles";
 const { width } = Dimensions.get("window");
-import { Feather } from "@expo/vector-icons";
 import { __generateRandomString } from "../../utils/funtion";
-import BottomPopup from "../common/BottomPopup";
-import AddProduct from "./AddProduct";
 
-const ProductList = ({ title, isHideAdd = false }) => {
+const ProductList2 = ({ title }) => {
     const [state, setState] = useState({
         list: [
             {
@@ -21,7 +18,7 @@ const ProductList = ({ title, isHideAdd = false }) => {
                 itemDescription: "Row Material 1",
                 hsnSacCode: "",
                 quantity: "1",
-                units: "KG",
+                units: "Kg",
                 currentStock: "140",
                 price: "₹150",
                 tax: "5%",
@@ -32,7 +29,7 @@ const ProductList = ({ title, isHideAdd = false }) => {
                 itemDescription: "Row Material 2",
                 hsnSacCode: "",
                 quantity: "2",
-                units: "KG",
+                units: "Kg",
                 currentStock: "80",
                 price: "₹200",
                 tax: "5%",
@@ -46,24 +43,6 @@ const ProductList = ({ title, isHideAdd = false }) => {
 
     return (
         <>
-            <BottomPopup
-                isShow={isShowAdd}
-                title="Add Item"
-                onClose={() => {
-                    updateState({ isShowAdd: false });
-                }}
-                component={
-                    <View
-                        style={{
-                            paddingBottom: 100,
-                            backgroundColor: Colors.whiteColor,
-                            paddingTop: 10,
-                        }}
-                    >
-                        <AddProduct />
-                    </View>
-                }
-            />
             <View
                 style={{
                     // width: width * 0.75,
@@ -72,54 +51,6 @@ const ProductList = ({ title, isHideAdd = false }) => {
                     marginHorizontal: 10,
                 }}
             >
-                <View
-                    style={{
-                        backgroundColor: Colors.primaryColor,
-                        padding: 10,
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        borderTopLeftRadius: 5,
-                        borderTopRightRadius: 5,
-                        paddingVertical: 12,
-                    }}
-                >
-                    <Text
-                        style={{
-                            ...Fonts.blackColor13Medium,
-                            color: Colors.whiteColor,
-                        }}
-                    >
-                        {title}
-                    </Text>
-                    {!isHideAdd && (
-                        <TouchableOpacity
-                            onPress={() => {
-                                updateState({ isShowAdd: true });
-                            }}
-                            style={{
-                                flexDirection: "row",
-                                gap: 5,
-                                alignItems: "center",
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    ...Fonts.blackColor13Medium,
-                                    color: Colors.whiteColor,
-                                }}
-                            >
-                                Add Item
-                            </Text>
-                            <Feather
-                                name="plus"
-                                size={18}
-                                color={Colors.whiteColor}
-                            />
-                        </TouchableOpacity>
-                    )}
-                </View>
-
                 <View
                     style={{
                         padding: 15,
@@ -136,7 +67,6 @@ const ProductList = ({ title, isHideAdd = false }) => {
                                 <View
                                     style={{
                                         overflow: "hidden",
-                                        // borderRadius: 5,
                                         margin: 0.5,
                                         backgroundColor: Colors.whiteColor,
                                         elevation: 2,
@@ -157,23 +87,26 @@ const ProductList = ({ title, isHideAdd = false }) => {
                                             200
                                         )}
                                         {titleBox(
-                                            "HSN/SAC Code",
+                                            "Quantity Ordered",
                                             true,
                                             true,
-                                            120
+                                            100
                                         )}
-                                        {titleBox("Quantity", true, true, 100)}
-                                        {titleBox("Units", true, true, 100)}
+                                        {titleBox("Unit", true, true, 130)}
                                         {titleBox(
-                                            "Current Stock",
+                                            "Quantitit Received",
                                             true,
                                             true,
-                                            120
+                                            130
                                         )}
-                                        {titleBox("Price", true, true, 100)}
-                                        {titleBox("Tax", true, true, 100)}
                                         {titleBox(
-                                            "Totak Before Tax",
+                                            "Quantitit Accepted",
+                                            true,
+                                            true,
+                                            130
+                                        )}
+                                        {titleBox(
+                                            "Quantitit Rejected",
                                             false,
                                             true,
                                             130
@@ -237,7 +170,6 @@ const ProductList = ({ title, isHideAdd = false }) => {
                         style={{
                             ...Fonts.blackColor15Medium,
                             fontSize: 12,
-                            // color: Colors.whiteColor,
                         }}
                     >
                         {text1}
@@ -248,7 +180,7 @@ const ProductList = ({ title, isHideAdd = false }) => {
     }
 };
 
-export default ProductList;
+export default ProductList2;
 const ListBox = ({ data }) => {
     const { bottom, sr } = data;
 
@@ -265,13 +197,10 @@ const ListBox = ({ data }) => {
                 {listText(sr, 0, 60)}
                 {listText(data?.itemId, 0, 100)}
                 {listText(data?.itemDescription, 0, 200)}
-                {listText(data?.hsnSacCode, 0, 120)}
-                {listText(data?.quantity, 0, 100)}
-                {listText(data?.units, 0, 100)}
-                {listText(data?.currentStock, 0, 120)}
-                {listText(data?.price, 0, 100)}
-                {listText(data?.tax, 0, 100)}
-                {listText(data?.totalBeforeTax, 0, 130, true)}
+                {listText(data?.quantity + data?.units, 0, 100)}
+                {listText("0.00" + data?.units, 0, 130)}
+                {listText("0.00" + data?.units, 0, 130)}
+                {listText("0.00" + data?.units, 0, 130, true)}
             </View>
         </View>
     );

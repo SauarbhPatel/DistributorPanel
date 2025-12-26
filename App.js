@@ -58,6 +58,8 @@ import InwardDetailsScreen from "./screens/inwardDocument/inwardDetailsScreen";
 import InventoryMasterScreen from "./screens/inventoryMaster/inventoryMasterScreen";
 import ReportScreen from "./screens/report/reportScreen";
 import ReportDetailsScreen from "./screens/reportDetails/reportDetailsScreen";
+import CreateGRNScreen from "./screens/grn/CreateGRNScreen";
+import GrnQualityReport from "./screens/grn/GrnQualityReport";
 
 LogBox.ignoreAllLogs();
 
@@ -200,6 +202,11 @@ function App() {
                 <Stack.Screen
                     name="ReportDetails"
                     component={ReportDetailsScreen}
+                />
+                <Stack.Screen name="CreateGRN" component={CreateGRNScreen} />
+                <Stack.Screen
+                    name="GrnQualityReport"
+                    component={GrnQualityReport}
                 />
             </Stack.Navigator>
         </NavigationContainer>
