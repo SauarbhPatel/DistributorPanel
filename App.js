@@ -60,6 +60,8 @@ import ReportScreen from "./screens/report/reportScreen";
 import ReportDetailsScreen from "./screens/reportDetails/reportDetailsScreen";
 import CreateGRNScreen from "./screens/grn/CreateGRNScreen";
 import GrnQualityReport from "./screens/grn/GrnQualityReport";
+import DistributorScreen from "./screens/distributor/distributorScreen";
+import TaskDashboardScreen from "./screens/taskDashboard/taskDashboardScreen";
 
 LogBox.ignoreAllLogs();
 
@@ -207,6 +209,14 @@ function App() {
                 <Stack.Screen
                     name="GrnQualityReport"
                     component={GrnQualityReport}
+                />
+                <Stack.Screen
+                    name="Distributor"
+                    component={DistributorScreen}
+                />
+                <Stack.Screen
+                    name="TaskDashboard"
+                    component={TaskDashboardScreen}
                 />
             </Stack.Navigator>
         </NavigationContainer>

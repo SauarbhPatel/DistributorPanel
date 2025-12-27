@@ -399,14 +399,16 @@ const CustomDrawer = (props) => {
                                 {getLocalizedString("Approvals")}
                             </Text>
                         </TouchableOpacity>
-                        <TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => props.navigation.push("Distributor")}
+                        >
                             <Text
                                 style={{
                                     marginVertical: Sizes.fixPadding - 5.0,
                                     ...Fonts.grayColor14SemiBold,
                                 }}
                             >
-                                {getLocalizedString("Buyers & Suppliers")}
+                                {getLocalizedString("Distributor")}
                             </Text>
                         </TouchableOpacity>
 
@@ -446,7 +448,11 @@ const CustomDrawer = (props) => {
                                 {getLocalizedString("AI Marketing Studio")}
                             </Text>
                         </TouchableOpacity>
-                        <TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() =>
+                                props.navigation.push("TaskDashboard")
+                            }
+                        >
                             <Text
                                 style={{
                                     marginVertical: Sizes.fixPadding - 5.0,
