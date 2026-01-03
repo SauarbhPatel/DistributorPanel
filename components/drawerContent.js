@@ -366,6 +366,18 @@ const CustomDrawer = (props) => {
                             </TouchableOpacity>
                         )} */}
                         <TouchableOpacity
+                            onPress={() => props.navigation.push("RawMaterial")}
+                        >
+                            <Text
+                                style={{
+                                    marginVertical: Sizes.fixPadding - 5.0,
+                                    ...Fonts.grayColor14SemiBold,
+                                }}
+                            >
+                                {getLocalizedString("Raw Material")}
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
                             onPress={() =>
                                 props.navigation.push("SalesAndPurchase")
                             }
@@ -379,7 +391,11 @@ const CustomDrawer = (props) => {
                                 {getLocalizedString("Sales & Purchase")}
                             </Text>
                         </TouchableOpacity>
-                        <TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() =>
+                                props.navigation.push("BusinessIntelligence")
+                            }
+                        >
                             <Text
                                 style={{
                                     marginVertical: Sizes.fixPadding - 5.0,
@@ -389,7 +405,9 @@ const CustomDrawer = (props) => {
                                 {getLocalizedString("Business Intelligence")}
                             </Text>
                         </TouchableOpacity>
-                        <TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => props.navigation.push("Approvals")}
+                        >
                             <Text
                                 style={{
                                     marginVertical: Sizes.fixPadding - 5.0,

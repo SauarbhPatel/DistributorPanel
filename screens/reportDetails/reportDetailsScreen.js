@@ -38,6 +38,11 @@ const ReportDetailsScreen = ({ navigation, route }) => {
                             )}
                             {route?.params?.name ==
                                 "RFQ Register (Item-wise)" && <ReportTwo />}
+
+                            {![
+                                "Order Confirmation / Sales Order Register (Item-wise)",
+                                "RFQ Register (Item-wise)",
+                            ].includes(route?.params?.name) && <ReportOne />}
                         </View>
                     }
                 />

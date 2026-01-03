@@ -263,6 +263,7 @@ export const Colors = {
     blueColor: "#2196F3",
     lightGrayColor: "#9E9E9E",
     greenColor: "#67A86B",
+    darkGreenColor: "#035108ff",
     yellowColor: "#FF9800",
     bodyColor: "#f5f6fb",
     borderColor: "#edededff",

@@ -34,7 +34,8 @@ const SplashScreen = ({ navigation }) => {
             }, 2000);
         } else {
             setTimeout(() => {
-                navigation.push("Login");
+                // navigation.push("Login");
+                navigation.push("Home");
             }, 2000);
         }
     };

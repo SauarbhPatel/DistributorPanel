@@ -1,21 +1,53 @@
-import React from "react";
+import React, { useState } from "react";
 import ItemCard from "./ItemCard";
+import OrderConfirmationSORfilter from "./OrderConfirmationSORfilter";
+import BottomPopup from "../common/BottomPopup";
+import { View } from "react-native";
+import { Colors } from "../../constants/styles";
 
-const Purchase = () => {
+const Purchase = ({ navigation, list = [] }) => {
+    const [state, setState] = useState({
+        isShow: false,
+        name: "",
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+
+    const { isShow, name } = state;
     return (
         <>
-            <ItemCard
-                title="Purchase Order Register (Item-wise)"
-                sub_title="Item-wise details of all purchase orders along with delivered quantity"
+            <BottomPopup
+                isShow={isShow}
+                title={name}
+                onClose={() => {
+                    updateState({ isShow: false });
+                }}
+                component={
+                    <View
+                        style={{
+                            paddingBottom: 100,
+                            backgroundColor: Colors.whiteColor,
+                            gap: 10,
+                            paddingHorizontal: 10,
+                            paddingTop: 10,
+                        }}
+                    >
+                        <OrderConfirmationSORfilter
+                            navigation={navigation}
+                            name={name}
+                        />
+                    </View>
+                }
             />
-            <ItemCard
-                title="Purchase Invoice Register"
-                sub_title="Details of all the purchase invoice along with their payment status"
-            />
-            <ItemCard
-                title="Service Items Reconciliation"
-                sub_title="Item-wise in/out quantity against service order (minus sub-contract)"
-            />
+
+            {list?.map((item) => (
+                <ItemCard
+                    key={item?.title}
+                    {...item}
+                    onPress={() => {
+                        updateState({ isShow: true, name: item?.title });
+                    }}
+                />
+            ))}
         </>
     );
 };

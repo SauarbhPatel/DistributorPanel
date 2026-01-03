@@ -62,6 +62,9 @@ import CreateGRNScreen from "./screens/grn/CreateGRNScreen";
 import GrnQualityReport from "./screens/grn/GrnQualityReport";
 import DistributorScreen from "./screens/distributor/distributorScreen";
 import TaskDashboardScreen from "./screens/taskDashboard/taskDashboardScreen";
+import BusinessIntelligenceScreen from "./screens/BusinessIntelligence/BusinessIntelligenceScreen";
+import ApprovalsScreen from "./screens/approvals/approvalsScreen";
+import RawMaterialScreen from "./screens/rawMaterial/rawMaterialScreen";
 
 LogBox.ignoreAllLogs();
 
@@ -217,6 +220,15 @@ function App() {
                 <Stack.Screen
                     name="TaskDashboard"
                     component={TaskDashboardScreen}
+                />
+                <Stack.Screen
+                    name="BusinessIntelligence"
+                    component={BusinessIntelligenceScreen}
+                />
+                <Stack.Screen name="Approvals" component={ApprovalsScreen} />
+                <Stack.Screen
+                    name="RawMaterial"
+                    component={RawMaterialScreen}
                 />
             </Stack.Navigator>
         </NavigationContainer>

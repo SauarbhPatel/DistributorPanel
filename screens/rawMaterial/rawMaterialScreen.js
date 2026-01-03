@@ -8,20 +8,16 @@ import {
 } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
 import { Feather, FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import { FlatList } from "react-native-gesture-handler";
 import { __generateRandomString } from "../../utils/funtion";
 import { TouchableOpacity } from "react-native";
 import { __makeGetBlogGetRequest } from "../../utils/api";
 import { useState } from "react";
 import { TextAreaBox } from "../../modules";
-import CreateDocuments from "../../components/salesAndPurchase/CreateDocuments";
-import SingleSelectTab from "../../components/common/SingleSelectTab";
-import Sales from "../../components/salesAndPurchase/Sales";
-import Quotations from "../../components/salesAndPurchase/Quotations";
-import AllDocuments from "../../components/salesAndPurchase/AllDocuments";
+import CreateDocuments from "../../components/rawMaterial/CreateDocuments";
+import MeterialList from "../../components/rawMaterial/MeterialList";
 const { width } = Dimensions.get("window");
 
-const SalesAndPurchaseScreen = ({ navigation }) => {
+const RawMaterialScreen = ({ navigation }) => {
     const [list, setlist] = useState([
         {
             companyName: "Surya Demo Supplier",
@@ -54,30 +50,6 @@ const SalesAndPurchaseScreen = ({ navigation }) => {
             <StatusBar backgroundColor={Colors.primaryColor} />
             <View style={{ flex: 1 }}>
                 {header()}
-                <View
-                    style={{
-                        backgroundColor: Colors.whiteColor,
-                        padding: 10,
-                        paddingHorizontal: 0,
-                        paddingBottom: 0,
-                    }}
-                >
-                    <SingleSelectTab
-                        list={[
-                            {
-                                id: "Sales & Purchase",
-                                name: "Sales & Purchase",
-                            },
-                            { id: "Quotations", name: "Quotations" },
-                            { id: "All Documents", name: "All Documents" },
-                        ]}
-                        onPress={(id) => {
-                            updateState({ active: id });
-                        }}
-                        active={active}
-                        tabType={2}
-                    />
-                </View>
 
                 <TextAreaBox
                     value={""}
@@ -113,9 +85,7 @@ const SalesAndPurchaseScreen = ({ navigation }) => {
                     }
                     customStyle={{ marginBottom: 5, marginTop: 10 }}
                 />
-                {active == "Sales & Purchase" && <Sales />}
-                {active == "Quotations" && <Quotations />}
-                {active == "All Documents" && <AllDocuments />}
+                <MeterialList />
             </View>
         </SafeAreaView>
     );
@@ -136,7 +106,7 @@ const SalesAndPurchaseScreen = ({ navigation }) => {
                         flex: 1,
                     }}
                 >
-                    Sales & Purchase
+                    Row Materials
                 </Text>
                 <CreateDocuments navigation={navigation} />
             </View>
@@ -166,7 +136,7 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SalesAndPurchaseScreen;
+export default RawMaterialScreen;
 
 const CardBox = ({ item }) => {
     return (
