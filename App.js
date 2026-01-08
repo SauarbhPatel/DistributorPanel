@@ -65,6 +65,9 @@ import TaskDashboardScreen from "./screens/taskDashboard/taskDashboardScreen";
 import BusinessIntelligenceScreen from "./screens/BusinessIntelligence/BusinessIntelligenceScreen";
 import ApprovalsScreen from "./screens/approvals/approvalsScreen";
 import RawMaterialScreen from "./screens/rawMaterial/rawMaterialScreen";
+import ProductionScreen from "./screens/production/productionScreen";
+import BillOfMaterialsScreen from "./screens/billOfMaterials/billOfMaterialsScreen";
+import AllProductionProcessScreen from "./screens/allProductionProcess/allProductionProcessScreen";
 
 LogBox.ignoreAllLogs();
 
@@ -229,6 +232,15 @@ function App() {
                 <Stack.Screen
                     name="RawMaterial"
                     component={RawMaterialScreen}
+                />
+                <Stack.Screen name="Production" component={ProductionScreen} />
+                <Stack.Screen
+                    name="BillOfMaterials"
+                    component={BillOfMaterialsScreen}
+                />
+                <Stack.Screen
+                    name="AllProductionProcess"
+                    component={AllProductionProcessScreen}
                 />
             </Stack.Navigator>
         </NavigationContainer>
