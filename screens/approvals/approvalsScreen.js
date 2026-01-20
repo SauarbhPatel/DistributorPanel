@@ -13,6 +13,9 @@ import { __makeGetBlogGetRequest } from "../../utils/api";
 import { useState } from "react";
 import FilterCard from "../../components/taskDashboard/FilterCard";
 import CommonHeader from "../../components/common/CommonHeader";
+import SingleSelectTab from "../../components/common/SingleSelectTab";
+import Received from "../../components/approvals/Received";
+import Log from "../../components/approvals/Log";
 
 const ApprovalsScreen = ({ navigation }) => {
     const [list, setlist] = useState([
@@ -27,14 +30,52 @@ const ApprovalsScreen = ({ navigation }) => {
             category: "Buyer",
         },
     ]);
+    const [state, setState] = useState({
+        loading: false,
+        active: "Received",
+    });
 
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+
+    const { loading, active } = state;
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
             <StatusBar backgroundColor={Colors.primaryColor} />
             <View style={{ flex: 1 }}>
                 <CommonHeader title={"Approvals"} navigation={navigation} />
+                <View
+                    style={{
+                        backgroundColor: Colors.whiteColor,
+                        padding: 10,
+                        paddingHorizontal: 0,
+                        paddingBottom: 0,
+                    }}
+                >
+                    <SingleSelectTab
+                        list={[
+                            {
+                                id: "Received",
+                                name: "Received",
+                            },
+                            { id: "Sent", name: "Sent" },
+                            { id: "Logs", name: "Logs" },
+                            { id: "Approval Rules", name: "Approval Rules" },
+                        ]}
+                        onPress={(id) => {
+                            updateState({ active: id });
+                        }}
+                        active={active}
+                        tabType={2}
+                    />
+                </View>
+                <FilterCard />
 
-                <FlatList
+                {active == "Received" && (
+                    <Received lable={"Received Requests"} />
+                )}
+                {active == "Sent" && <Received lable={"Sent Requests"} />}
+                {active == "Logs" && <Log lable={"Request Logs"} />}
+                {/* <FlatList
                     ListHeaderComponent={
                         <View style={{ padding: 0 }}>
                             <Text
@@ -89,7 +130,6 @@ const ApprovalsScreen = ({ navigation }) => {
                             >
                                 Pending Received Request
                             </Text>
-                            <FilterCard />
                             <Text
                                 style={{
                                     ...Fonts.blackColor11Medium,
@@ -126,7 +166,7 @@ const ApprovalsScreen = ({ navigation }) => {
                         paddingTop: 10,
                         paddingBottom: 20,
                     }}
-                />
+                /> */}
             </View>
         </SafeAreaView>
     );

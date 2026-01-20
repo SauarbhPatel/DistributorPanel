@@ -68,6 +68,8 @@ import RawMaterialScreen from "./screens/rawMaterial/rawMaterialScreen";
 import ProductionScreen from "./screens/production/productionScreen";
 import BillOfMaterialsScreen from "./screens/billOfMaterials/billOfMaterialsScreen";
 import AllProductionProcessScreen from "./screens/allProductionProcess/allProductionProcessScreen";
+import PaymentInvoiceScreen from "./screens/payment/paymentInvoiceScreen";
+import ResourcePlanningScreen from "./screens/resourcePlanning/resourcePlanningScreen";
 
 LogBox.ignoreAllLogs();
 
@@ -241,6 +243,14 @@ function App() {
                 <Stack.Screen
                     name="AllProductionProcess"
                     component={AllProductionProcessScreen}
+                />
+                <Stack.Screen
+                    name="PaymentInvoice"
+                    component={PaymentInvoiceScreen}
+                />
+                <Stack.Screen
+                    name="ResourcePlanning"
+                    component={ResourcePlanningScreen}
                 />
             </Stack.Navigator>
         </NavigationContainer>

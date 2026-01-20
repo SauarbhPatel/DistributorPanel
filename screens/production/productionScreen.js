@@ -8,17 +8,11 @@ import {
 } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
 import { Feather, FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import { FlatList } from "react-native-gesture-handler";
 import { __generateRandomString } from "../../utils/funtion";
-import { TouchableOpacity } from "react-native";
 import { __makeGetBlogGetRequest } from "../../utils/api";
 import { useState } from "react";
 import { TextAreaBox } from "../../modules";
-import CreateDocuments from "../../components/salesAndPurchase/CreateDocuments";
 import SingleSelectTab from "../../components/common/SingleSelectTab";
-import Sales from "../../components/salesAndPurchase/Sales";
-import Quotations from "../../components/salesAndPurchase/Quotations";
-import AllDocuments from "../../components/salesAndPurchase/AllDocuments";
 import CommonHeader from "../../components/common/CommonHeader";
 import AllProductionProcess from "../../components/production/AllProductionProcess";
 import WorkOrders from "../../components/production/WorkOrders";
