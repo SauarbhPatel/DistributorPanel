@@ -26,8 +26,8 @@ import Loader from "../../components/loader";
 import * as ImagePicker from "expo-image-picker";
 // import * as Permissions from "expo-permissions";
 import { Alert } from "react-native";
-import { __getToken } from "../../utils/localization";
 import { __generateRandomString } from "../../utils/funtion";
+// import { __getToken } from "../../utils/localization";
 const AccountScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(false);
     const [profile, setProfile] = useState("");
@@ -73,10 +73,10 @@ const AccountScreen = ({ navigation }) => {
     };
     const __handleProfileUpdate = () => {
         setLoading(true);
-        const token = __getToken();
-        if (!token) {
-            return Alert.alert("", "You are not Login. Please login first.");
-        }
+        // const token = __getToken();
+        // if (!token) {
+        //     return Alert.alert("", "You are not Login. Please login first.");
+        // }
         __makeUpdateProfileDetailsPutRequest(
             {
                 firstname: fullName,
@@ -86,7 +86,7 @@ const AccountScreen = ({ navigation }) => {
                 // language: language,
                 // country: country,
             },
-            token
+            token,
         )
             .then((res) => {
                 console.log(JSON.stringify(res));
@@ -120,10 +120,10 @@ const AccountScreen = ({ navigation }) => {
     // };
 
     const __handleGetProfile = () => {
-        const token = __getToken();
-        if (!token) {
-            return Alert.alert("", "You are not Login. Please login first.");
-        }
+        // const token = __getToken();
+        // if (!token) {
+        //     return Alert.alert("", "You are not Login. Please login first.");
+        // }
         __makeGetProfileDetailsGetRequest(token)
             .then((res) => {
                 console.log(JSON.stringify(res));
@@ -163,7 +163,7 @@ const AccountScreen = ({ navigation }) => {
                 await ImagePicker.requestCameraPermissionsAsync();
             if (status !== "granted") {
                 return alert(
-                    "Sorry, we need camera permissions to make this work!"
+                    "Sorry, we need camera permissions to make this work!",
                 );
             }
             let result;

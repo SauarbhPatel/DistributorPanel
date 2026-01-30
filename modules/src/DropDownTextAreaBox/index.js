@@ -145,40 +145,53 @@ const DropDownTextAreaBox = React.memo(
                       ))
                     : null}
 
-                {type == "select_multi"
-                    ? list?.map((item, i) => (
-                          <SelectListBox
-                              key={i}
-                              item={item}
-                              onSelected={(newValue) => {
-                                  const oldValue = JSON.parse(
-                                      JSON.stringify(value || [])
-                                  );
+                {type == "select_multi" ? (
+                    <>
+                        <View
+                            style={{
+                                alignItems: "center",
+                                ...inputBoxDefaultStyle,
+                                ...inputBoxDynamicStyle,
+                                ...inputCustomStyle,
+                                flexDirection: "column",
+                            }}
+                        >
+                            {list?.map((item, i) => (
+                                <SelectListBox
+                                    key={i}
+                                    item={item}
+                                    onSelected={(newValue) => {
+                                        const oldValue = JSON.parse(
+                                            JSON.stringify(value || []),
+                                        );
 
-                                  const find = oldValue.find(
-                                      (item) => item.id === newValue.id
-                                  );
+                                        const find = oldValue.find(
+                                            (item) => item.id === newValue.id,
+                                        );
 
-                                  if (find) {
-                                      onSelected(
-                                          oldValue.filter(
-                                              (item) => item.id != newValue.id
-                                          )
-                                      );
-                                  } else {
-                                      oldValue.push(newValue);
-                                      onSelected(oldValue);
-                                  }
-                              }}
-                              selected={value?.map((item) => item.id)}
-                              listItemCustomStyle={{
-                                  marginHorizontal: Sizes.fixPadding * 2.0,
-                                  ...customStyle,
-                              }}
-                              multi={true}
-                          />
-                      ))
-                    : null}
+                                        if (find) {
+                                            onSelected(
+                                                oldValue.filter(
+                                                    (item) =>
+                                                        item.id != newValue.id,
+                                                ),
+                                            );
+                                        } else {
+                                            oldValue.push(newValue);
+                                            onSelected(oldValue);
+                                        }
+                                    }}
+                                    selected={value?.map((item) => item.id)}
+                                    listItemCustomStyle={{
+                                        marginHorizontal: 0.0,
+                                        ...customStyle,
+                                    }}
+                                    multi={true}
+                                />
+                            ))}
+                        </View>
+                    </>
+                ) : null}
 
                 {type == "select" ? (
                     <SelectForm
@@ -211,11 +224,11 @@ const DropDownTextAreaBox = React.memo(
                                 });
 
                                 const newevent = JSON.parse(
-                                    JSON.stringify(event)
+                                    JSON.stringify(event),
                                 );
                                 if (newevent?.type == "set") {
                                     onSelected(
-                                        `${selectedDate.toDateString()}`
+                                        `${selectedDate.toDateString()}`,
                                     );
                                 }
                             } catch (error) {
@@ -237,7 +250,7 @@ const DropDownTextAreaBox = React.memo(
                             if (event.type == "set") {
                                 onSelected(
                                     __getTimeInfo(new Date(selectedDate)),
-                                    new Date(selectedDate)
+                                    new Date(selectedDate),
                                 );
                             }
                         }}
@@ -245,7 +258,7 @@ const DropDownTextAreaBox = React.memo(
                 ) : null}
             </View>
         );
-    }
+    },
 );
 
 export default DropDownTextAreaBox;

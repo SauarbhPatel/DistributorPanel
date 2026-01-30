@@ -10,12 +10,13 @@ import {
     StyleSheet,
     Text,
     FlatList,
+    Alert,
 } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
-import Loader from "../../components/loader";
 import {
     __makeLoginPostRequest,
+    __postApiData,
     __verifyLoginPostRequest,
 } from "../../utils/api";
 import { __setLocalStorageData } from "../../utils/localStorage";
@@ -26,6 +27,9 @@ import { __generateRandomString } from "../../utils/funtion";
 import IdentityVerificationForm from "../../components/kyc/IdentityVerificationForm";
 import PersonalDetailsForm from "../../components/kyc/PersonalDetailsForm";
 import GstForm from "../../components/kyc/GstForm";
+import WpcDetails from "../../components/kyc/WpcDetails";
+import BankDetails from "../../components/kyc/BankDetails";
+import { Loader } from "../../modules";
 
 const KycScreen = ({ navigation }) => {
     // const backAction = () => {
@@ -55,7 +59,113 @@ const KycScreen = ({ navigation }) => {
 
     const [backClickCount, setBackClickCount] = useState(0);
     const [activeForm, setActiveForm] = useState(0);
+    const [state, setState] = useState({});
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
+    const {
+        panNumber,
+        isPanVerified,
+        aadhaarNumber,
+        isAadharVerified,
+        aadhaarDocumentUrl,
+        panDocumentUrl,
+        //
+        name,
+        alternateMobile,
+        phoneNumber,
+        //
+        gstRegistered,
+        gstNumber,
+        companyName,
+        distributorType,
+        //
+        wpcLicenseNumber,
+        wpcDocumentUrl,
+        //
+        bankName,
+        ifsc,
+        accountNumber,
+        accountType,
+    } = state;
+
+    const __handleCreate = async () => {
+        try {
+            setLoading(true);
+            const data = await __postApiData("/users/distributor/register", {
+                panNumber,
+                isPanVerified,
+                aadhaarNumber,
+                aadhaarDocumentUrl,
+                panVerificationRefId: "",
+                panDocumentUrl,
+                //
+                name,
+                countryCode: "+91",
+                alternateMobile,
+                phoneNumber,
+                //
+
+                gstRegistered,
+                gstNumber,
+                companyName,
+                distributorType,
+                //
+                wpcLicenseNumber,
+                wpcDocumentUrl,
+                //
+                bankName,
+                ifsc,
+                accountNumber,
+                accountType,
+                //
+                billingAddress: [],
+                deliveryAddress: [],
+                // billingAddress: [
+                //     {
+                //         fullName: "Rahul Sharma",
+                //         phone: "9876543210",
+                //         email: "rahul@example.com",
+                //         addressLine1: "Flat 203, Green Residency",
+                //         addressLine2: "Near City Mall",
+                //         city: "New Delhi",
+                //         state: "Delhi",
+                //         area: "string",
+                //         country: "India",
+                //         postalCode: "110001",
+                //         gstNumber: "07ABCDE1234F1Z5",
+                //     },
+                // ],
+                // deliveryAddress: [
+                //     {
+                //         fullName: "Rahul Sharma",
+                //         phone: "9876543210",
+                //         email: "rahul@example.com",
+                //         addressLine1: "Flat 203, Green Residency",
+                //         addressLine2: "Near City Mall",
+                //         city: "New Delhi",
+                //         state: "Delhi",
+                //         area: "string",
+                //         country: "India",
+                //         postalCode: "110001",
+                //         gstNumber: "07ABCDE1234F1Z5",
+                //     },
+                // ],
+            });
+            setLoading(false);
+
+            console.log(data);
+            if (data?.success) {
+                Alert.alert("Success", data?.message, [
+                    { text: "OK", onPress: () => navigation.pop() },
+                ]);
+            } else {
+                Alert.alert("", data?.message);
+            }
+        } catch (error) {
+            setLoading(false);
+            Alert.alert("", "User already exists with this phone number");
+        }
+    };
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
             <StatusBar
@@ -65,12 +175,6 @@ const KycScreen = ({ navigation }) => {
             {loading && <Loader />}
             <View style={{ flex: 1 }}>
                 <CommonHeader title={"Complete your KYC"} />
-                {/* <ScrollView
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{
-                        paddingTop: Sizes.fixPadding * 4.0,
-                    }}
-                ></ScrollView> */}
                 <FlatList
                     data={[
                         {
@@ -80,7 +184,10 @@ const KycScreen = ({ navigation }) => {
                                 "Confirm your identity to begin the process.",
                             inputForm: (
                                 <IdentityVerificationForm
-                                    onClickContinue={() => setActiveForm(1)}
+                                    onClickContinue={(data) => {
+                                        updateState({ ...data });
+                                        setActiveForm(1);
+                                    }}
                                 />
                             ),
                         },
@@ -91,7 +198,10 @@ const KycScreen = ({ navigation }) => {
                                 "Enter your personal information to continue.",
                             inputForm: (
                                 <PersonalDetailsForm
-                                    onClickContinue={() => setActiveForm(2)}
+                                    onClickContinue={(data) => {
+                                        updateState({ ...data });
+                                        setActiveForm(2);
+                                    }}
                                     onClickBack={() => setActiveForm(0)}
                                 />
                             ),
@@ -103,24 +213,47 @@ const KycScreen = ({ navigation }) => {
                                 "Provide your GST and business information.",
                             inputForm: (
                                 <GstForm
-                                    onClickContinue={() =>
-                                        navigation.push("Home")
-                                    }
-                                    onClickBack={() => setActiveForm(0)}
+                                    // onClickContinue={() => {
+                                    //     navigation.push("Home");
+                                    // }}
+                                    onClickContinue={(data) => {
+                                        updateState({ ...data });
+                                        setActiveForm(3);
+                                    }}
+                                    onClickBack={() => setActiveForm(1)}
                                 />
                             ),
                         },
-                        // {
-                        //     sr_no: "4",
-                        //     title: "WPC Details",
-                        //     sub_title: "Submit your WPC compliance details.",
-                        // },
-                        // {
-                        //     sr_no: "5",
-                        //     title: "Bank Details",
-                        //     sub_title:
-                        //         "Add your bank information for payments.",
-                        // },
+                        {
+                            sr_no: "4",
+                            title: "WPC Details",
+                            sub_title: "Submit your WPC compliance details.",
+                            inputForm: (
+                                <WpcDetails
+                                    onClickContinue={(data) => {
+                                        updateState({ ...data });
+                                        setActiveForm(4);
+                                    }}
+                                    onClickBack={() => setActiveForm(2)}
+                                />
+                            ),
+                        },
+                        {
+                            sr_no: "5",
+                            title: "Bank Details",
+                            sub_title:
+                                "Add your bank information for payments.",
+                            inputForm: (
+                                <BankDetails
+                                    onClickContinue={(data) => {
+                                        updateState({ ...data });
+
+                                        __handleCreate();
+                                    }}
+                                    onClickBack={() => setActiveForm(2)}
+                                />
+                            ),
+                        },
                         // {
                         //     sr_no: "6",
                         //     title: "Upload Document",

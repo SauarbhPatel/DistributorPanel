@@ -1,25 +1,20 @@
 import React, { useState } from "react";
 import { Alert, View, Text, TouchableOpacity } from "react-native";
-import { DropDownTextAreaBox, TextAreaBox } from "../../modules";
-import { AntDesign } from "@expo/vector-icons";
+import { TextAreaBox } from "../../modules";
 import { Colors, Fonts } from "../../constants/styles";
 import { __generateRandomString } from "../../utils/funtion";
-import PageBox from "../common/PageBox";
 const PersonalDetailsForm = ({
-    onAdd,
-    oldanswer = [],
     onClickContinue = () => {},
     onClickBack = () => {},
 }) => {
     const [state, setState] = useState({
-        res: "",
-        period: null,
-        answer: [],
-        duration_type: "",
+        name: "",
+        alternateMobile: "",
+        phoneNumber: "",
     });
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
-    const { res, period, answer, duration_type } = state;
+    const { name, alternateMobile, phoneNumber } = state;
     return (
         <View
             style={{
@@ -33,13 +28,13 @@ const PersonalDetailsForm = ({
             }}
         >
             <TextAreaBox
-                value={res}
+                value={name}
                 onChangeText={(value) => {
                     updateState(value);
                 }}
                 placeholder={"Enter Name"}
                 title={"Name"}
-                valuekey={"res"}
+                valuekey={"name"}
                 titleCustomStyle={{
                     marginHorizontal: 0,
                 }}
@@ -53,145 +48,162 @@ const PersonalDetailsForm = ({
                 }}
                 customStyle={{ marginBottom: 5 }}
             />
-            <TextAreaBox
-                value={res}
-                onChangeText={(value) => {
-                    updateState(value);
-                }}
-                placeholder={"Enter Mobile"}
-                title={"Mobile"}
-                valuekey={"res"}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
-                inputCustomStyle={{
-                    marginHorizontal: 0,
-                    borderWidth: 1,
-                    borderColor: "#c1c1c1ff",
-                    elevation: 0,
-                    backgroundColor: Colors.whiteColor,
-                    paddingVertical: 5,
-                }}
-                customStyle={{ marginBottom: 5 }}
-            />
-            <TextAreaBox
-                value={res}
-                onChangeText={(value) => {
-                    updateState(value);
-                }}
-                placeholder={"Enter Alternate Mobile"}
-                title={"Alternate Mobile"}
-                valuekey={"res"}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
-                inputCustomStyle={{
-                    marginHorizontal: 0,
-                    borderWidth: 1,
-                    borderColor: "#c1c1c1ff",
-                    elevation: 0,
-                    backgroundColor: Colors.whiteColor,
-                    paddingVertical: 5,
-                }}
-                customStyle={{ marginBottom: 5 }}
-            />
-            <TextAreaBox
-                value={res}
-                onChangeText={(value) => {
-                    updateState(value);
-                }}
-                placeholder={"Enter Present Address"}
-                title={"Present Address"}
-                valuekey={"res"}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
-                inputCustomStyle={{
-                    marginHorizontal: 0,
-                    borderWidth: 1,
-                    borderColor: "#c1c1c1ff",
-                    elevation: 0,
-                    backgroundColor: Colors.whiteColor,
-                    paddingVertical: 5,
-                }}
-                customStyle={{ marginBottom: 5 }}
-            />
+            <View style={{ flexDirection: "row", gap: 10 }}>
+                <TextAreaBox
+                    value={phoneNumber}
+                    onChangeText={(value) => {
+                        updateState(value);
+                    }}
+                    placeholder={"000 000 0000"}
+                    title={"Mobile"}
+                    valuekey={"phoneNumber"}
+                    titleCustomStyle={{
+                        marginHorizontal: 0,
+                        marginTop: 10,
+                    }}
+                    inputCustomStyle={{
+                        marginHorizontal: 0,
+                        borderWidth: 1,
+                        borderColor: "#c1c1c1ff",
+                        elevation: 0,
+                        backgroundColor: Colors.whiteColor,
+                        paddingVertical: 5,
+                    }}
+                    customStyle={{ marginBottom: 5, flex: 1 }}
+                    keyboardType={"number-pad"}
+                    leftIcon={<Text>+91</Text>}
+                    customInputProps={{
+                        maxLength: 10,
+                    }}
+                />
+                <TextAreaBox
+                    value={alternateMobile}
+                    onChangeText={(value) => {
+                        updateState(value);
+                    }}
+                    placeholder={"000 000 0000"}
+                    title={"Alternate Mobile"}
+                    valuekey={"alternateMobile"}
+                    titleCustomStyle={{
+                        marginHorizontal: 0,
+                        marginTop: 10,
+                    }}
+                    inputCustomStyle={{
+                        marginHorizontal: 0,
+                        borderWidth: 1,
+                        borderColor: "#c1c1c1ff",
+                        elevation: 0,
+                        backgroundColor: Colors.whiteColor,
+                        paddingVertical: 5,
+                    }}
+                    customStyle={{ marginBottom: 5, flex: 1 }}
+                    keyboardType={"number-pad"}
+                    leftIcon={<Text>+91</Text>}
+                    customInputProps={{
+                        maxLength: 10,
+                    }}
+                />
+            </View>
+            {/* <View style={{ flexDirection: "row", gap: 10 }}>
+                <TextAreaBox
+                    value={res}
+                    onChangeText={(value) => {
+                        updateState(value);
+                    }}
+                    placeholder={"Enter Present Address"}
+                    title={"Present Address"}
+                    valuekey={"res"}
+                    titleCustomStyle={{
+                        marginHorizontal: 0,
+                        marginTop: 10,
+                    }}
+                    inputCustomStyle={{
+                        marginHorizontal: 0,
+                        borderWidth: 1,
+                        borderColor: "#c1c1c1ff",
+                        elevation: 0,
+                        backgroundColor: Colors.whiteColor,
+                        paddingVertical: 5,
+                    }}
+                    customStyle={{ marginBottom: 5, flex: 1 }}
+                />
 
-            <DropDownTextAreaBox
-                type="select"
-                title={"Select Country"}
-                placeholder={"Select Country"}
-                list={[].map((num) => ({
-                    id: num,
-                    name: num,
-                }))}
-                value={duration_type}
-                isSearchable
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
-                inputCustomStyle={{
-                    marginHorizontal: 0,
-                    borderWidth: 1,
-                    borderColor: "#c1c1c1ff",
-                    elevation: 0,
-                    backgroundColor: Colors.whiteColor,
-                    paddingVertical: 5,
-                }}
-                onSelected={(value) => {
-                    // updateState({ duration_type: value });
-                }}
-                // customStyle={{marginBottom: 20 }}
-                customStyle={{ marginBottom: 5 }}
-            />
-            <TextAreaBox
-                value={res}
-                onChangeText={(value) => {
-                    updateState(value);
-                }}
-                placeholder={"Enter Pin Code"}
-                title={"Pin Code"}
-                valuekey={"res"}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
-                inputCustomStyle={{
-                    marginHorizontal: 0,
-                    borderWidth: 1,
-                    borderColor: "#c1c1c1ff",
-                    elevation: 0,
-                    backgroundColor: Colors.whiteColor,
-                    paddingVertical: 5,
-                }}
-                customStyle={{ marginBottom: 5 }}
-            />
-            <TextAreaBox
-                value={res}
-                onChangeText={(value) => {
-                    updateState(value);
-                }}
-                placeholder={"Enter State"}
-                title={"State"}
-                valuekey={"res"}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
-                inputCustomStyle={{
-                    marginHorizontal: 0,
-                    borderWidth: 1,
-                    borderColor: "#c1c1c1ff",
-                    elevation: 0,
-                    backgroundColor: Colors.whiteColor,
-                    paddingVertical: 5,
-                }}
-                customStyle={{ marginBottom: 5 }}
-            />
+                <DropDownTextAreaBox
+                    type="select"
+                    title={"Select Country"}
+                    placeholder={"Select Country"}
+                    list={["India", "USA"].map((num) => ({
+                        id: num,
+                        name: num,
+                    }))}
+                    value={duration_type}
+                    isSearchable
+                    titleCustomStyle={{
+                        marginHorizontal: 0,
+                        marginTop: 10,
+                    }}
+                    inputCustomStyle={{
+                        marginHorizontal: 0,
+                        borderWidth: 1,
+                        borderColor: "#c1c1c1ff",
+                        elevation: 0,
+                        backgroundColor: Colors.whiteColor,
+                        paddingVertical: 5,
+                    }}
+                    onSelected={(value) => {
+                        // updateState({ duration_type: value });
+                    }}
+                    // customStyle={{marginBottom: 20 }}
+                    customStyle={{ marginBottom: 5, flex: 1 }}
+                />
+            </View>
+            <View style={{ flexDirection: "row", gap: 10 }}>
+                <TextAreaBox
+                    value={res}
+                    onChangeText={(value) => {
+                        updateState(value);
+                    }}
+                    placeholder={"Enter Pin Code"}
+                    title={"Pin Code"}
+                    valuekey={"res"}
+                    titleCustomStyle={{
+                        marginHorizontal: 0,
+                        marginTop: 10,
+                    }}
+                    inputCustomStyle={{
+                        marginHorizontal: 0,
+                        borderWidth: 1,
+                        borderColor: "#c1c1c1ff",
+                        elevation: 0,
+                        backgroundColor: Colors.whiteColor,
+                        paddingVertical: 5,
+                    }}
+                    customStyle={{ marginBottom: 5, flex: 1 }}
+                />
+                <TextAreaBox
+                    value={res}
+                    onChangeText={(value) => {
+                        updateState(value);
+                    }}
+                    placeholder={"Enter State"}
+                    title={"State"}
+                    valuekey={"res"}
+                    titleCustomStyle={{
+                        marginHorizontal: 0,
+                        marginTop: 10,
+                    }}
+                    inputCustomStyle={{
+                        marginHorizontal: 0,
+                        borderWidth: 1,
+                        borderColor: "#c1c1c1ff",
+                        elevation: 0,
+                        backgroundColor: Colors.whiteColor,
+                        paddingVertical: 5,
+                    }}
+                    customStyle={{ marginBottom: 5, flex: 1 }}
+                />
+            </View>
+
             <TextAreaBox
                 value={res}
                 onChangeText={(value) => {
@@ -213,55 +225,8 @@ const PersonalDetailsForm = ({
                     paddingVertical: 5,
                 }}
                 customStyle={{ marginBottom: 5 }}
-            />
-            {/* <View
-                style={{
-                    flexDirection: "row",
-                    gap: 10,
-                }}
-            >
-                <TextAreaBox
-                    value={period}
-                    onChangeText={(value) => {
-                        updateState(value);
-                    }}
-                    placeholder={"Duration of Consumption"}
-                    valuekey={"period"}
-                    inputCustomStyle={{
-                        marginHorizontal: 0,
-                        borderWidth: 1,
-                        borderColor: Colors.lightGrayColor,
-                        elevation: 0,
-                        backgroundColor: Colors.bodyColor,
-                        flex: 1,
-                    }}
-                    customStyle={{ marginTop: 5, marginBottom: 20, flex: 1 }}
-                    keyboardType={"number-pad"}
-                />
-                <DropDownTextAreaBox
-                    type="select"
-                    placeholder={"Period"}
-                    list={["Years", "Months", "Weeks", "Days"].map((num) => ({
-                        id: num,
-                        name: num,
-                    }))}
-                    value={duration_type}
-                    isSearchable
-                    inputCustomStyle={{
-                        marginHorizontal: 0,
-                        borderWidth: 1,
-                        borderColor: Colors.lightGrayColor,
-                        elevation: 0,
-                        backgroundColor: Colors.bodyColor,
-                        width: 110,
-                    }}
-                    titleCustomStyle={{ marginHorizontal: 0 }}
-                    onSelected={(value) => {
-                        updateState({ duration_type: value });
-                    }}
-                    customStyle={{ marginTop: 5, marginBottom: 20 }}
-                />
-            </View> */}
+            /> */}
+
             <View
                 style={{
                     flexDirection: "row",
@@ -294,7 +259,21 @@ const PersonalDetailsForm = ({
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    onPress={() => onClickContinue()}
+                    onPress={() => {
+                        if (!name.trim()) {
+                            return Alert.alert("", "Enter Name");
+                        }
+                        if (phoneNumber.length != 10) {
+                            return Alert.alert("", "Enter valid mobile number");
+                        }
+                        if (alternateMobile.length != 10) {
+                            return Alert.alert(
+                                "",
+                                "Enter valid alternate mobile number",
+                            );
+                        }
+                        onClickContinue({ name, alternateMobile, phoneNumber });
+                    }}
                     style={{
                         backgroundColor: Colors.primaryColor,
                         height: 45,

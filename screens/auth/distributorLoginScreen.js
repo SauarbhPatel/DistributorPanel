@@ -23,7 +23,7 @@ import { __setLocalStorageData } from "../../utils/localStorage";
 import { __setLocalization, __setToken } from "../../utils/localization";
 import { useFocusEffect } from "@react-navigation/native";
 
-const LoginScreen = ({ navigation }) => {
+const DistributorLoginScreen = ({ navigation }) => {
     const backAction = () => {
         backClickCount == 1 ? BackHandler.exitApp() : _spring();
         return true;
@@ -47,7 +47,7 @@ const LoginScreen = ({ navigation }) => {
         }, 1000);
     }
 
-    const [phone, setPhone] = useState("9876543210");
+    const [phone, setPhone] = useState("");
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false);
 
@@ -139,21 +139,6 @@ const LoginScreen = ({ navigation }) => {
                     {appLogo()}
                     {!isShowOtp && loginInfo()}
                     {isShowOtp && otpInfo()}
-                    <Text
-                        onPress={() => {
-                            navigation.push("KycScreen");
-                        }}
-                        style={{
-                            ...Fonts.blackColor13Medium,
-                            textAlign: "center",
-                            paddingVertical: 10,
-                            fontSize: 15,
-                            textDecorationLine: "underline",
-                            color: Colors.primaryColor,
-                        }}
-                    >
-                        become Distributor?
-                    </Text>
                 </ScrollView>
             </View>
             {backClickCount == 1 ? (
@@ -177,8 +162,7 @@ const LoginScreen = ({ navigation }) => {
                         fontSize: 18,
                     }}
                 >
-                    {/* Welcome to Distributor Panel 👋🏻 */}
-                    Welcome to ERP Admin Panel 👋🏻
+                    Welcome to Distributor Panel 👋🏻
                 </Text>
                 <Text
                     style={{
@@ -428,7 +412,6 @@ const styles = StyleSheet.create({
         marginHorizontal: Sizes.fixPadding * 1.0,
         paddingHorizontal: Sizes.fixPadding,
         marginVertical: Sizes.fixPadding * 2.5,
-        marginBottom: 0,
     },
     animatedView: {
         backgroundColor: "#333333",
@@ -443,7 +426,7 @@ const styles = StyleSheet.create({
     },
 });
 
-export default LoginScreen;
+export default DistributorLoginScreen;
 
 // {
 //     "operationType": "signIn",

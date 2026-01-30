@@ -87,7 +87,7 @@ const TextAreaBox = React.memo(
                 </View>
             </View>
         );
-    }
+    },
 );
 
 export default TextAreaBox;

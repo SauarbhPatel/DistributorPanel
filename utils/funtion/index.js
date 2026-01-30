@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { __getLocalStorageData, __setLocalStorageData } from "../localStorage";
 
 export function __generateRandomString(length) {
     const characters =
@@ -66,7 +67,7 @@ export function __formatDate(date) {
 export const checkLanguage = async () => {
     try {
         const data = await AsyncStorage.getItem("token");
-        console.log("data", data);
+        //console.log("data", data);
         if (data) {
             // Token was found in AsyncStorage
             return "checked";
@@ -85,11 +86,11 @@ export const checkLanguage = async () => {
 //     if (token) {
 //       try {
 //         let fcmtoken = await messaging().getToken();
-//         console.log(' fcmtoken:', fcmtoken);
+//         //console.log(' fcmtoken:', fcmtoken);
 //         fcmtoken && (await AsyncStorage.setItem('fcmtoken', fcmtoken));
 //       } catch (error) {}
 //     } else {
-//       console.log('token fcmtoken:', token);
+//       //console.log('token fcmtoken:', token);
 //     }
 
 export function __getRendomColor(mode) {
@@ -133,4 +134,66 @@ export function __splitProductAndVarianat(list) {
     });
 
     return products;
+    return list;
+}
+
+export async function __setNewRecentlyViewed(item) {
+    const getOldList = await __getLocalStorageData("recently_view");
+    console.log("getOldList", getOldList);
+    const convertInObject = getOldList ? JSON.parse(getOldList) : [];
+    const newList = [
+        item,
+        ...convertInObject?.filter(
+            (old) =>
+                // old?.uid != item?.uid &&
+                old?.variations[0]?.uid != item?.variations[0]?.uid,
+        ),
+    ];
+    __setLocalStorageData("recently_view", newList);
+    return;
+}
+
+export function isValidPAN(pan) {
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
+    return panRegex.test(pan);
+}
+export function isValidAadhaar(aadhaar) {
+    // Must be exactly 12 digits
+    if (!/^\d{12}$/.test(aadhaar)) {
+        return false;
+    }
+
+    // Verhoeff tables
+    const d = [
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        [1, 2, 3, 4, 0, 6, 7, 8, 9, 5],
+        [2, 3, 4, 0, 1, 7, 8, 9, 5, 6],
+        [3, 4, 0, 1, 2, 8, 9, 5, 6, 7],
+        [4, 0, 1, 2, 3, 9, 5, 6, 7, 8],
+        [5, 9, 8, 7, 6, 0, 4, 3, 2, 1],
+        [6, 5, 9, 8, 7, 1, 0, 4, 3, 2],
+        [7, 6, 5, 9, 8, 2, 1, 0, 4, 3],
+        [8, 7, 6, 5, 9, 3, 2, 1, 0, 4],
+        [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
+    ];
+
+    const p = [
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        [1, 5, 7, 6, 2, 8, 3, 0, 9, 4],
+        [5, 8, 0, 3, 7, 9, 6, 1, 4, 2],
+        [8, 9, 1, 6, 0, 4, 3, 5, 2, 7],
+        [9, 4, 5, 3, 1, 2, 6, 8, 7, 0],
+        [4, 2, 8, 6, 5, 7, 3, 9, 0, 1],
+        [2, 7, 9, 3, 8, 0, 6, 4, 1, 5],
+        [7, 0, 4, 6, 9, 1, 3, 2, 5, 8],
+    ];
+
+    let c = 0;
+    const digits = aadhaar.split("").reverse().map(Number);
+
+    for (let i = 0; i < digits.length; i++) {
+        c = d[c][p[i % 8][digits[i]]];
+    }
+
+    return c === 0;
 }

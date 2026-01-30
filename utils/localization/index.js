@@ -11,8 +11,7 @@ function __getToken() {
 }
 
 function __setLocalization(object) {
-    if (!object || typeof object !== "object")
-        return console.log("invalid formate");
+    if (!object || typeof object !== "object") return;
     localizationDetails = { ...localizationDetails, ...object };
 }
 

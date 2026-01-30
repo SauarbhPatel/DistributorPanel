@@ -366,6 +366,20 @@ const CustomDrawer = (props) => {
                             </TouchableOpacity>
                         )} */}
                         <TouchableOpacity
+                            onPress={() =>
+                                props.navigation.push("ProductManagement")
+                            }
+                        >
+                            <Text
+                                style={{
+                                    marginVertical: Sizes.fixPadding - 5.0,
+                                    ...Fonts.grayColor14SemiBold,
+                                }}
+                            >
+                                {getLocalizedString("Product Management")}
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
                             onPress={() => props.navigation.push("RawMaterial")}
                         >
                             <Text
@@ -418,7 +432,11 @@ const CustomDrawer = (props) => {
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            onPress={() => props.navigation.push("Distributor")}
+                            onPress={() =>
+                                props.navigation.push("Distributor", {
+                                    name: "Distributor",
+                                })
+                            }
                         >
                             <Text
                                 style={{
@@ -426,7 +444,23 @@ const CustomDrawer = (props) => {
                                     ...Fonts.grayColor14SemiBold,
                                 }}
                             >
-                                {getLocalizedString("Distributor")}
+                                {getLocalizedString("Distributor Master")}
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() =>
+                                props.navigation.push("Distributor", {
+                                    name: "Supplier",
+                                })
+                            }
+                        >
+                            <Text
+                                style={{
+                                    marginVertical: Sizes.fixPadding - 5.0,
+                                    ...Fonts.grayColor14SemiBold,
+                                }}
+                            >
+                                {getLocalizedString("Supplier Master")}
                             </Text>
                         </TouchableOpacity>
 

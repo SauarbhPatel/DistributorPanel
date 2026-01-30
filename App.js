@@ -70,6 +70,15 @@ import BillOfMaterialsScreen from "./screens/billOfMaterials/billOfMaterialsScre
 import AllProductionProcessScreen from "./screens/allProductionProcess/allProductionProcessScreen";
 import PaymentInvoiceScreen from "./screens/payment/paymentInvoiceScreen";
 import ResourcePlanningScreen from "./screens/resourcePlanning/resourcePlanningScreen";
+import ProductManagement from "./screens/productManagement/productManagement";
+import ProductAttributes from "./screens/productAttributes/productAttributes";
+import AttributeSets from "./screens/attributeSets/attributeSets";
+import HsnCodes from "./screens/hsnCodes/hsnCodes";
+import DistributorLoginScreen from "./screens/auth/distributorLoginScreen";
+import BrandMaster from "./screens/brandMaster/brandMaster";
+import TaxTypes from "./screens/taxTypes/taxTypes";
+import TaxMaster from "./screens/taxMaster/TaxMaster";
+import HsnSet from "./screens/hsnCodes/hsnSet";
 
 LogBox.ignoreAllLogs();
 
@@ -106,6 +115,11 @@ function App() {
                 <Stack.Screen
                     name="Login"
                     component={LoginScreen}
+                    options={{ ...TransitionPresets.DefaultTransition }}
+                />
+                <Stack.Screen
+                    name="DistributorLogin"
+                    component={DistributorLoginScreen}
                     options={{ ...TransitionPresets.DefaultTransition }}
                 />
                 <Stack.Screen
@@ -252,6 +266,20 @@ function App() {
                     name="ResourcePlanning"
                     component={ResourcePlanningScreen}
                 />
+                <Stack.Screen
+                    name="ProductManagement"
+                    component={ProductManagement}
+                />
+                <Stack.Screen
+                    name="ProductAttributes"
+                    component={ProductAttributes}
+                />
+                <Stack.Screen name="AttributeSets" component={AttributeSets} />
+                <Stack.Screen name="HsnCodes" component={HsnCodes} />
+                <Stack.Screen name="HsnSet" component={HsnSet} />
+                <Stack.Screen name="BrandMaster" component={BrandMaster} />
+                <Stack.Screen name="TaxTypes" component={TaxTypes} />
+                <Stack.Screen name="TaxMaster" component={TaxMaster} />
             </Stack.Navigator>
         </NavigationContainer>
     );

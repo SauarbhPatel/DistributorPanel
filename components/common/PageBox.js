@@ -7,6 +7,8 @@ import { Ionicons, AntDesign } from "@expo/vector-icons";
 // import UploadDocumentPopup from "./UploadDocumentPopup";
 // import ImageViewerCom from "./ImageViewerCom";
 const { width } = Dimensions.get("screen");
+import * as DocumentPicker from "expo-document-picker";
+import { __uploadImage } from "../../utils/api/commonApi";
 
 const PageBox = ({
     title,
@@ -15,6 +17,7 @@ const PageBox = ({
     onRemove = () => {},
     dyWidth,
     dyHeight,
+    type,
 }) => {
     const [state, setState] = useState({
         isOpenCamera: false,
@@ -24,33 +27,24 @@ const PageBox = ({
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
     const { isOpenCamera, isShowImage } = state;
+    const pickFile = async () => {
+        try {
+            const result = await DocumentPicker.getDocumentAsync();
+            if (!result.canceled) {
+                console.log(result.assets[0]);
+                const img = await __uploadImage(
+                    result.assets[0]?.uri,
+                    result.assets[0]?.name,
+                    result.assets[0]?.mimeType,
+                );
+                console.log(img);
+            }
+        } catch (error) {
+            console.error("Error picking file:", error);
+        }
+    };
     return (
         <>
-            {/* {isShowImage && (
-                <ImageViewerCom
-                    onClose={() => {
-                        updateState({
-                            isShowImage: false,
-                        });
-                    }}
-                    images={[
-                        {
-                            url: item?.fullUrl,
-                        },
-                    ]}
-                />
-            )}
-            <UploadDocumentPopup
-                isShow={isOpenCamera}
-                onClose={() => updateState({ isOpenCamera: false })}
-                onSelected={(value, details) => {
-                    console.log("UploadDocumentPopup", value);
-                    if (!value) return;
-                    console.log(value);
-                    updateState({ isOpenCamera: false });
-                    onChange(details);
-                }}
-            /> */}
             <TouchableOpacity
                 activeOpacity={0.9}
                 onPress={() => {
@@ -59,6 +53,9 @@ const PageBox = ({
                             isShowImage: true,
                         });
                         return;
+                    }
+                    if (type == "pdf") {
+                        pickFile();
                     }
                     updateState({
                         isOpenCamera: true,

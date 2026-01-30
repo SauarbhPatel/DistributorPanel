@@ -1,24 +1,116 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { __getToken } from "../localization";
+import AppInfo from "../../appInfo";
 
-const _HOST = "https://onlineparttimejobs.in/api";
+const _HOST = AppInfo?.Api;
+const _CompanyId = AppInfo?.companyId;
+
+// New type Apis
+
+export function __apiHeaderNew() {
+    return {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + __getToken(),
+            "X-Company-Id": _CompanyId,
+        },
+    };
+}
+
+export function __apiHeaderFormDataNew() {
+    return {
+        headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: "Bearer " + __getToken(),
+            "X-Company-Id": _CompanyId,
+        },
+    };
+}
+
+export const __getApiData = (endpoint) => {
+    return axios
+        .get(`${_HOST}${endpoint}`, __apiHeaderNew())
+        .then((response) => {
+            return response.data;
+        })
+        .catch((error) => {
+            throw error;
+        });
+};
+
+export const __postApiData = (endpoint, data, type) => {
+    return axios
+        .post(
+            `${_HOST}${endpoint}`,
+            data,
+            type == "from" ? __apiHeaderFormDataNew() : __apiHeaderNew(),
+        )
+        .then((response) => {
+            return response.data;
+        })
+        .catch((error) => {
+            throw error;
+        });
+};
+
+export const __putApiData = (endpoint, data, type) => {
+    return axios
+        .put(
+            `${_HOST}${endpoint}`,
+            data,
+            type == "from" ? __apiHeaderFormDataNew() : __apiHeaderNew(),
+        )
+        .then((response) => {
+            return response.data;
+        })
+        .catch((error) => {
+            throw error;
+        });
+};
+export const __patchApiData = (endpoint, data, type) => {
+    console.log(`${_HOST}${endpoint}`);
+    return axios
+        .patch(
+            `${_HOST}${endpoint}`,
+            data,
+            type == "from" ? __apiHeaderFormDataNew() : __apiHeaderNew(),
+        )
+        .then((response) => {
+            return response.data;
+        })
+        .catch((error) => {
+            throw error;
+        });
+};
+
+export const __deleteApiData = (endpoint, data) => {
+    console.log(`${_HOST}${endpoint}`);
+    return axios
+        .delete(`${_HOST}${endpoint}`, { data: data, ...__apiHeaderNew() })
+        .then((response) => {
+            return response.data;
+        })
+        .catch((error) => {
+            console.log(JSON.stringify(error));
+            throw error;
+        });
+};
+// old type Apis
 
 export function __apiHeader(accesToken) {
     return {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accesToken,
-        companyId: "68dccefde4c236bc9312289c",
+        "X-Company-Id": _CompanyId,
     };
 }
 export function __apiFormHeader(accesToken) {
     return {
         "Content-Type": "multipart/form-data",
         Authorization: "Bearer " + accesToken,
-        CompanyID: "68dccefde4c236bc9312289c",
+        "X-Company-Id": _CompanyId,
     };
 }
-
-// https://ind-eng.onlineparttimejobs.in/api/product/trendingSearches
 
 export function __makeVerifyLoginPostRequest(apidata) {
     const url = _HOST + "/auth/phone/verify";
@@ -35,7 +127,7 @@ export function __makeBannerGetRequest(apiParams) {
     const url = _HOST + "/banner" + apiParams;
     // const url = _HOST + "/banner/public" + apiParams;
     const headers = __apiHeader();
-    console.log(url, headers);
+    //console.log(url, headers);
     return axios
         .get(url, { headers })
         .then((response) => {
@@ -47,6 +139,18 @@ export function __makeBannerGetRequest(apiParams) {
 }
 export function __makeFeaturedCategoryGetRequest(apidata) {
     const url = _HOST + "/category/filter";
+    const headers = __apiHeader();
+    return axios
+        .get(url, { headers })
+        .then((response) => {
+            return response.data;
+        })
+        .catch((error) => {
+            throw error;
+        });
+}
+export function __getTrendingProductsGetRequest() {
+    const url = _HOST + "/trending";
     const headers = __apiHeader();
     return axios
         .get(url, { headers })
@@ -71,7 +175,42 @@ export function __makeProductsGetRequest(page, count) {
 }
 export function __makeProductDetailsGetRequest(uid, variant_slug) {
     const url = _HOST + "/product/public/" + uid + "/" + variant_slug;
-    // const url = _HOST + "/product/public/" + uid;
+    const headers = __apiHeader();
+    return axios
+        .get(url, { headers })
+        .then((response) => {
+            return response.data;
+        })
+        .catch((error) => {
+            throw error;
+        });
+}
+export function __getComboRequest(uid, variant_slug) {
+    const url = _HOST + "/comboDeal/product/" + uid + "/" + variant_slug;
+    const headers = __apiHeader();
+    return axios
+        .get(url, { headers })
+        .then((response) => {
+            return response.data;
+        })
+        .catch((error) => {
+            throw error;
+        });
+}
+export function __makeTrendingSearchesGetRequest() {
+    const url = _HOST + "/product/trendingSearches";
+    const headers = __apiHeader();
+    return axios
+        .get(url, { headers })
+        .then((response) => {
+            return response.data;
+        })
+        .catch((error) => {
+            throw error;
+        });
+}
+export function __makeSearchesGetRequest(search) {
+    const url = _HOST + "/product/search/" + search;
     const headers = __apiHeader();
     return axios
         .get(url, { headers })
@@ -309,7 +448,7 @@ export function __makeGetAbndtRequest(token, id) {
 export function __makeAddToCartPostRequest(apidata, token, cart) {
     const url = _HOST + `/cart?products=${cart}&coupon=`;
     const headers = __apiHeader(token);
-    console.log(url);
+    //console.log(url);
     return axios
         .post(url, apidata, { headers })
         .then((response) => {
@@ -372,6 +511,46 @@ export function __makeCheckoutRequest(token, cart) {
             throw error;
         });
 }
+export function __makeProductQueriesGetRequest(token, prodId, varId) {
+    const url =
+        _HOST + `/productQueries/public?prodId=${prodId}&varId=${varId}`;
+    const headers = __apiHeader(token);
+    return axios
+        .get(url, { headers })
+        .then((response) => {
+            return response.data;
+        })
+        .catch((error) => {
+            throw error;
+        });
+}
+
+export function __makeAddQuestionPostRequest(apidata, token) {
+    const url = _HOST + "/productQueries/add";
+    const headers = __apiHeader(token);
+    //console.log(apidata, headers);
+    return axios
+        .post(url, apidata, { headers })
+        .then((response) => {
+            return response.data;
+        })
+        .catch((error) => {
+            throw error;
+        });
+}
+export function __makeLikeDisLikePostRequest(apidata, token) {
+    const url = _HOST + "/productQueries/reaction";
+    const headers = __apiHeader(token);
+    //console.log(apidata, headers);
+    return axios
+        .post(url, apidata, { headers })
+        .then((response) => {
+            return response.data;
+        })
+        .catch((error) => {
+            throw error;
+        });
+}
 export function __makeWishListGetRequest(token) {
     // const url = _HOST + "/user/wishlist";
     const url = _HOST + "/user/wishlist_nw";
@@ -389,7 +568,7 @@ export function __makeAddWishListGetRequest(apidata, token) {
     // const url = _HOST + "/product/wishlist";
     const url = _HOST + "/product/wishlist_nw";
     const headers = __apiHeader(token);
-    console.log(apidata, headers);
+    //console.log(apidata, headers);
     return axios
         .post(url, apidata, { headers })
         .then((response) => {
@@ -404,15 +583,15 @@ export function __makeOrderPostRequest(apidata, token, cart) {
     // const url = _HOST + "/order/temp_cart";
     // const url = _HOST + "/order/temp_cart_nw?products=" + cart;
     const url = _HOST + `/order/temp_cart_nw?products=${cart}&coupon=`;
+
     const headers = __apiHeader(token);
-    console.log("apidata", apidata);
     return axios
         .post(url, apidata, { headers })
         .then((response) => {
             return response.data;
         })
         .catch((error) => {
-            console.log(error);
+            //console.log(error);
             throw error;
         });
 }
@@ -425,7 +604,7 @@ export function __makeOrderCheckoutPostRequest(apidata, token) {
             return response.data;
         })
         .catch((error) => {
-            console.log(error);
+            //console.log(error);
             throw error;
         });
 }
@@ -434,6 +613,18 @@ export function __makeAddAddressPostRequest(apidata, token) {
     const headers = __apiHeader(token);
     return axios
         .post(url, apidata, { headers })
+        .then((response) => {
+            return response.data;
+        })
+        .catch((error) => {
+            throw error;
+        });
+}
+export function __makeUpdateAddressPostRequest(apidata, id, token) {
+    const url = _HOST + "/user/register/billAddress-new/" + id;
+    const headers = __apiHeader(token);
+    return axios
+        .put(url, apidata, { headers })
         .then((response) => {
             return response.data;
         })
@@ -513,7 +704,7 @@ export function __makeGetProfileDetailsGetRequest(token) {
         });
 }
 export function __makeUpdateProfileDetailsPutRequest(apidata, token) {
-    const url = _HOST + "/user/edit-user";
+    const url = _HOST + "/user/profile-update";
     const headers = __apiHeader(token);
     return axios
         .put(url, apidata, { headers })
@@ -537,7 +728,8 @@ export function __makeUpdateProfileImagePostRequest(apidata, token) {
         });
 }
 export function __makeCreateTicketPostRequest(apidata, token) {
-    const url = _HOST + "/ticketList/add_Tickets";
+    // const url = _HOST + "/ticketList/add_Tickets";
+    const url = _HOST + "/dmtdisputeChat/add_dispute/public";
     const headers = __apiHeader(token);
     return axios
         .post(url, apidata, { headers })
@@ -548,11 +740,12 @@ export function __makeCreateTicketPostRequest(apidata, token) {
             throw error;
         });
 }
-export function __makeGetTicketGetRequest(token) {
-    const url = _HOST + "/ticketList/user";
+export function __makeGetTicketGetRequest(apidata, token) {
+    // const url = _HOST + "/ticketList/user";
+    const url = _HOST + "/dmtDisputes/public";
     const headers = __apiHeader(token);
     return axios
-        .get(url, { headers })
+        .post(url, apidata, { headers })
         .then((response) => {
             return response.data;
         })
@@ -561,7 +754,8 @@ export function __makeGetTicketGetRequest(token) {
         });
 }
 export function __makeGetTicketMessageGetRequest(token, id) {
-    const url = _HOST + "/ticketList/ticket/" + id;
+    const url =
+        _HOST + "/dmtdisputechat/public?dispute_id=" + id + "&count=20&page=0";
     const headers = __apiHeader(token);
     return axios
         .get(url, { headers })
@@ -605,10 +799,12 @@ export function __makeGetCoupenGetRequest() {
             throw error;
         });
 }
-export function __makeGetFAQGetRequest() {
-    const url = _HOST + "/faqsmaster";
+export function __makeGetFAQGetRequest(token) {
+    const url = _HOST + "/faqs";
+    const headers = __apiHeader(token);
+
     return axios
-        .get(url)
+        .get(url, { headers })
         .then((response) => {
             return response.data;
         })
@@ -656,9 +852,11 @@ export function __makeGetBlogDetailsGetRequest(id) {
         });
 }
 export function __makeTandSGetRequest() {
-    const url = _HOST + "/termsCondition/singleTermsAndCondition";
+    const url = _HOST + "/pages/public?type=terms-condition";
+    const headers = __apiHeader();
+
     return axios
-        .get(url)
+        .get(url, { headers })
         .then((response) => {
             return response.data;
         })
@@ -667,9 +865,11 @@ export function __makeTandSGetRequest() {
         });
 }
 export function __makePPGetRequest() {
-    const url = _HOST + "/privacypolicy/singlePrivacyPolicy";
+    const url = _HOST + "/pages/public?type=privacy-policy";
+    const headers = __apiHeader();
+
     return axios
-        .get(url)
+        .get(url, { headers })
         .then((response) => {
             return response.data;
         })
@@ -678,9 +878,9 @@ export function __makePPGetRequest() {
         });
 }
 
-export function __makeGetReasonGetRequest() {
+export function __makeGetReasonGetRequest(token) {
     const url = _HOST + "/cancelReason";
-    const headers = __apiHeader();
+    const headers = __apiHeader(token);
     return axios
         .get(url, { headers })
         .then((response) => {

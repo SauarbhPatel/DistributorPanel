@@ -4,7 +4,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
 import { Text } from "react-native";
 
-const CommonHeader = ({ navigation, title }) => {
+const CommonHeader = ({ navigation, title, subTitle }) => {
     return (
         <View
             style={{
@@ -22,14 +22,30 @@ const CommonHeader = ({ navigation, title }) => {
                 size={25}
                 onPress={() => navigation && navigation?.pop()}
             />
-            <Text
-                style={{
-                    marginLeft: Sizes.fixPadding + 5.0,
-                    ...Fonts.blackColor18Bold,
-                }}
-            >
-                {title}
-            </Text>
+            <View style={{ flex: 1 }}>
+                <Text
+                    style={{
+                        marginLeft: Sizes.fixPadding + 5.0,
+                        ...Fonts.blackColor18Bold,
+                        marginTop: subTitle ? -7 : 0,
+                    }}
+                >
+                    {title}
+                </Text>
+                {subTitle ? (
+                    <Text
+                        style={{
+                            marginLeft: Sizes.fixPadding + 5.0,
+                            ...Fonts.grayColor14Medium,
+                            fontSize: 8.5,
+                            position: "absolute",
+                            bottom: -8,
+                        }}
+                    >
+                        {subTitle}
+                    </Text>
+                ) : null}
+            </View>
         </View>
     );
 };

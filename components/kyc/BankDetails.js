@@ -5,17 +5,19 @@ import { AntDesign } from "@expo/vector-icons";
 import { Colors, Fonts } from "../../constants/styles";
 import { __generateRandomString } from "../../utils/funtion";
 import PageBox from "../common/PageBox";
-import MultiCheckBox from "../common/MultiCheckBox";
-const GstForm = ({ onClickContinue = () => {}, onClickBack = () => {} }) => {
+const BankDetails = ({
+    onClickContinue = () => {},
+    onClickBack = () => {},
+}) => {
     const [state, setState] = useState({
-        gstRegistered: true,
-        gstNumber: "",
-        companyName: "",
-        distributorType: "",
+        bankName: "",
+        ifsc: "",
+        accountNumber: "",
+        accountType: null,
     });
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
-    const { gstRegistered, gstNumber, companyName, distributorType } = state;
+    const { bankName, ifsc, accountNumber, accountType } = state;
     return (
         <View
             style={{
@@ -28,28 +30,36 @@ const GstForm = ({ onClickContinue = () => {}, onClickBack = () => {} }) => {
                 borderRadius: 10,
             }}
         >
-            <MultiCheckBox
-                title="GST Status (Registered with GST)"
-                list={[
-                    { name: "Yes", id: true },
-                    { name: "No (Not Registered)", id: false },
-                ]}
-                selected={[gstRegistered]}
-                onChange={(value) => {
-                    // console.log("IsVerified", value);
-                    updateState({ gstRegistered: value });
+            <TextAreaBox
+                value={bankName}
+                onChangeText={(value) => {
+                    updateState(value);
                 }}
+                placeholder={"Enter Bank Name"}
+                title={"Bank Name"}
+                valuekey={"bankName"}
+                titleCustomStyle={{
+                    marginHorizontal: 0,
+                }}
+                inputCustomStyle={{
+                    marginHorizontal: 0,
+                    borderWidth: 1,
+                    borderColor: "#c1c1c1ff",
+                    elevation: 0,
+                    backgroundColor: Colors.whiteColor,
+                    paddingVertical: 5,
+                }}
+                customStyle={{ marginBottom: 5 }}
             />
-
-            {gstRegistered && (
+            <View style={{}}>
                 <TextAreaBox
-                    value={gstNumber}
+                    value={accountNumber}
                     onChangeText={(value) => {
                         updateState(value);
                     }}
-                    placeholder={"Enter Gst Number"}
-                    title={"Gst Number"}
-                    valuekey={"gstNumber"}
+                    placeholder={"000 000 0000 0000 0000"}
+                    title={"Account Number"}
+                    valuekey={"accountNumber"}
                     titleCustomStyle={{
                         marginHorizontal: 0,
                         marginTop: 10,
@@ -62,17 +72,45 @@ const GstForm = ({ onClickContinue = () => {}, onClickBack = () => {} }) => {
                         backgroundColor: Colors.whiteColor,
                         paddingVertical: 5,
                     }}
-                    customStyle={{ marginBottom: 5 }}
+                    customStyle={{ marginBottom: 5, flex: 1 }}
+                    keyboardType={"number-pad"}
+                    customInputProps={{
+                        maxLength: 16,
+                    }}
                 />
-            )}
-            <TextAreaBox
-                value={companyName}
-                onChangeText={(value) => {
-                    updateState(value);
-                }}
-                placeholder={"Enter Company Name"}
-                title={"Company Name"}
-                valuekey={"companyName"}
+                <TextAreaBox
+                    value={ifsc}
+                    onChangeText={(value) => {
+                        updateState(value);
+                    }}
+                    placeholder={"Enter IFSC Code"}
+                    title={"IFSC Code"}
+                    valuekey={"ifsc"}
+                    titleCustomStyle={{
+                        marginHorizontal: 0,
+                        marginTop: 10,
+                    }}
+                    inputCustomStyle={{
+                        marginHorizontal: 0,
+                        borderWidth: 1,
+                        borderColor: "#c1c1c1ff",
+                        elevation: 0,
+                        backgroundColor: Colors.whiteColor,
+                        paddingVertical: 5,
+                    }}
+                    customStyle={{ marginBottom: 5, flex: 1 }}
+                />
+            </View>
+            <DropDownTextAreaBox
+                type="select"
+                title={"Account Type"}
+                placeholder={"Select Account Type"}
+                list={["Savings", "Current"].map((num) => ({
+                    id: num,
+                    name: num,
+                }))}
+                value={accountType}
+                isSearchable
                 titleCustomStyle={{
                     marginHorizontal: 0,
                     marginTop: 10,
@@ -85,29 +123,11 @@ const GstForm = ({ onClickContinue = () => {}, onClickBack = () => {} }) => {
                     backgroundColor: Colors.whiteColor,
                     paddingVertical: 5,
                 }}
-                customStyle={{ marginBottom: 5 }}
-            />
-            <TextAreaBox
-                value={distributorType}
-                onChangeText={(value) => {
-                    updateState(value);
+                onSelected={(value) => {
+                    updateState({ accountType: value });
                 }}
-                placeholder={"Enter Distribution Type"}
-                title={"Distribution Type"}
-                valuekey={"distributorType"}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
-                inputCustomStyle={{
-                    marginHorizontal: 0,
-                    borderWidth: 1,
-                    borderColor: "#c1c1c1ff",
-                    elevation: 0,
-                    backgroundColor: Colors.whiteColor,
-                    paddingVertical: 5,
-                }}
-                customStyle={{ marginBottom: 5 }}
+                // customStyle={{marginBottom: 20 }}
+                customStyle={{ marginBottom: 5, flex: 1 }}
             />
 
             <View
@@ -142,14 +162,14 @@ const GstForm = ({ onClickContinue = () => {}, onClickBack = () => {} }) => {
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    onPress={() =>
+                    onPress={() => {
                         onClickContinue({
-                            gstRegistered,
-                            gstNumber,
-                            companyName,
-                            distributorType,
-                        })
-                    }
+                            bankName,
+                            ifsc,
+                            accountNumber,
+                            accountType,
+                        });
+                    }}
                     style={{
                         backgroundColor: Colors.primaryColor,
                         height: 45,
@@ -177,4 +197,4 @@ const GstForm = ({ onClickContinue = () => {}, onClickBack = () => {} }) => {
     );
 };
 
-export default GstForm;
+export default BankDetails;

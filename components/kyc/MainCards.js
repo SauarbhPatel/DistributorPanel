@@ -55,7 +55,10 @@ const MainCards = ({
                     ) : null}
                 </View>
             </TouchableOpacity>
-            {isActive ? inputForm : <></>}
+            <View style={{ display: isActive ? "flex" : "none" }}>
+                {inputForm}
+                {/* {isActive ? inputForm : <></>} */}
+            </View>
         </View>
     );
 };

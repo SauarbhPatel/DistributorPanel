@@ -11,11 +11,10 @@ import { __generateRandomString } from "../../utils/funtion";
 import { TouchableOpacity } from "react-native";
 import { __makeGetBlogGetRequest } from "../../utils/api";
 import { useState } from "react";
-import { TextAreaBox } from "../../modules";
 import CreateDocuments from "../../components/distributor/CreateDocuments";
 import FilterCard from "../../components/distributor/FilterCard";
 
-const DistributorScreen = ({ navigation }) => {
+const DistributorScreen = ({ navigation, route }) => {
     const [list, setlist] = useState([
         {
             companyName: "Surya Demo Supplier",
@@ -66,7 +65,7 @@ const DistributorScreen = ({ navigation }) => {
                         flex: 1,
                     }}
                 >
-                    Distributor
+                    {route?.params?.name} Master
                 </Text>
                 <CreateDocuments navigation={navigation} />
             </View>
