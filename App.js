@@ -79,6 +79,10 @@ import BrandMaster from "./screens/brandMaster/brandMaster";
 import TaxTypes from "./screens/taxTypes/taxTypes";
 import TaxMaster from "./screens/taxMaster/TaxMaster";
 import HsnSet from "./screens/hsnCodes/hsnSet";
+import CategoryManagment from "./screens/categoryManagment/categoryManagment";
+import GlobalProducts from "./screens/globalProducts/globalProducts";
+import GenericProducts from "./screens/genericProducts/genericProducts";
+import ProductListings from "./screens/productListings/productListings";
 
 LogBox.ignoreAllLogs();
 
@@ -274,12 +278,28 @@ function App() {
                     name="ProductAttributes"
                     component={ProductAttributes}
                 />
+                <Stack.Screen
+                    name="CategoryManagment"
+                    component={CategoryManagment}
+                />
                 <Stack.Screen name="AttributeSets" component={AttributeSets} />
                 <Stack.Screen name="HsnCodes" component={HsnCodes} />
                 <Stack.Screen name="HsnSet" component={HsnSet} />
                 <Stack.Screen name="BrandMaster" component={BrandMaster} />
                 <Stack.Screen name="TaxTypes" component={TaxTypes} />
                 <Stack.Screen name="TaxMaster" component={TaxMaster} />
+                <Stack.Screen
+                    name="GlobalProducts"
+                    component={GlobalProducts}
+                />
+                <Stack.Screen
+                    name="GenericProducts"
+                    component={GenericProducts}
+                />
+                <Stack.Screen
+                    name="ProductListings"
+                    component={ProductListings}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );

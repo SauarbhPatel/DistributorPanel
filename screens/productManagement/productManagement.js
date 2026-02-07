@@ -23,7 +23,7 @@ const PRODUCT_MENU = [
     {
         title: "Category Management",
         icon: "category",
-        screen: "CategoryManagement",
+        screen: "CategoryManagment",
     },
     { title: "Attribute Sets", icon: "layers", screen: "AttributeSets" },
     {
@@ -37,7 +37,7 @@ const PRODUCT_MENU = [
     { title: "Tax Type", icon: "percent", screen: "TaxTypes" },
     { title: "Global Products", icon: "public", screen: "GlobalProducts" },
     { title: "Generic Products", icon: "inventory", screen: "GenericProducts" },
-    { title: "Product Listing", icon: "view-list", screen: "ProductListing" },
+    { title: "Product Listing", icon: "view-list", screen: "ProductListings" },
 ];
 
 const ProductManagement = ({ navigation }) => {

@@ -41,6 +41,7 @@ const CommonHeader = ({ navigation, title, subTitle }) => {
                             position: "absolute",
                             bottom: -8,
                         }}
+                        numberOfLines={1}
                     >
                         {subTitle}
                     </Text>

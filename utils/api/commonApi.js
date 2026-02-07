@@ -103,14 +103,16 @@ const __getTaxList = async () => {
             return [];
         });
 };
-const __getHsnCodeList = async () => {
+const __getHsnCodeList = async (taxRate) => {
     return __getApiData(`/hsnCodes/getAllHsnCode`)
         .then((res) => {
             if (res.success) {
                 return res?.data?.map((item) => ({
                     ...item,
                     id: item?._id,
-                    name: `${item?.code}`,
+                    name: taxRate
+                        ? `${item?.code} (${item?.taxRate}%)`
+                        : `${item?.code}`,
                 }));
             }
             return [];
@@ -135,6 +137,21 @@ const __getLedgersList = async () => {
             return [];
         });
 };
+const __getAttributeSetList = async () => {
+    return __getApiData(`/attributeSet/getAllAttributeSet`)
+        .then((res) => {
+            if (res.success) {
+                return res?.data?.map((item) => ({
+                    ...item,
+                    id: item?._id,
+                }));
+            }
+            return [];
+        })
+        .catch((error) => {
+            return [];
+        });
+};
 
 export {
     __uploadImage,
@@ -144,4 +161,5 @@ export {
     __getTaxList,
     __getHsnCodeList,
     __getLedgersList,
+    __getAttributeSetList,
 };
