@@ -11,7 +11,7 @@ import {
     ActivityIndicator,
 } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
-import { Feather, MaterialIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import CommonHeader from "../../components/common/CommonHeader";
@@ -165,13 +165,13 @@ const ProductAttributes = ({ navigation }) => {
                             />
                             <StatCard
                                 title="Active Attributes"
-                                value={filterableAttributes}
+                                value={variantAttributes}
                                 colors={["#10B981", "#059669"]}
                                 icon="filter"
                             />
                             <StatCard
                                 title="Total Values"
-                                value={variantAttributes}
+                                value={filterableAttributes}
                                 colors={["#8B5CF6", "#7C3AED"]}
                                 icon="layers"
                             />
@@ -224,6 +224,79 @@ const ProductAttributes = ({ navigation }) => {
 
 export default ProductAttributes;
 
+// const ListCard = ({ item, __handleDeleteAttribute, onDone = () => {} }) => {
+//     const [state, setState] = useState({
+//         isShowCreate: false,
+//     });
+
+//     const updateState = (data) => setState((state) => ({ ...state, ...data }));
+
+//     const { isShowCreate } = state;
+//     return (
+//         <View style={styles.attributeCard}>
+//             <BottomPopup
+//                 isShow={isShowCreate}
+//                 title="Edit Attribute"
+//                 onClose={() => updateState({ isShowCreate: false })}
+//                 component={
+//                     <CreateProductAttribute
+//                         onClose={() => {
+//                             updateState({ isShowCreate: false });
+//                             onDone();
+//                         }}
+//                         isEdit
+//                         item={item}
+//                     />
+//                 }
+//             />
+//             <View style={{ flex: 1 }}>
+//                 <View style={styles.attrTitleRow}>
+//                     <MaterialIcons
+//                         name="label-outline"
+//                         size={20}
+//                         color={Colors.primaryColor}
+//                     />
+//                     <Text style={styles.attrTitle}>{item.name}</Text>
+//                 </View>
+
+//                 <View style={styles.valuesRow}>
+//                     {item?.allowedValues?.map((val, index) => (
+//                         <View key={index} style={styles.valueChip}>
+//                             <Text style={styles.valueText}>{val}</Text>
+//                         </View>
+//                     ))}
+//                 </View>
+//             </View>
+
+//             <View style={styles.rightSection}>
+//                 <View style={styles.activeBadge}>
+//                     <Text style={styles.activeText}>
+//                         {item.status ? "Active" : "In-Active"}
+//                     </Text>
+//                 </View>
+
+//                 <View style={styles.actionRow}>
+//                     <TouchableOpacity
+//                         onPress={() => updateState({ isShowCreate: true })}
+//                     >
+//                         <Feather
+//                             name="edit-2"
+//                             size={18}
+//                             color={Colors.primaryColor}
+//                         />
+//                     </TouchableOpacity>
+//                     <TouchableOpacity
+//                         style={{ marginLeft: 12 }}
+//                         onPress={() => __handleDeleteAttribute(item._id)}
+//                     >
+//                         <Feather name="trash-2" size={18} color="red" />
+//                     </TouchableOpacity>
+//                 </View>
+//             </View>
+//         </View>
+//     );
+// };
+
 const ListCard = ({ item, __handleDeleteAttribute, onDone = () => {} }) => {
     const [state, setState] = useState({
         isShowCreate: false,
@@ -231,11 +304,10 @@ const ListCard = ({ item, __handleDeleteAttribute, onDone = () => {} }) => {
 
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
-    const { isShowCreate } = state;
     return (
-        <View style={styles.attributeCard}>
+        <View style={styles.card}>
             <BottomPopup
-                isShow={isShowCreate}
+                isShow={state.isShowCreate}
                 title="Edit Attribute"
                 onClose={() => updateState({ isShowCreate: false })}
                 component={
@@ -249,53 +321,104 @@ const ListCard = ({ item, __handleDeleteAttribute, onDone = () => {} }) => {
                     />
                 }
             />
-            <View style={{ flex: 1 }}>
-                <View style={styles.attrTitleRow}>
-                    <MaterialIcons
-                        name="label-outline"
-                        size={20}
-                        color={Colors.primaryColor}
-                    />
-                    <Text style={styles.attrTitle}>{item.name}</Text>
+
+            {/* HEADER */}
+            <View style={styles.headerRow}>
+                <View style={{ flex: 1 }}>
+                    <Text style={styles.title}>{item.name}</Text>
+                    {item.description && (
+                        <Text style={styles.subtitle}>{item.description}</Text>
+                    )}
                 </View>
 
-                <View style={styles.valuesRow}>
-                    {item?.allowedValues?.map((val, index) => (
-                        <View key={index} style={styles.valueChip}>
-                            <Text style={styles.valueText}>{val}</Text>
-                        </View>
-                    ))}
+                <View
+                    style={[
+                        styles.statusBadge,
+                        {
+                            backgroundColor: item.isActive
+                                ? "#ECFDF5"
+                                : "#FEF2F2",
+                        },
+                    ]}
+                >
+                    <Text
+                        style={{
+                            color: item.isActive ? "#047857" : "#B91C1C",
+                            fontSize: 12,
+                            fontWeight: "700",
+                        }}
+                    >
+                        {item.isActive ? "ACTIVE" : "INACTIVE"}
+                    </Text>
                 </View>
             </View>
 
-            <View style={styles.rightSection}>
-                <View style={styles.activeBadge}>
-                    <Text style={styles.activeText}>
-                        {item.status ? "Active" : "In-Active"}
-                    </Text>
+            {/* INFO GRID */}
+            <View style={styles.infoGrid}>
+                <InfoItem label="Code" value={item?.code} />
+                <InfoItem label="Data Type" value={item?.type} />
+            </View>
+
+            <View style={styles.infoGrid}>
+                <View style={styles.infoItem}>
+                    <Text style={styles.label}>Scope</Text>
+                    <View style={styles.scopeBadge}>
+                        <Text style={styles.scopeText}>
+                            {item.scope || "-"}
+                        </Text>
+                    </View>
                 </View>
 
-                <View style={styles.actionRow}>
-                    <TouchableOpacity
-                        onPress={() => updateState({ isShowCreate: true })}
-                    >
-                        <Feather
-                            name="edit-2"
-                            size={18}
-                            color={Colors.primaryColor}
-                        />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={{ marginLeft: 12 }}
-                        onPress={() => __handleDeleteAttribute(item._id)}
-                    >
-                        <Feather name="trash-2" size={18} color="red" />
-                    </TouchableOpacity>
-                </View>
+                <InfoItem
+                    label="Flags"
+                    value={[
+                        item?.isFilterable ? "Filterable" : "",
+                        item?.isSearchable ? "Searchable" : "",
+                        item?.isSortable ? "Sortable" : "",
+                        item?.isVariant ? "Variant" : "",
+                        item?.isComparable ? "Comparable" : "",
+                        item?.isVisibleOnFrontend ? "Visible on Frontend" : "",
+                        item?.isEditableAfterApproval
+                            ? "Editable After Approval"
+                            : "",
+                    ]
+                        .filter(Boolean)
+                        .join(" • ")}
+                />
+            </View>
+
+            {/* ACTIONS */}
+            <View style={styles.actionRow}>
+                <TouchableOpacity
+                    style={styles.iconBtn}
+                    onPress={() => updateState({ isShowCreate: true })}
+                >
+                    <Feather
+                        name="edit-2"
+                        size={16}
+                        color={Colors.primaryColor}
+                    />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={[styles.iconBtn, { marginLeft: 12 }]}
+                    onPress={() => __handleDeleteAttribute(item._id)}
+                >
+                    <Feather name="trash-2" size={16} color="#DC2626" />
+                </TouchableOpacity>
             </View>
         </View>
     );
 };
+
+const InfoItem = ({ label, value }) => (
+    <View style={styles.infoItem}>
+        <Text style={styles.label}>{label}</Text>
+        <Text style={styles.value} numberOfLines={1}>
+            {value || "-"}
+        </Text>
+    </View>
+);
 
 const StatCard = ({ title, value, colors, icon }) => (
     <LinearGradient colors={colors} style={styles.statCard}>
@@ -434,5 +557,90 @@ const styles = StyleSheet.create({
     actionRow: {
         flexDirection: "row",
         marginTop: 10,
+    },
+    card: {
+        backgroundColor: "#FFFFFF",
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: "#E5E7EB",
+    },
+
+    headerRow: {
+        flexDirection: "row",
+        alignItems: "flex-start",
+        marginBottom: 12,
+        gap: 10,
+    },
+
+    title: {
+        fontSize: 16,
+        fontWeight: "700",
+        color: "#111827",
+    },
+
+    subtitle: {
+        fontSize: 13,
+        color: "#6B7280",
+        marginTop: 2,
+    },
+
+    statusBadge: {
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 8,
+    },
+
+    infoGrid: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginTop: 10,
+        gap: 12,
+    },
+
+    infoItem: {
+        flex: 1,
+    },
+
+    label: {
+        fontSize: 12,
+        color: "#6B7280",
+        marginBottom: 2,
+    },
+
+    value: {
+        fontSize: 14,
+        fontWeight: "600",
+        color: "#111827",
+    },
+
+    scopeBadge: {
+        alignSelf: "flex-start",
+        backgroundColor: "#EEF2FF",
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 8,
+    },
+
+    scopeText: {
+        fontSize: 12,
+        fontWeight: "700",
+        color: "#4F46E5",
+    },
+
+    actionRow: {
+        flexDirection: "row",
+        justifyContent: "flex-end",
+        marginTop: 14,
+    },
+
+    iconBtn: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: "#F3F4F6",
+        justifyContent: "center",
+        alignItems: "center",
     },
 });

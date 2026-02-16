@@ -15,57 +15,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import CommonHeader from "../../components/common/CommonHeader";
 import { __deleteApiData, __getApiData } from "../../utils/api";
-import CreateProductAttribute from "../../components/form/CreateProductAttribute";
 import BottomPopup from "../../components/common/BottomPopup";
 import CreateBrand from "../../components/form/CreateBrand";
-
-const ATTRIBUTE_SET_LIST = [
-    {
-        _id: "set_1",
-        name: "Basic T-Shirt Attributes",
-        description: "Essential attributes for T-shirts",
-        attributes: [
-            "Color",
-            "Size",
-            "Material",
-            "Neck Type",
-            "Fit",
-            "Pattern",
-        ],
-        status: "Active",
-    },
-    {
-        _id: "set_2",
-        name: "Fashion Apparel Complete",
-        description: "Complete attribute set for fashion items",
-        attributes: [
-            "Color",
-            "Size",
-            "Material",
-            "Sleeve Length",
-            "Neck Type",
-            "Fit",
-            "Pattern",
-            "Occasion",
-            "Wash Care",
-            "Brand",
-        ],
-        status: "Active",
-    },
-    {
-        _id: "set_3",
-        name: "Electronics Basic Specs",
-        description: "Core specifications for electronics",
-        attributes: [
-            "Brand",
-            "Model",
-            "Color",
-            "Warranty",
-            "Power Consumption",
-        ],
-        status: "Inactive",
-    },
-];
 
 const BrandMaster = ({ navigation }) => {
     const [search, setSearch] = useState("");

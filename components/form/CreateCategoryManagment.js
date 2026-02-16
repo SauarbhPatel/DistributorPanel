@@ -6,7 +6,9 @@ import { __patchApiData, __postApiData } from "../../utils/api";
 import {
     __getAttributeSetList,
     __getHsnCodeList,
+    __getHsnSetList,
 } from "../../utils/api/commonApi";
+import SingleSelectTab from "../common/SingleSelectTab";
 
 const CreateCategoryManagment = ({
     onClose = () => {},
@@ -57,6 +59,14 @@ const CreateCategoryManagment = ({
             Alert.alert("Validation Error", "code is required");
             return false;
         }
+        if (!attributeSetId) {
+            Alert.alert("Validation Error", "attribute set is required");
+            return false;
+        }
+        if (!hsnsetId) {
+            Alert.alert("Validation Error", "HSN code is required");
+            return false;
+        }
 
         if (categoryName?.trim().length < 2) {
             Alert.alert(
@@ -72,6 +82,18 @@ const CreateCategoryManagment = ({
     const __handleSave = () => {
         if (!validateForm()) return;
         updateState({ loading: true });
+        console.log({
+            name: categoryName,
+            code,
+            parentId: parentId,
+            displayOrder: Number(displayOrder),
+            enabled: isActive,
+            isActive: isActive,
+            metaTitle: metaTitle,
+            metaDescription: metaDescription,
+            hsnsetId: hsnsetId?.id || null,
+            attributeSetId: attributeSetId?.id || null,
+        });
 
         __postApiData("/categories/createCategory", {
             name: categoryName,
@@ -104,50 +126,55 @@ const CreateCategoryManagment = ({
 
     const __handleEditSave = () => {
         if (!validateForm()) return;
-        updateState({ loading: true });
+        try {
+            updateState({ loading: true });
 
-        __patchApiData("/api/categories/updateCategoryById/" + item?._id, {
-            name: categoryName,
-            code,
-            parentId: parentId,
-            displayOrder: Number(displayOrder),
-            enabled: isActive,
-            isActive: isActive,
-            metaTitle: metaTitle,
-            metaDescription: metaDescription,
-            hsnsetId: hsnsetId?.id || null,
-            attributeSetId: attributeSetId?.id || null,
-        })
-            .then((res) => {
-                console.log(JSON.stringify(res));
-                if (res?.success) {
-                    // setError(res.message);
-                    Alert.alert("", res.message);
-                    onClose();
-                } else {
-                    Alert.alert("", res.message);
-                }
-                updateState({ loading: false });
+            __patchApiData("/categories/updateCategoryById/" + item?._id, {
+                name: categoryName,
+                code,
+                displayOrder: Number(displayOrder),
+                enabled: isActive,
+                isActive: isActive,
+                metaTitle: metaTitle,
+                metaDescription: metaDescription,
+                hsnsetId: hsnsetId?.id || null,
+                attributeSetId: attributeSetId?.id || null,
             })
-            .catch((error) => {
-                Alert.alert("", "Failed");
-                updateState({ loading: false });
-            });
+                .then((res) => {
+                    console.log(JSON.stringify(res));
+                    if (res?.success) {
+                        // setError(res.message);
+                        Alert.alert("", res.message);
+                        onClose();
+                    } else {
+                        Alert.alert("", res.message);
+                    }
+                    updateState({ loading: false });
+                })
+                .catch((error) => {
+                    console.log(error);
+                    Alert.alert("", "Failed");
+                    updateState({ loading: false });
+                });
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     useEffect(() => {
         if (isEdit) {
             console.log(item);
             updateState({
-                // categoryName: item?.name,
-                // values: item?.allowedValues,
-                // isActive: item?.status,
-                metaTitle: item?.name,
-                metaDescription: item?.name,
                 categoryName: item?.name,
-                code: item?.name,
-                hsnsetId: item?.name,
-                attributeSetId: item?.name,
+                code: item?.code,
+                metaTitle: item?.metaTitle,
+                metaDescription: item?.metaDescription,
+                hsnsetId: item?.hsnsetId
+                    ? { id: item?.hsnsetId, name: item?.hsnSetName }
+                    : null,
+                attributeSetId: item?.attributeSetId
+                    ? { id: item?.attributeSetId, name: item?.attributeSetName }
+                    : null,
                 displayOrder: String(item?.displayOrder) || "1",
                 isActive: item?.isActive || false,
             });
@@ -156,7 +183,7 @@ const CreateCategoryManagment = ({
 
     const __handleGetData = async () => {
         try {
-            const code = await __getHsnCodeList(true);
+            const code = await __getHsnSetList(true);
             const attra = await __getAttributeSetList(true);
             updateState({ hsnCodeList: code, attributeList: attra });
         } catch (error) {}
@@ -231,6 +258,7 @@ const CreateCategoryManagment = ({
                             }}
                             inputCustomStyle={inputStyle}
                             customStyle={{ flex: 1 }}
+                            keyboardType="numeric"
                         />
                     </View>
                     {/* Active Status */}
@@ -268,11 +296,12 @@ const CreateCategoryManagment = ({
                         paddingBottom: 10,
                     }}
                 >
-                    <Text style={hintText}>HSN Code & Attribute Set</Text>
+                    <Text style={hintText}>HSN Set & Attribute Set</Text>
                     <DropDownTextAreaBox
                         type="select"
-                        title={"HSN Code (includes Tax)"}
-                        placeholder={"Select HSN Code (includes Tax)"}
+                        title={"HSN Set"}
+                        placeholder={"Select HSN Set"}
+                        required
                         list={hsnCodeList}
                         value={hsnsetId}
                         isSearchable
@@ -286,10 +315,12 @@ const CreateCategoryManagment = ({
                                 hsnsetId: value,
                             });
                         }}
+                        editable={!isEdit}
                     />
                     <DropDownTextAreaBox
                         type="select"
                         title={"Attribute Set"}
+                        required
                         placeholder={"Select Attribute Set"}
                         list={attributeList}
                         value={attributeSetId}
@@ -304,6 +335,7 @@ const CreateCategoryManagment = ({
                                 attributeSetId: value,
                             });
                         }}
+                        editable={!isEdit}
                     />
                 </View>
                 <View
@@ -318,7 +350,7 @@ const CreateCategoryManagment = ({
 
                     <TextAreaBox
                         title="Meta Title"
-                        placeholder="e.g., color"
+                        placeholder="SEO title for search engines"
                         value={metaTitle}
                         valuekey="metaTitle"
                         onChangeText={updateState}
@@ -331,7 +363,7 @@ const CreateCategoryManagment = ({
                     />
                     <TextAreaBox
                         title="Meta Description"
-                        placeholder="e.g., color"
+                        placeholder="Brief summary for search results"
                         value={metaDescription}
                         valuekey="metaDescription"
                         onChangeText={updateState}

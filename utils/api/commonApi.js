@@ -1,4 +1,5 @@
 import { __postApiData, __getApiData } from ".";
+import { createCategoryList } from "../funtion";
 
 const __uploadImage = async (img, type, name) => {
     const formData = new FormData();
@@ -121,6 +122,21 @@ const __getHsnCodeList = async (taxRate) => {
             return [];
         });
 };
+const __getHsnSetList = async () => {
+    return __getApiData(`/hsnSets/getAllHsnSets`)
+        .then((res) => {
+            if (res.success) {
+                return res?.data?.map((item) => ({
+                    ...item,
+                    id: item?._id,
+                }));
+            }
+            return [];
+        })
+        .catch((error) => {
+            return [];
+        });
+};
 const __getLedgersList = async () => {
     return __getApiData(`/ledgers/getAllLedgers`)
         .then((res) => {
@@ -152,6 +168,94 @@ const __getAttributeSetList = async () => {
             return [];
         });
 };
+const __getProductAllAttributeList = async () => {
+    return __getApiData(
+        `/productAttributes/getAllAttributes?search=${""}&page=1&limit=100`,
+    )
+        .then((res) => {
+            console.log(res);
+            if (res.success) {
+                return res?.data?.data?.map((item) => ({
+                    // ...item,
+                    attributeId: item?._id,
+                    name: item?.name,
+                    code: item?.code,
+                    type: item?.type,
+                    isMandatory: false,
+                    isVariant: false,
+                }));
+            }
+            return [];
+        })
+        .catch((error) => {
+            return [];
+        });
+};
+
+const __getProductAttributeSetList = async () => {
+    return __getApiData(
+        `/productAttributes/getAllVariantAttributes?search=${""}`,
+    )
+        .then((res) => {
+            console.log(res);
+            if (res.success) {
+                return res?.data?.data?.map((item) => ({
+                    ...item,
+                    id: item?._id,
+                }));
+            }
+            return [];
+        })
+        .catch((error) => {
+            return [];
+        });
+};
+const __getProductRegularAttributeSetList = async () => {
+    return __getApiData(
+        `/productAttributes/getAllRegularAttributes?search=${""}`,
+    )
+        .then((res) => {
+            console.log(res);
+            if (res.success) {
+                return res?.data?.data?.map((item) => ({
+                    ...item,
+                    id: item?._id,
+                }));
+            }
+            return [];
+        })
+        .catch((error) => {
+            return [];
+        });
+};
+const __getBrandList = async () => {
+    return __getApiData(`/brands/getAllBrand`)
+        .then((res) => {
+            console.log(res);
+            if (res.success) {
+                return res?.data?.map((item) => ({
+                    ...item,
+                    id: item?._id,
+                }));
+            }
+            return [];
+        })
+        .catch((error) => {
+            return [];
+        });
+};
+const __getProductCategoryList = async () => {
+    return __getApiData(`/categories/getCategoryTree?page=1&limit=10`)
+        .then((res) => {
+            if (res.success) {
+                return createCategoryList(res?.data?.nestedData);
+            }
+            return [];
+        })
+        .catch((error) => {
+            return [];
+        });
+};
 
 export {
     __uploadImage,
@@ -160,6 +264,12 @@ export {
     __getTaxTypeList,
     __getTaxList,
     __getHsnCodeList,
+    __getHsnSetList,
     __getLedgersList,
     __getAttributeSetList,
+    __getProductAllAttributeList,
+    __getProductAttributeSetList,
+    __getProductRegularAttributeSetList,
+    __getProductCategoryList,
+    __getBrandList,
 };

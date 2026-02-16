@@ -82,9 +82,10 @@ const DropDownTextAreaBox = React.memo(
                 {type == "select" || type == "date" || type == "time" ? (
                     <TouchableOpacity
                         activeOpacity={1}
-                        onPress={(text) => {
+                        onPress={() => {
                             editable && updateOwnState({ showModel: true });
                         }}
+                        style={editable ? {} : { opacity: 0.6 }}
                     >
                         <View
                             style={{

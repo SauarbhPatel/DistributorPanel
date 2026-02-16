@@ -122,13 +122,13 @@ const CategoryManagment = ({ navigation }) => {
                 {statsCards()}
                 {searchAndAdd()}
                 <View style={{ position: "relative" }}>
-                    {loading1 && (
+                    {/* {loading1 && (
                         <ActivityIndicator
                             style={{
                                 margin: 10,
                             }}
                         />
-                    )}
+                    )} */}
                     {attributeCards()}
                 </View>
             </ScrollView>
@@ -253,29 +253,21 @@ const CategoryCard = ({
     const [expanded, setExpanded] = useState(false);
     const [state, setState] = useState({
         isShowCreate: false,
+        isShowAdd: false,
         loading: false,
+        isAcitve: false,
     });
 
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
-    const { isShowCreate } = state;
+    const { isShowCreate, isShowAdd, isActive } = state;
 
-    const __handleEditSave = (isActive) => {
+    const __handleEditSave = (status) => {
         updateState({ loading: true });
 
-        __patchApiData("/api/categories/updateCategoryById/" + item?._id, {
-            // name: categoryName,
-
-            // //
-            // metaTitle: item?.name,
-            // metaDescription: item?.name,
-            // categoryName: item?.name,
-            // code: item?.name,
-            // hsnsetId: item?.name,
-            // attributeSetId: item?.name,
-            // displayOrder: item?.displayOrder,
-            isActive: isActive,
-            enabled: isActive,
+        __patchApiData("/categories/updateCategoryById/" + item?._id, {
+            isActive: status,
+            enabled: status,
         })
             .then((res) => {
                 console.log(JSON.stringify(res));
@@ -292,6 +284,9 @@ const CategoryCard = ({
                 updateState({ loading: false });
             });
     };
+    useEffect(() => {
+        if (item) updateState({ isActive: item.enabled });
+    }, [item]);
 
     return (
         <View
@@ -306,8 +301,22 @@ const CategoryCard = ({
             ]}
         >
             <BottomPopup
+                isShow={isShowAdd}
+                title="Add Sub-Category"
+                onClose={() => updateState({ isShowAdd: false })}
+                component={
+                    <CreateCategoryManagment
+                        onClose={() => {
+                            updateState({ isShowAdd: false });
+                            onDone();
+                        }}
+                        parentId={item?._id || null}
+                    />
+                }
+            />
+            <BottomPopup
                 isShow={isShowCreate}
-                title="Edit Root Category"
+                title="Edit Category"
                 onClose={() => updateState({ isShowCreate: false })}
                 component={
                     <CreateCategoryManagment
@@ -317,6 +326,7 @@ const CategoryCard = ({
                         }}
                         isEdit
                         item={item}
+                        parentId={item?.parentId || null}
                     />
                 }
             />
@@ -360,7 +370,9 @@ const CategoryCard = ({
                         </View>
                     )}
 
-                    <TouchableOpacity onPress={() => onAdd(item)}>
+                    <TouchableOpacity
+                        onPress={() => updateState({ isShowAdd: true })}
+                    >
                         <Feather name="plus" size={18} color="#10B981" />
                     </TouchableOpacity>
 
@@ -375,10 +387,11 @@ const CategoryCard = ({
                     </TouchableOpacity>
 
                     <Switch
-                        value={item.enabled}
+                        value={isActive}
                         onValueChange={(v) => {
                             onToggle(item, v);
-                            __handleEditSave(!item.enabled);
+                            __handleEditSave(v);
+                            updateState({ isActive: v });
                         }}
                         trackColor={{
                             false: "#E5E7EB",

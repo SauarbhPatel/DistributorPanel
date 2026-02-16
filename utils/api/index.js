@@ -28,6 +28,7 @@ export function __apiHeaderFormDataNew() {
 }
 
 export const __getApiData = (endpoint) => {
+    // console.log(`${_HOST}${endpoint}`);
     return axios
         .get(`${_HOST}${endpoint}`, __apiHeaderNew())
         .then((response) => {
@@ -39,6 +40,7 @@ export const __getApiData = (endpoint) => {
 };
 
 export const __postApiData = (endpoint, data, type) => {
+    console.log(JSON.stringify(data));
     return axios
         .post(
             `${_HOST}${endpoint}`,
@@ -69,6 +71,8 @@ export const __putApiData = (endpoint, data, type) => {
 };
 export const __patchApiData = (endpoint, data, type) => {
     console.log(`${_HOST}${endpoint}`);
+    console.log(JSON.stringify(data));
+
     return axios
         .patch(
             `${_HOST}${endpoint}`,

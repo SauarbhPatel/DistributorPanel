@@ -197,3 +197,29 @@ export function isValidAadhaar(aadhaar) {
 
     return c === 0;
 }
+
+export function createCategoryList(categories) {
+    const result = [];
+
+    function traverse(nodes, parentPath = "") {
+        nodes.forEach((node) => {
+            const currentPath = parentPath
+                ? `${parentPath} > ${node.name}`
+                : node.name;
+
+            result.push({
+                id: node._id,
+                name: currentPath,
+                slug: node.slug,
+                isActive: node.isActive,
+            });
+
+            if (node.children && node.children.length > 0) {
+                traverse(node.children, currentPath);
+            }
+        });
+    }
+
+    traverse(categories);
+    return result;
+}

@@ -322,14 +322,6 @@ const inputStyle = {
     paddingVertical: 6,
 };
 
-const labelStyle = {
-    ...Fonts.blackColor14Medium,
-};
-
-const hintText = {
-    ...Fonts.grayColor11Regular,
-};
-
 const styles = {
     chip: {
         flexDirection: "row",

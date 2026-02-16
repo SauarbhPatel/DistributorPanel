@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Switch, Alert } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import BottomPopup from "../common/BottomPopup";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
-import { Loader, TextAreaBox } from "../../modules";
+import { DropDownTextAreaBox, Loader, TextAreaBox } from "../../modules";
 import { __patchApiData, __postApiData } from "../../utils/api";
 
 const CreateProductAttribute = ({
@@ -12,25 +11,55 @@ const CreateProductAttribute = ({
     item = null,
 }) => {
     const [state, setState] = useState({
-        isShowCreate: false,
-        attributeName: "",
-        slug: "",
-        valueInput: "",
-        values: [],
-        isActive: true,
         loading: false,
+        //
+        attributeName: "",
+        attributeType: "SELECT",
+        code: "",
+        abbreviation: "",
+        characterLimit: null,
+        description: "",
+        minRangeValue: null,
+        maxRangeValue: null,
+        unit: "",
+        status: "DRAFT",
+        scope: "GLOBAL",
+
+        //
+        isFilterable: false,
+        isVariant: false,
+        isActive: true,
+        isSearchable: false,
+        isSortable: false,
+        isComparable: false,
+        isVisibleOnFrontend: true,
+        isEditableAfterApproval: false,
     });
 
     const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
 
     const {
         loading,
-        isShowCreate,
         attributeName,
-        slug,
-        valueInput,
-        values,
+        attributeType,
+        code,
+        abbreviation,
+        characterLimit,
+        description,
+        minRangeValue,
+        maxRangeValue,
+        unit,
+        status,
+        scope,
+        //
         isActive,
+        isFilterable,
+        isVariant,
+        isSearchable,
+        isSortable,
+        isComparable,
+        isVisibleOnFrontend,
+        isEditableAfterApproval,
     } = state;
 
     const validateForm = () => {
@@ -46,46 +75,60 @@ const CreateProductAttribute = ({
             );
             return false;
         }
-
-        if (values?.length === 0) {
+        if (!code?.trim()) {
+            Alert.alert("Validation Error", "Attribute code is required");
+            return false;
+        }
+        if (
+            minRangeValue &&
+            maxRangeValue &&
+            Number(minRangeValue) >= Number(maxRangeValue)
+        ) {
             Alert.alert(
                 "Validation Error",
-                "Please add at least one allowed value",
+                `Min value must be less than Max value`,
             );
             return false;
         }
+        // if (!characterLimit && attributeType === "TEXT") {
+        //     Alert.alert(
+        //         "Validation Error",
+        //         "Character limit is required for TEXT attributes",
+        //     );
+        //     return false;
+        // }
 
         return true;
     };
-    const addValue = () => {
-        if (valueInput?.trim()) {
-            updateState({
-                values: [...values, ...valueInput?.split(",")],
-                valueInput: "",
-            });
-        }
-    };
-    const removeValue = (index) => {
-        // const updatedValues = values.filter((_, i) => i !== index);
-        // updateState({ values: updatedValues });
-        Alert.alert(
-            "Remove Value",
-            "Are you sure you want to remove this value?",
-            [
-                { text: "Cancel", style: "cancel" },
-                {
-                    text: "Remove",
-                    style: "destructive",
-                    onPress: () => {
-                        const updatedValues = values.filter(
-                            (_, i) => i !== index,
-                        );
-                        updateState({ values: updatedValues });
-                    },
-                },
-            ],
-        );
-    };
+    // const addValue = () => {
+    //     if (valueInput?.trim()) {
+    //         updateState({
+    //             values: [...values, ...valueInput?.split(",")],
+    //             valueInput: "",
+    //         });
+    //     }
+    // };
+    // const removeValue = (index) => {
+    //     // const updatedValues = values.filter((_, i) => i !== index);
+    //     // updateState({ values: updatedValues });
+    //     Alert.alert(
+    //         "Remove Value",
+    //         "Are you sure you want to remove this value?",
+    //         [
+    //             { text: "Cancel", style: "cancel" },
+    //             {
+    //                 text: "Remove",
+    //                 style: "destructive",
+    //                 onPress: () => {
+    //                     const updatedValues = values.filter(
+    //                         (_, i) => i !== index,
+    //                     );
+    //                     updateState({ values: updatedValues });
+    //                 },
+    //             },
+    //         ],
+    //     );
+    // };
 
     const __handleSave = () => {
         if (!validateForm()) return;
@@ -93,11 +136,40 @@ const CreateProductAttribute = ({
 
         __postApiData("/productAttributes/createAttribute", {
             name: attributeName,
-            type: "SELECT",
-            allowedValues: values,
-            isFilterable: isActive,
-            isVariant: isActive,
-            status: isActive,
+            code: code,
+            abbreviation: abbreviation,
+            description: description,
+            type: attributeType,
+            status: status,
+            scope: scope,
+            ...(attributeType === "TEXT" &&
+                characterLimit != null &&
+                characterLimit != "" && {
+                    characterLimit: Number(characterLimit),
+                }),
+
+            ...(["NUMBER", "UNIT_RANGE"].includes(attributeType) &&
+                minRangeValue != null &&
+                minRangeValue != "" && {
+                    minRangeValue: Number(minRangeValue),
+                }),
+            ...(["NUMBER", "UNIT_RANGE"].includes(attributeType) &&
+                maxRangeValue != null &&
+                maxRangeValue != "" && {
+                    maxRangeValue: Number(maxRangeValue),
+                }),
+            ...(attributeType === "UNIT_RANGE" &&
+                unit != null &&
+                unit != "" && { unit: unit }),
+            //
+            isFilterable: isFilterable,
+            isVariant: isVariant,
+            isSearchable: isSearchable,
+            isSortable: isSortable,
+            isComparable: isComparable,
+            isVisibleOnFrontend: isVisibleOnFrontend,
+            isEditableAfterApproval: isEditableAfterApproval,
+            isActive: isActive,
         })
             .then((res) => {
                 console.log(JSON.stringify(res));
@@ -121,12 +193,46 @@ const CreateProductAttribute = ({
         updateState({ loading: true });
 
         __patchApiData("/productAttributes/updateAttibuteBy/" + item?._id, {
-            name: attributeName,
-            type: "SELECT",
-            allowedValues: values,
-            isFilterable: isActive,
-            isVariant: isActive,
-            status: isActive,
+            ...(attributeName != item?.name && { name: attributeName }),
+            ...(code != item?.code && { code: code }),
+            ...(abbreviation != item?.abbreviation && {
+                abbreviation: abbreviation,
+            }),
+            ...(description != item?.description && {
+                description: description,
+            }),
+            type: attributeType,
+
+            status: status,
+            scope: scope,
+            ...(attributeType === "TEXT" &&
+                characterLimit != null &&
+                characterLimit != "" && {
+                    characterLimit: Number(characterLimit),
+                }),
+
+            ...(["NUMBER", "UNIT_RANGE"].includes(attributeType) &&
+                minRangeValue != null &&
+                minRangeValue != "" && {
+                    minRangeValue: Number(minRangeValue),
+                }),
+            ...(["NUMBER", "UNIT_RANGE"].includes(attributeType) &&
+                maxRangeValue != null &&
+                maxRangeValue != "" && {
+                    maxRangeValue: Number(maxRangeValue),
+                }),
+            ...(attributeType === "UNIT_RANGE" &&
+                unit != null &&
+                unit != "" && { unit: unit }),
+            //
+            isFilterable: isFilterable,
+            isVariant: isVariant,
+            isSearchable: isSearchable,
+            isSortable: isSortable,
+            isComparable: isComparable,
+            isVisibleOnFrontend: isVisibleOnFrontend,
+            isEditableAfterApproval: isEditableAfterApproval,
+            isActive: isActive,
         })
             .then((res) => {
                 console.log(JSON.stringify(res));
@@ -149,8 +255,24 @@ const CreateProductAttribute = ({
         if (isEdit) {
             updateState({
                 attributeName: item?.name,
-                values: item?.allowedValues,
-                isActive: item?.status,
+                code: item?.code,
+                abbreviation: item?.abbreviation,
+                description: item?.description,
+                attributeType: item?.type,
+                status: item?.status,
+                scope: item?.scope,
+                characterLimit: item?.characterLimit || null,
+                minRangeValue: item?.minRangeValue || null,
+                maxRangeValue: item?.maxRangeValue || null,
+                unit: item?.unit,
+                isFilterable: item?.isFilterable || false,
+                isVariant: item?.isVariant || false,
+                isSearchable: item?.isSearchable || false,
+                isSortable: item?.isSortable || false,
+                isComparable: item?.isComparable || false,
+                isVisibleOnFrontend: item?.isVisibleOnFrontend || false,
+                isEditableAfterApproval: item?.isEditableAfterApproval || false,
+                isActive: item?.isActive || false,
             });
         }
     }, [isEdit, item]);
@@ -172,96 +294,458 @@ const CreateProductAttribute = ({
                     <View style={{ flexDirection: "row", gap: 10 }}>
                         <TextAreaBox
                             title="Attribute Name"
-                            placeholder="e.g., Color, Size"
+                            placeholder="e.g., Color, Battery Capacity"
                             required
                             value={attributeName}
                             valuekey="attributeName"
                             onChangeText={updateState}
                             titleCustomStyle={{ marginHorizontal: 0 }}
                             inputCustomStyle={inputStyle}
-                            customStyle={{ flex: 1 }}
+                            customStyle={{ flex: 1.5 }}
                         />
 
-                        {/* <TextAreaBox
-                            title="Slug (Optional)"
-                            placeholder="e.g., color"
-                            value={slug}
-                            valuekey="slug"
-                            onChangeText={updateState}
-                            titleCustomStyle={{ marginHorizontal: 0 }}
+                        <DropDownTextAreaBox
+                            type="select"
+                            title={"Data type"}
+                            placeholder={"Select Data type"}
+                            list={[
+                                "TEXT",
+                                "SELECT",
+                                "NUMBER",
+                                "CHECKBOX",
+                                "BOOLEAN",
+                                "FILE",
+                                "DATE",
+                                "UNITRANGE",
+                            ].map((type) => ({
+                                id: type == "UNITRANGE" ? "UNIT_RANGE" : type,
+                                name: type,
+                            }))}
+                            value={
+                                attributeType
+                                    ? {
+                                          name:
+                                              attributeType == "UNIT_RANGE"
+                                                  ? "UNITRANGE"
+                                                  : attributeType,
+                                          id: attributeType,
+                                      }
+                                    : null
+                            }
+                            isSearchable
+                            required
+                            titleCustomStyle={{
+                                marginHorizontal: 0,
+                            }}
                             inputCustomStyle={inputStyle}
-                            customStyle={{ flex: 1 }}
-                        /> */}
+                            onSelected={(value) => {
+                                updateState({
+                                    attributeType: value.id,
+                                    isVariant:
+                                        value.id === "SELECT"
+                                            ? isVariant
+                                            : false,
+                                });
+                            }}
+                            customStyle={{ marginBottom: 5, flex: 1 }}
+                        />
                     </View>
-
                     <TextAreaBox
-                        title="Allowed Values"
-                        placeholder="Type and press Enter (e.g., Red, Blue)"
-                        value={valueInput}
-                        onSubmitEditing={addValue}
-                        // inputCustomStyle={inputStyle}
-                        valuekey="valueInput"
+                        title="Attribute code (system key)"
+                        placeholder="e.g. colour, battery_capacity"
+                        required
+                        value={code}
+                        valuekey="code"
                         onChangeText={updateState}
                         titleCustomStyle={{
                             marginHorizontal: 0,
                             marginTop: 10,
                         }}
                         inputCustomStyle={inputStyle}
-                        customStyle={{ flex: 1 }}
                     />
+                    <TextAreaBox
+                        title="Attribute Abbreviation"
+                        placeholder="e.g. CLR, BATT"
+                        value={abbreviation}
+                        valuekey="abbreviation"
+                        onChangeText={updateState}
+                        titleCustomStyle={{
+                            marginHorizontal: 0,
+                            marginTop: 10,
+                        }}
+                        inputCustomStyle={inputStyle}
+                    />
+
+                    {/* {attributeType === "SELECT" && (
+                        <TextAreaBox
+                            title="Allowed Values"
+                            placeholder="Type and press Enter (e.g., Red, Blue)"
+                            value={valueInput}
+                            onSubmitEditing={addValue}
+                            // inputCustomStyle={inputStyle}
+                            valuekey="valueInput"
+                            onChangeText={updateState}
+                            titleCustomStyle={{
+                                marginHorizontal: 0,
+                                marginTop: 10,
+                            }}
+                            inputCustomStyle={inputStyle}
+                            customStyle={{ flex: 1 }}
+                        />
+                    )}*/}
                 </View>
 
-                {/* Value Chips */}
+                {/* {attributeType === "SELECT" && (
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            flexWrap: "wrap",
+                            gap: 8,
+                        }}
+                    >
+                        {values.map((item, index) => (
+                            <TouchableOpacity
+                                onPress={() => removeValue(index)}
+                                key={index}
+                                style={styles.chip}
+                            >
+                                <Text style={styles.chipText}>{item}</Text>
+
+                                <View style={{ marginLeft: 6 }}>
+                                    <FontAwesome
+                                        name="close"
+                                        size={12}
+                                        color="#555"
+                                    />
+                                </View>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                )} */}
+
+                {/* {attributeType === "SELECT" && (
+                    <Text style={hintText}>* Press Enter to save a value.</Text>
+                )} */}
+                {["TEXT", "NUMBER", "UNIT_RANGE"].includes(attributeType) && (
+                    <View
+                        style={{
+                            padding: 10,
+                            borderWidth: 1,
+                            borderColor: Colors.borderColor,
+                            borderRadius: 10,
+                            backgroundColor: Colors.bodyColor,
+                        }}
+                    >
+                        <Text style={{ ...hintText, fontSize: 12 }}>
+                            Validation
+                        </Text>
+                        {attributeType === "TEXT" && (
+                            <TextAreaBox
+                                title="Character limit"
+                                placeholder=""
+                                value={characterLimit?.toString() || ""}
+                                valuekey="characterLimit"
+                                onChangeText={(value) =>
+                                    updateState({
+                                        characterLimit: value?.characterLimit
+                                            ? parseInt(value.characterLimit)
+                                            : null,
+                                    })
+                                }
+                                titleCustomStyle={{
+                                    marginHorizontal: 0,
+                                    marginTop: 10,
+                                }}
+                                inputCustomStyle={inputStyle}
+                                keyboardType="number-pad"
+                                customInputProps={{ maxLength: 6 }}
+                            />
+                        )}
+                        {["NUMBER", "UNIT_RANGE"].includes(attributeType) && (
+                            <>
+                                <View style={{ flexDirection: "row", gap: 10 }}>
+                                    <TextAreaBox
+                                        title="Min value"
+                                        placeholder=""
+                                        value={minRangeValue?.toString() || ""}
+                                        valuekey="minRangeValue"
+                                        onChangeText={(value) =>
+                                            updateState({
+                                                minRangeValue:
+                                                    value?.minRangeValue
+                                                        ? parseInt(
+                                                              value.minRangeValue,
+                                                          )
+                                                        : null,
+                                            })
+                                        }
+                                        titleCustomStyle={{
+                                            marginHorizontal: 0,
+                                            marginTop: 10,
+                                        }}
+                                        inputCustomStyle={inputStyle}
+                                        customStyle={{ flex: 1 }}
+                                        keyboardType="number-pad"
+                                        // customInputProps={{ maxLength: 6 }}
+                                    />
+                                    <TextAreaBox
+                                        title="Max value"
+                                        placeholder=""
+                                        value={maxRangeValue?.toString() || ""}
+                                        valuekey="maxRangeValue"
+                                        onChangeText={(value) =>
+                                            updateState({
+                                                maxRangeValue:
+                                                    value?.maxRangeValue
+                                                        ? parseInt(
+                                                              value.maxRangeValue,
+                                                          )
+                                                        : null,
+                                            })
+                                        }
+                                        titleCustomStyle={{
+                                            marginHorizontal: 0,
+                                            marginTop: 10,
+                                        }}
+                                        inputCustomStyle={inputStyle}
+                                        customStyle={{ flex: 1 }}
+                                        keyboardType="number-pad"
+                                        // customInputProps={{ maxLength: 10 }}
+                                    />
+                                </View>
+                                {attributeType === "UNIT_RANGE" && (
+                                    <TextAreaBox
+                                        title="Unit"
+                                        placeholder="e.g. mAh, Kg, MHz, cm"
+                                        value={unit}
+                                        valuekey="unit"
+                                        onChangeText={updateState}
+                                        titleCustomStyle={{
+                                            marginHorizontal: 0,
+                                            marginTop: 10,
+                                        }}
+                                        inputCustomStyle={inputStyle}
+                                    />
+                                )}
+                            </>
+                        )}
+                    </View>
+                )}
+                <TextAreaBox
+                    title="Description"
+                    placeholder=""
+                    value={description}
+                    valuekey="description"
+                    onChangeText={updateState}
+                    titleCustomStyle={{
+                        marginHorizontal: 0,
+                        marginTop: 0,
+                    }}
+                    inputCustomStyle={{
+                        ...inputStyle,
+                    }}
+                    customInputProps={{
+                        multiline: true,
+                        numberOfLines: 4,
+                        textAlignVertical: "top",
+                    }}
+                />
+                <DropDownTextAreaBox
+                    type="select"
+                    title={"Status"}
+                    placeholder={"Select Status"}
+                    list={["DRAFT", "SUBMIT", "APPROVED", "REJECTED"].map(
+                        (type) => ({
+                            id: type,
+                            name: type,
+                        }),
+                    )}
+                    value={
+                        status
+                            ? {
+                                  name: status,
+                                  id: status,
+                              }
+                            : null
+                    }
+                    isSearchable
+                    required
+                    titleCustomStyle={{
+                        marginHorizontal: 0,
+                        marginTop: 0,
+                    }}
+                    inputCustomStyle={inputStyle}
+                    onSelected={(value) => {
+                        updateState({
+                            status: value.id,
+                        });
+                    }}
+                    customStyle={{ marginBottom: 5, flex: 1 }}
+                />
+                <DropDownTextAreaBox
+                    type="select"
+                    title={"Scope "}
+                    placeholder={"Select Scope"}
+                    list={["GLOBAL", "CATEGORY", "BRAND"].map((type) => ({
+                        id: type,
+                        name: type,
+                    }))}
+                    value={
+                        scope
+                            ? {
+                                  name: scope,
+                                  id: scope,
+                              }
+                            : null
+                    }
+                    isSearchable
+                    required
+                    titleCustomStyle={{
+                        marginHorizontal: 0,
+                        marginTop: 0,
+                    }}
+                    inputCustomStyle={inputStyle}
+                    onSelected={(value) => {
+                        updateState({
+                            scope: value.id,
+                        });
+                    }}
+                    customStyle={{ marginBottom: 5, flex: 1 }}
+                />
                 <View
                     style={{
-                        flexDirection: "row",
-                        flexWrap: "wrap",
-                        gap: 8,
+                        padding: 10,
+                        borderWidth: 1,
+                        borderColor: Colors.borderColor,
+                        borderRadius: 10,
+                        backgroundColor: Colors.bodyColor,
+                        gap: 10,
                     }}
                 >
-                    {values.map((item, index) => (
-                        <TouchableOpacity
-                            onPress={() => removeValue(index)}
-                            key={index}
-                            style={styles.chip}
-                        >
-                            <Text style={styles.chipText}>{item}</Text>
-
-                            <View style={{ marginLeft: 6 }}>
-                                <FontAwesome
-                                    name="close"
-                                    size={12}
-                                    color="#555"
-                                />
-                            </View>
-                        </TouchableOpacity>
-                    ))}
-                </View>
-
-                <Text style={hintText}>* Press Enter to save a value.</Text>
-
-                {/* Active Status */}
-                <View style={styles.statusBox}>
-                    <View>
-                        <Text style={Fonts.blackColor15Medium}>
-                            Active Status
-                        </Text>
-                        <Text
-                            style={{ ...Fonts.grayColor14Medium, fontSize: 10 }}
-                        >
-                            Enable or disable this attribute
-                        </Text>
+                    <Text style={{ ...hintText, fontSize: 12 }}>
+                        Behavior flags
+                    </Text>
+                    <View style={styles.statusBox}>
+                        <Text style={Fonts.blackColor15Medium}>Filterable</Text>
+                        <Switch
+                            value={isFilterable}
+                            onValueChange={(value) =>
+                                updateState({ isFilterable: value })
+                            }
+                            trackColor={{
+                                false: "#ccc",
+                                true: Colors.primaryColor,
+                            }}
+                        />
                     </View>
-                    <Switch
-                        value={isActive}
-                        onValueChange={(value) =>
-                            updateState({ isActive: value })
-                        }
-                        trackColor={{
-                            false: "#ccc",
-                            true: Colors.primaryColor,
-                        }}
-                    />
+                    <View style={styles.statusBox}>
+                        <Text style={Fonts.blackColor15Medium}>Searchable</Text>
+                        <Switch
+                            value={isSearchable}
+                            onValueChange={(value) =>
+                                updateState({ isSearchable: value })
+                            }
+                            trackColor={{
+                                false: "#ccc",
+                                true: Colors.primaryColor,
+                            }}
+                        />
+                    </View>
+                    <View style={styles.statusBox}>
+                        <Text style={Fonts.blackColor15Medium}>Sortable</Text>
+                        <Switch
+                            value={isSortable}
+                            onValueChange={(value) =>
+                                updateState({ isSortable: value })
+                            }
+                            trackColor={{
+                                false: "#ccc",
+                                true: Colors.primaryColor,
+                            }}
+                        />
+                    </View>
+                    <View
+                        style={[
+                            styles.statusBox,
+                            // attributeType !== "SELECT" && { opacity: 0.9 },
+                        ]}
+                    >
+                        <Text
+                            style={[
+                                Fonts.blackColor15Medium,
+                                attributeType !== "SELECT" && { opacity: 0.5 },
+                            ]}
+                        >
+                            Variant
+                        </Text>
+                        <Switch
+                            value={isVariant}
+                            onValueChange={(value) =>
+                                updateState({ isVariant: value })
+                            }
+                            trackColor={{
+                                false: "#ccc",
+                                true: Colors.primaryColor,
+                            }}
+                            disabled={attributeType !== "SELECT"}
+                        />
+                    </View>
+                    <View style={[styles.statusBox]}>
+                        <Text style={Fonts.blackColor15Medium}>Comparable</Text>
+                        <Switch
+                            value={isComparable}
+                            onValueChange={(value) =>
+                                updateState({ isComparable: value })
+                            }
+                            trackColor={{
+                                false: "#ccc",
+                                true: Colors.primaryColor,
+                            }}
+                        />
+                    </View>
+                    <View style={[styles.statusBox]}>
+                        <Text style={Fonts.blackColor15Medium}>
+                            Visible on frontend
+                        </Text>
+                        <Switch
+                            value={isVisibleOnFrontend}
+                            onValueChange={(value) =>
+                                updateState({ isVisibleOnFrontend: value })
+                            }
+                            trackColor={{
+                                false: "#ccc",
+                                true: Colors.primaryColor,
+                            }}
+                        />
+                    </View>
+                    <View style={[styles.statusBox]}>
+                        <Text style={Fonts.blackColor15Medium}>
+                            Editable after approval
+                        </Text>
+                        <Switch
+                            value={isEditableAfterApproval}
+                            onValueChange={(value) =>
+                                updateState({ isEditableAfterApproval: value })
+                            }
+                            trackColor={{
+                                false: "#ccc",
+                                true: Colors.primaryColor,
+                            }}
+                        />
+                    </View>
+                    <View style={styles.statusBox}>
+                        <Text style={Fonts.blackColor15Medium}>Active</Text>
+                        <Switch
+                            value={isActive}
+                            onValueChange={(value) =>
+                                updateState({ isActive: value })
+                            }
+                            trackColor={{
+                                false: "#ccc",
+                                true: Colors.primaryColor,
+                            }}
+                        />
+                    </View>
                 </View>
 
                 {/* Action Buttons */}
@@ -299,12 +783,9 @@ const inputStyle = {
     paddingVertical: 6,
 };
 
-const labelStyle = {
-    ...Fonts.blackColor14Medium,
-};
-
 const hintText = {
-    ...Fonts.grayColor11Regular,
+    ...Fonts.blackColor11Medium,
+    marginTop: -5,
 };
 
 const styles = {
@@ -328,7 +809,8 @@ const styles = {
         borderColor: "#e5e7eb",
         borderRadius: Sizes.fixPadding,
         padding: Sizes.fixPadding,
-        marginTop: 10,
+        // marginTop: 10,
+        backgroundColor: Colors.whiteColor,
     },
 
     footer: {

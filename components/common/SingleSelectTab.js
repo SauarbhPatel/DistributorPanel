@@ -30,15 +30,27 @@ const SingleSelectTab = ({
                                               : Colors.whiteColor,
                                   }
                                 : tabType == 2
-                                ? {
-                                      borderBottomWidth: 1.5,
-                                      padding: 10,
-                                      borderColor:
-                                          active == item?.id
-                                              ? Colors.greenColor
-                                              : Colors.whiteColor,
-                                  }
-                                : {}
+                                  ? {
+                                        borderBottomWidth: 1.5,
+                                        padding: 10,
+                                        borderColor:
+                                            active == item?.id
+                                                ? Colors.greenColor
+                                                : Colors.whiteColor,
+                                    }
+                                  : tabType == 3
+                                    ? {
+                                          borderWidth: 1.5,
+                                          borderColor: Colors.greenColor,
+                                          padding: 10,
+                                          borderRadius: 10,
+                                          paddingHorizontal: 10,
+                                          backgroundColor:
+                                              active == item?.id
+                                                  ? Colors.greenColor
+                                                  : Colors.whiteColor,
+                                      }
+                                    : {}
                         }
                     >
                         <Text
@@ -48,7 +60,9 @@ const SingleSelectTab = ({
                                     active == item?.id
                                         ? tabType == 1
                                             ? Colors.whiteColor
-                                            : Colors.greenColor
+                                            : tabType == 3
+                                              ? Colors.whiteColor
+                                              : Colors.greenColor
                                         : Colors.blackColor,
                             }}
                         >

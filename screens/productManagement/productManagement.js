@@ -41,14 +41,13 @@ const PRODUCT_MENU = [
 ];
 
 const ProductManagement = ({ navigation }) => {
-    const [list, setlist] = useState([]);
-    const [state, setState] = useState({
-        loading: false,
-    });
+    // const [state, setState] = useState({
+    //     loading: false,
+    // });
 
-    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+    // const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
-    const { loading, active } = state;
+    // const { loading, active } = state;
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>

@@ -15,57 +15,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import CommonHeader from "../../components/common/CommonHeader";
 import { __deleteApiData, __getApiData } from "../../utils/api";
-import CreateProductAttribute from "../../components/form/CreateProductAttribute";
+import CreateAttribute from "../../components/form/CreateAttribute";
 import BottomPopup from "../../components/common/BottomPopup";
 import { Loader } from "../../modules";
-
-const ATTRIBUTE_SET_LIST = [
-    {
-        _id: "set_1",
-        name: "Basic T-Shirt Attributes",
-        description: "Essential attributes for T-shirts",
-        attributes: [
-            "Color",
-            "Size",
-            "Material",
-            "Neck Type",
-            "Fit",
-            "Pattern",
-        ],
-        status: "Active",
-    },
-    {
-        _id: "set_2",
-        name: "Fashion Apparel Complete",
-        description: "Complete attribute set for fashion items",
-        attributes: [
-            "Color",
-            "Size",
-            "Material",
-            "Sleeve Length",
-            "Neck Type",
-            "Fit",
-            "Pattern",
-            "Occasion",
-            "Wash Care",
-            "Brand",
-        ],
-        status: "Active",
-    },
-    {
-        _id: "set_3",
-        name: "Electronics Basic Specs",
-        description: "Core specifications for electronics",
-        attributes: [
-            "Brand",
-            "Model",
-            "Color",
-            "Warranty",
-            "Power Consumption",
-        ],
-        status: "Inactive",
-    },
-];
 
 const AttributeSets = ({ navigation }) => {
     const [search, setSearch] = useState("");
@@ -93,18 +45,21 @@ const AttributeSets = ({ navigation }) => {
         try {
             updateState({ loading: true });
             const res = await __getApiData(`/attributeSet/getAllAttributeSet`);
-            console.log(JSON.stringify(res));
             if (res?.success) {
                 updateState({
                     list: res.data?.map((item) => ({
                         ...item,
-                        attributes: item?.variantAttributes
-                            .map((variant) => variant?.name)
-                            .concat(
-                                item?.regularAttributes.map(
-                                    (variant) => variant?.name,
-                                ),
-                            ),
+                        attributesString: item?.attributes.map(
+                            (variant) => variant?.name,
+                        ),
+
+                        // attributes: item?.variantAttributes
+                        //     .map((variant) => variant?.name)
+                        //     .concat(
+                        //         item?.regularAttributes.map(
+                        //             (variant) => variant?.name,
+                        //         ),
+                        //     ),
                     })),
                     // ...res?.data?.stats,
                 });
@@ -137,7 +92,7 @@ const AttributeSets = ({ navigation }) => {
                             updateState({ loading: true });
 
                             const res = await __deleteApiData(
-                                `/productAttributes/deleteAttributeById/${id}`,
+                                `/attributeSet/deleteAttributeSetById/${id}`,
                             );
                             if (res?.success) {
                                 // refresh list after delete
@@ -168,19 +123,19 @@ const AttributeSets = ({ navigation }) => {
                 {searchAndAdd()}
                 {attributeCards()}
             </ScrollView>
-            {/* <BottomPopup
+            <BottomPopup
                 isShow={isShowCreate}
-                title="Add New Attribute"
+                title="Add New Attribute Set"
                 onClose={() => updateState({ isShowCreate: false })}
                 component={
-                    <CreateProductAttribute
+                    <CreateAttribute
                         onClose={() => {
                             updateState({ isShowCreate: false });
                             __handleGetData(search);
                         }}
                     />
                 }
-            /> */}
+            />
         </SafeAreaView>
     );
 
@@ -235,7 +190,7 @@ const AttributeSets = ({ navigation }) => {
                     onPress={() => updateState({ isShowCreate: true })}
                 >
                     <Feather name="plus" size={18} color={Colors.whiteColor} />
-                    <Text style={styles.addText}>Add Attribute Set</Text>
+                    <Text style={styles.addText}>Add Set</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -266,6 +221,21 @@ const ListCard = ({ item, __handleDeleteAttribute, onDone = () => {} }) => {
     return (
         <View style={styles.card}>
             {/* Header */}
+            <BottomPopup
+                isShow={state?.isShowCreate}
+                title="Edit Attribute"
+                onClose={() => updateState({ isShowCreate: false })}
+                component={
+                    <CreateAttribute
+                        onClose={() => {
+                            updateState({ isShowCreate: false });
+                            onDone();
+                        }}
+                        item={item}
+                        isEdit={true}
+                    />
+                }
+            />
             <View style={styles.cardHeader}>
                 <View style={styles.titleRow}>
                     <MaterialIcons
@@ -297,16 +267,16 @@ const ListCard = ({ item, __handleDeleteAttribute, onDone = () => {} }) => {
 
             {/* Attribute Chips */}
             <View style={styles.chipRow}>
-                {item.attributes.slice(0, 5).map((attr, index) => (
+                {item.attributesString.slice(0, 5).map((attr, index) => (
                     <View key={index} style={styles.chip}>
                         <Text style={styles.chipText}>{attr}</Text>
                     </View>
                 ))}
 
-                {item.attributes.length > 5 && (
+                {item.attributesString.length > 5 && (
                     <View style={styles.moreChip}>
                         <Text style={styles.moreText}>
-                            +{item.attributes.length - 5} more
+                            +{item.attributesString.length - 5} more
                         </Text>
                     </View>
                 )}
@@ -315,7 +285,7 @@ const ListCard = ({ item, __handleDeleteAttribute, onDone = () => {} }) => {
             {/* Footer */}
             <View style={styles.cardFooter}>
                 <Text style={styles.countText}>
-                    {item.attributes.length} Attributes
+                    {item.attributesString.length} Attributes
                 </Text>
 
                 <View style={styles.actions}>

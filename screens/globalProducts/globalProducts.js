@@ -10,13 +10,14 @@ import {
     Alert,
 } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
-import { Feather, MaterialIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import CommonHeader from "../../components/common/CommonHeader";
 import { __deleteApiData, __getApiData } from "../../utils/api";
 import BottomPopup from "../../components/common/BottomPopup";
 import { Loader } from "../../modules";
+import CreateGlobalProducts from "../../components/form/CreateGlobalProducts";
 
 const GlobalProducts = ({ navigation }) => {
     const [search, setSearch] = useState("");
@@ -118,19 +119,20 @@ const GlobalProducts = ({ navigation }) => {
                 {searchAndAdd()}
                 {ProductsCards()}
             </ScrollView>
-            {/* <BottomPopup
+            <BottomPopup
                 isShow={isShowCreate}
-                title="Add New Products"
+                title="Create Global Product"
                 onClose={() => updateState({ isShowCreate: false })}
                 component={
-                    <CreateProductProducts
+                    <CreateGlobalProducts
                         onClose={() => {
                             updateState({ isShowCreate: false });
                             __handleGetData(search);
                         }}
                     />
                 }
-            /> */}
+                top="10%"
+            />
         </SafeAreaView>
     );
 
