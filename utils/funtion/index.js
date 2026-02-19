@@ -63,6 +63,22 @@ export function __formatDate(date) {
 
     return formattedDate;
 }
+export function __formatDate2(date) {
+    let inputDate = new Date(date);
+    if (!(inputDate instanceof Date)) {
+        throw new Error("Input must be a valid Date object");
+    }
+
+    const day = inputDate.getDate().toString().padStart(2, "0");
+
+    const month = monthNames[inputDate.getMonth()];
+    const year = inputDate.getFullYear();
+    const hours = inputDate.getHours() % 12 || 12; // Convert to 12-hour format
+
+    const formattedDate = `${month} ${day}, ${year} ${hours}`;
+
+    return formattedDate;
+}
 
 export const checkLanguage = async () => {
     try {

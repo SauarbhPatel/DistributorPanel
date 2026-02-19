@@ -236,25 +236,6 @@ const ListCard = ({ item, onDelete, onDone }) => {
                 <Text style={styles.name} numberOfLines={1}>
                     {item.name}
                 </Text>
-
-                <View style={styles.actions}>
-                    <TouchableOpacity
-                        onPress={() => updateState({ isShowCreate: true })}
-                        style={styles.iconBtn}
-                    >
-                        <Feather name="edit-2" size={18} color="#2563EB" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => onDelete(item?._id)}
-                        style={styles.iconBtn}
-                    >
-                        <MaterialIcons
-                            name="delete-outline"
-                            size={20}
-                            color="#DC2626"
-                        />
-                    </TouchableOpacity>
-                </View>
             </View>
 
             {/* Description */}
@@ -266,11 +247,67 @@ const ListCard = ({ item, onDelete, onDone }) => {
 
             {/* HSN Codes */}
             <View style={styles.chipRow}>
-                {item.hsnCodes?.map((hsn) => (
+                {item?.hsnCodesDetails?.map((hsn) => (
                     <View key={hsn._id} style={styles.chip}>
                         <Text style={styles.chipText}>{hsn.code}</Text>
                     </View>
                 ))}
+            </View>
+            {/* Bottom Section */}
+            <View
+                style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginTop: 12,
+                }}
+            >
+                {/* Status */}
+                <View
+                    style={[
+                        {
+                            paddingHorizontal: 10,
+                            paddingVertical: 4,
+                            borderRadius: 20,
+                            backgroundColor: item.isActive
+                                ? "#DCFCE7"
+                                : "#FEE2E2",
+                        },
+                    ]}
+                >
+                    <Text
+                        style={[
+                            {
+                                fontSize: 12,
+                                color: "#6B7280",
+                                marginTop: 2,
+                                color: item.isActive ? "#16A34A" : "#DC2626",
+                            },
+                        ]}
+                    >
+                        {item.isActive ? "Active" : "Inactive"}
+                    </Text>
+                </View>
+
+                {/* Actions */}
+                <View style={{ flexDirection: "row", marginLeft: "auto" }}>
+                    <TouchableOpacity
+                        style={styles.iconBtn}
+                        onPress={() => updateState({ isShowCreate: true })}
+                    >
+                        <Feather name="edit-2" size={18} color="#2563EB" />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.iconBtn}
+                        onPress={() => onDelete(item?._id)}
+                    >
+                        <MaterialIcons
+                            name="delete-outline"
+                            size={20}
+                            color="#DC2626"
+                        />
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
     );

@@ -214,10 +214,10 @@ const ListCard = ({ item, onDelete, onDone }) => {
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
     const { isShowCreate } = state;
-    // console.log(item);
+
     return (
         <View style={styles.card}>
-            {/* Top Row */}
+            {/* Edit Popup */}
             <BottomPopup
                 isShow={isShowCreate}
                 title="Edit HSN Code"
@@ -233,35 +233,58 @@ const ListCard = ({ item, onDelete, onDone }) => {
                     />
                 }
             />
+
+            {/* Top Section */}
             <View style={styles.topRow}>
-                <View style={{ width: "80%" }}>
-                    <Text style={styles.hsnCode}>{item.code}</Text>
+                <View style={{ width: "75%" }}>
+                    <Text style={styles.hsnCode}>HSN: {item.code}</Text>
+
                     <Text style={styles.description} numberOfLines={2}>
                         {item.description}
                     </Text>
+
+                    <Text style={styles.subText}>
+                        GST Slab: {item?.TaxSlabId?.name} (
+                        {item?.TaxSlabId?.code})
+                    </Text>
+
+                    <Text style={styles.subText}>
+                        Product Type: {item.productType}
+                    </Text>
                 </View>
 
+                {/* Tax Badge */}
                 <View style={styles.badge}>
                     <Text style={styles.badgeText}>{item.taxRate}%</Text>
                 </View>
             </View>
 
-            {/* Bottom Row */}
+            {/* Bottom Section */}
             <View style={styles.bottomRow}>
-                {/* <View
+                {/* Status */}
+                <View
                     style={[
-                        styles.statusDot,
+                        styles.statusPill,
                         {
                             backgroundColor: item.isActive
-                                ? "#16A34A"
-                                : "#DC2626",
+                                ? "#DCFCE7"
+                                : "#FEE2E2",
                         },
                     ]}
-                />
-                <Text style={styles.statusText}>
-                    {item.isActive ? "Active" : "Inactive"}
-                </Text> */}
+                >
+                    <Text
+                        style={[
+                            styles.statusText,
+                            {
+                                color: item.isActive ? "#16A34A" : "#DC2626",
+                            },
+                        ]}
+                    >
+                        {item.isActive ? "Active" : "Inactive"}
+                    </Text>
+                </View>
 
+                {/* Actions */}
                 <View style={styles.actionRow}>
                     <TouchableOpacity
                         style={styles.iconBtn}
@@ -454,5 +477,16 @@ const styles = StyleSheet.create({
         marginLeft: 6,
         backgroundColor: "#F3F4F6",
         borderRadius: 8,
+    },
+    statusPill: {
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 20,
+    },
+
+    subText: {
+        fontSize: 12,
+        color: "#6B7280",
+        marginTop: 2,
     },
 });

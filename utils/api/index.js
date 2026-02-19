@@ -71,7 +71,7 @@ export const __putApiData = (endpoint, data, type) => {
 };
 export const __patchApiData = (endpoint, data, type) => {
     console.log(`${_HOST}${endpoint}`);
-    console.log(JSON.stringify(data));
+    console.log("__patchApiData", JSON.stringify(data));
 
     return axios
         .patch(

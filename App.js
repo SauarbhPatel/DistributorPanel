@@ -83,6 +83,7 @@ import CategoryManagment from "./screens/categoryManagment/categoryManagment";
 import GlobalProducts from "./screens/globalProducts/globalProducts";
 import GenericProducts from "./screens/genericProducts/genericProducts";
 import ProductListings from "./screens/productListings/productListings";
+import TaxJurisdiction from "./screens/taxJurisdiction/taxJurisdiction";
 
 LogBox.ignoreAllLogs();
 
@@ -286,6 +287,10 @@ function App() {
                 <Stack.Screen name="HsnCodes" component={HsnCodes} />
                 <Stack.Screen name="HsnSet" component={HsnSet} />
                 <Stack.Screen name="BrandMaster" component={BrandMaster} />
+                <Stack.Screen
+                    name="TaxJurisdiction"
+                    component={TaxJurisdiction}
+                />
                 <Stack.Screen name="TaxTypes" component={TaxTypes} />
                 <Stack.Screen name="TaxMaster" component={TaxMaster} />
                 <Stack.Screen

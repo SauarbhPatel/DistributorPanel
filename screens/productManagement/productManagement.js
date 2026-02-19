@@ -33,6 +33,11 @@ const PRODUCT_MENU = [
     },
     { title: "HSN Code", icon: "qr-code", screen: "HsnCodes" },
     { title: "HSN Set", icon: "qr-code", screen: "HsnSet" },
+    {
+        title: "Tax Jurisdiction",
+        icon: "receipt-long",
+        screen: "TaxJurisdiction",
+    },
     { title: "Tax Master", icon: "receipt-long", screen: "TaxMaster" },
     { title: "Tax Type", icon: "percent", screen: "TaxTypes" },
     { title: "Global Products", icon: "public", screen: "GlobalProducts" },

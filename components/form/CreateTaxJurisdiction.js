@@ -5,57 +5,35 @@ import { DropDownTextAreaBox, Loader, TextAreaBox } from "../../modules";
 import { __patchApiData, __postApiData } from "../../utils/api";
 import { __getCountryList, __getTaxList } from "../../utils/api/commonApi";
 
-const CreateHSNcode = ({ onClose = () => {}, isEdit = false, item = null }) => {
+const CreateTaxJurisdiction = ({
+    onClose = () => {},
+    isEdit = false,
+    item = null,
+    parentId = null,
+}) => {
     const [state, setState] = useState({
         isLoading: false,
-        isActive: true,
         country: null,
-        description: "",
+        jurisdictionsName: "",
         code: "",
-        productType: "",
+        isActive: true,
+
         //
         countryList: [],
     });
 
     const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
 
-    const {
-        isLoading,
-        name,
-        country,
-        values,
-        description,
-        code,
-        isActive,
-        productType,
-        //
-        countryList,
-    } = state;
+    const { isLoading, country, jurisdictionsName, code, isActive } = state;
 
     const validateForm = () => {
         if (!code?.trim()) {
-            Alert.alert("Validation Error", "HSN / SAC Code is required");
-            return false;
-        }
-        console.log(code.length);
-        if (code.length < 3) {
-            Alert.alert(
-                "Validation Error",
-                "Code must be longer than or equal to 4 characters",
-            );
+            Alert.alert("Validation Error", "Tax code is required");
             return false;
         }
 
         if (!country) {
-            Alert.alert("Validation Error", "Please select Tax Slab");
-            return false;
-        }
-        if (!productType.trim()) {
-            Alert.alert("Validation Error", "Product Type is required");
-            return false;
-        }
-        if (!description.trim()) {
-            Alert.alert("Validation Error", "Description is required");
+            Alert.alert("Validation Error", "Please select trademark country");
             return false;
         }
 
@@ -66,17 +44,18 @@ const CreateHSNcode = ({ onClose = () => {}, isEdit = false, item = null }) => {
         if (!validateForm()) return;
         try {
             const payload = {
+                name: jurisdictionsName,
                 code: code,
-                description: description,
-                taxRate: country?.rate || null,
-                TaxSlabId: country?.id,
-                productType: productType,
+                type: country?.id,
                 isActive: isActive,
+                ...(parentId && {
+                    parentId: parentId,
+                }),
             };
             console.log(payload);
             updateState({ isLoading: true });
 
-            __postApiData("/hsnCodes/createHsnCode", payload)
+            __postApiData("/jurisdictions/createJurisdiction", payload)
                 .then((res) => {
                     if (res?.success) {
                         Alert.alert("Success", res.message);
@@ -98,12 +77,10 @@ const CreateHSNcode = ({ onClose = () => {}, isEdit = false, item = null }) => {
     const __handleEditSave = () => {
         if (!validateForm()) return;
         updateState({ isLoading: true });
-        __patchApiData("/hsnCodes/updateHsnCodeById/" + item?._id, {
+        __patchApiData("/jurisdictions/getJurisdictionById/" + item?._id, {
+            name: jurisdictionsName,
             code: code,
-            description: description,
-            taxRate: country?.rate || null,
-            TaxSlabId: country?.id,
-            productType: productType,
+            type: country?.id,
             isActive: isActive,
         })
             .then((res) => {
@@ -128,30 +105,17 @@ const CreateHSNcode = ({ onClose = () => {}, isEdit = false, item = null }) => {
         if (isEdit) {
             updateState({
                 code: item?.code,
-                description: item?.description,
-                country: item?.TaxSlabId
+                jurisdictionsName: item?.name,
+                country: item?.type
                     ? {
-                          ...item?.TaxSlabId,
-                          name: item?.TaxSlabId?.rate + "%",
-                          id: item?.TaxSlabId?._id,
+                          name: item?.type,
+                          id: item?.type,
                       }
                     : null,
                 isActive: item?.isActive,
-                productType: item?.productType,
             });
         }
     }, [isEdit, item]);
-
-    const __handleGetData = async () => {
-        try {
-            const country = await __getTaxList();
-            updateState({ countryList: country });
-        } catch (error) {}
-    };
-
-    useEffect(() => {
-        __handleGetData();
-    }, []);
 
     return (
         <>
@@ -168,8 +132,21 @@ const CreateHSNcode = ({ onClose = () => {}, isEdit = false, item = null }) => {
                 <View>
                     <View style={{}}>
                         <TextAreaBox
-                            title="HSN / SAC Code"
-                            placeholder="e.g., 8517"
+                            title="Name"
+                            placeholder="e.g. Maharashtra"
+                            value={jurisdictionsName}
+                            valuekey="jurisdictionsName"
+                            onChangeText={updateState}
+                            titleCustomStyle={{
+                                marginHorizontal: 0,
+                                marginTop: 10,
+                            }}
+                            inputCustomStyle={inputStyle}
+                            customStyle={{ flex: 1 }}
+                        />
+                        <TextAreaBox
+                            title="Code"
+                            placeholder="e.g., MH"
                             required
                             value={code}
                             valuekey="code"
@@ -181,66 +158,34 @@ const CreateHSNcode = ({ onClose = () => {}, isEdit = false, item = null }) => {
                             inputCustomStyle={inputStyle}
                             customStyle={{ flex: 1 }}
                         />
+                        <DropDownTextAreaBox
+                            type="select"
+                            title={"Type"}
+                            placeholder={"Select Type"}
+                            list={[
+                                { id: "COUNTRY", name: "COUNTRY" },
+                                { id: "STATE", name: "STATE" },
+                                { id: "PROVINCE", name: "PROVINCE" },
+                                { id: "DISTRICT", name: "DISTRICT" },
+                                { id: "CITY", name: "CITY" },
+                                { id: "OTHER", name: "OTHER" },
+                            ]}
+                            value={country}
+                            isSearchable
+                            titleCustomStyle={{
+                                marginHorizontal: 0,
+                                marginTop: 10,
+                            }}
+                            inputCustomStyle={inputStyle}
+                            onSelected={(value) => {
+                                updateState({
+                                    country: value,
+                                });
+                            }}
+                            customStyle={{ marginBottom: 5, flex: 1 }}
+                        />
                     </View>
-                    <TextAreaBox
-                        title="Description"
-                        required
-                        placeholder="e.g. Telecommunication equipment"
-                        value={description}
-                        valuekey="description"
-                        onChangeText={updateState}
-                        titleCustomStyle={{
-                            marginHorizontal: 0,
-                            marginTop: 10,
-                        }}
-                        inputCustomStyle={{
-                            ...inputStyle,
-                            height: 100,
-                            textAlignVertical: "top",
-                        }}
-                        customInputProps={{
-                            textAlignVertical: "top",
-                            multiline: true,
-                            numberOfLines: 6,
-                        }}
-                        customStyle={{ flex: 1 }}
-                    />
-                    <DropDownTextAreaBox
-                        type="select"
-                        required
-                        title={"Default Tax Slab"}
-                        placeholder={"Select Tax Slab"}
-                        list={countryList}
-                        value={country}
-                        isSearchable
-                        titleCustomStyle={{
-                            marginHorizontal: 0,
-                            marginTop: 10,
-                        }}
-                        inputCustomStyle={inputStyle}
-                        onSelected={(value) => {
-                            updateState({
-                                country: value,
-                            });
-                        }}
-                        customStyle={{ marginBottom: 5, flex: 1 }}
-                    />
-                    <TextAreaBox
-                        required
-                        title="Product Type"
-                        placeholder="Enter Product Type"
-                        value={productType}
-                        valuekey="productType"
-                        onChangeText={updateState}
-                        titleCustomStyle={{
-                            marginHorizontal: 0,
-                            marginTop: 10,
-                        }}
-                        inputCustomStyle={inputStyle}
-                        customStyle={{ flex: 1 }}
-                    />
                 </View>
-                {/* Active Status */}
                 <View style={styles.statusBox}>
                     <Text style={Fonts.blackColor15Medium}>Active</Text>
                     <Switch
@@ -270,7 +215,9 @@ const CreateHSNcode = ({ onClose = () => {}, isEdit = false, item = null }) => {
                             isEdit ? __handleEditSave() : __handleSave()
                         }
                     >
-                        <Text style={styles.createText}>Create</Text>
+                        <Text style={styles.createText}>
+                            {isEdit ? "Update" : "Create"}
+                        </Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -278,7 +225,7 @@ const CreateHSNcode = ({ onClose = () => {}, isEdit = false, item = null }) => {
     );
 };
 
-export default CreateHSNcode;
+export default CreateTaxJurisdiction;
 const inputStyle = {
     marginHorizontal: 0,
     borderWidth: 1,

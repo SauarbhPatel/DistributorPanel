@@ -8,21 +8,24 @@ import {
     TextInput,
     FlatList,
     Alert,
+    ActivityIndicator,
+    Switch,
 } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
-import { Feather, MaterialIcons } from "@expo/vector-icons";
+import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import CommonHeader from "../../components/common/CommonHeader";
-import { __deleteApiData, __getApiData, __postApiData } from "../../utils/api";
+import { __deleteApiData, __getApiData, __patchApiData } from "../../utils/api";
 import BottomPopup from "../../components/common/BottomPopup";
-import CreateTaxType from "../../components/form/CreateTaxType";
 import { Loader } from "../../modules";
+import CreateTaxJurisdiction from "../../components/form/CreateTaxJurisdiction";
 
-const TaxTypes = ({ navigation }) => {
+const TaxJurisdiction = ({ navigation }) => {
     const [search, setSearch] = useState("");
     const [state, setState] = useState({
         loading: false,
+        loading1: false,
         list: [],
         totalAttributes: 0,
         filterableAttributes: 0,
@@ -35,6 +38,7 @@ const TaxTypes = ({ navigation }) => {
     const {
         isShowCreate,
         loading,
+        loading1,
         list,
         totalAttributes,
         filterableAttributes,
@@ -43,29 +47,33 @@ const TaxTypes = ({ navigation }) => {
 
     const __handleGetData = async (ser) => {
         try {
-            updateState({ loading: true });
-            const res = await __getApiData(`/taxTypes/getAllTaxTypes`);
+            updateState({ loading1: true });
+            const res = await __getApiData(
+                `/jurisdictions/getAllJurisdictions?search=${ser}&page=1&limit=10`,
+            );
             console.log(JSON.stringify(res));
+
             if (res?.success) {
                 updateState({
                     list: res.data?.records,
+                    // ...res?.data?.stats,
                 });
             }
         } catch (error) {
             console.error("Error creating ticket:", error);
         } finally {
-            updateState({ loading: false });
+            updateState({ loading1: false });
         }
     };
 
     useEffect(() => {
-        __handleGetData();
-    }, []);
+        __handleGetData(search);
+    }, [search]);
 
     const __handleDelete = (id) => {
         Alert.alert(
-            "Delete Tax Type",
-            "Are you sure you want to delete?",
+            "Delete Jurisdiction",
+            "Are you sure you want to delete this Jurisdiction?",
             [
                 {
                     text: "Cancel",
@@ -78,10 +86,11 @@ const TaxTypes = ({ navigation }) => {
                         try {
                             updateState({ loading: true });
 
-                            const res = await __postApiData(
-                                `/taxTypes/deleteTaxTypeById/${id}`,
+                            const res = await __deleteApiData(
+                                `/jurisdictions/deleteJurisdictionById/${id}`,
                             );
                             if (res?.success) {
+                                // refresh list after delete
                                 __handleGetData(search);
                             } else {
                                 Alert.alert("Error", res?.message);
@@ -101,25 +110,33 @@ const TaxTypes = ({ navigation }) => {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
             <CommonHeader
-                title={"Tax Types"}
-                subTitle={"Manage Tax Types."}
+                title={"Tax Jurisdictions"}
+                subTitle={"Configure countries, states, and regions."}
                 navigation={navigation}
             />
             <Loader isShow={loading} />
+
             <ScrollView
                 contentContainerStyle={{ paddingBottom: 20, paddingTop: 10 }}
             >
-                {/* {statsCards()} */}
                 {searchAndAdd()}
-                {attributeCards()}
+                <View style={{ position: "relative" }}>
+                    {/* {loading1 && (
+                        <ActivityIndicator
+                            style={{
+                                margin: 10,
+                            }}
+                        />
+                    )} */}
+                    {attributeCards()}
+                </View>
             </ScrollView>
             <BottomPopup
                 isShow={isShowCreate}
-                title="Add Tax Type"
-                // top="55%"
+                title="Add Tax Jurisdiction"
                 onClose={() => updateState({ isShowCreate: false })}
                 component={
-                    <CreateTaxType
+                    <CreateTaxJurisdiction
                         onClose={() => {
                             updateState({ isShowCreate: false });
                             __handleGetData(search);
@@ -139,19 +156,19 @@ const TaxTypes = ({ navigation }) => {
                     <>
                         <View style={styles.statsRow}>
                             <StatCard
-                                title="Total Tax Types"
+                                title="Total Categories"
                                 value={totalAttributes}
                                 colors={["#3B82F6", "#2563EB"]}
                                 icon="tag"
                             />
                             <StatCard
-                                title="With Tax Linked"
+                                title="Active"
                                 value={filterableAttributes}
                                 colors={["#10B981", "#059669"]}
                                 icon="filter"
                             />
                             <StatCard
-                                title="Pending Tax"
+                                title="Root Levels"
                                 value={variantAttributes}
                                 colors={["#8B5CF6", "#7C3AED"]}
                                 icon="layers"
@@ -169,7 +186,7 @@ const TaxTypes = ({ navigation }) => {
                 <View style={styles.searchBox}>
                     <Feather name="search" size={18} color={Colors.grayColor} />
                     <TextInput
-                        placeholder="Search Tax Types..."
+                        placeholder="Search categories..."
                         style={styles.searchInput}
                         value={search}
                         onChangeText={setSearch}
@@ -181,7 +198,7 @@ const TaxTypes = ({ navigation }) => {
                     onPress={() => updateState({ isShowCreate: true })}
                 >
                     <Feather name="plus" size={18} color={Colors.whiteColor} />
-                    <Text style={styles.addText}>Add Type</Text>
+                    <Text style={styles.addText}>Add</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -189,116 +206,173 @@ const TaxTypes = ({ navigation }) => {
 
     function attributeCards() {
         return (
-            <View style={{ paddingHorizontal: Sizes.fixPadding }}>
-                {list
-                    ?.filter(
-                        (item) =>
-                            item?.name
-                                ?.toLowerCase()
-                                .includes(search.toLowerCase()) ||
-                            item?.code
-                                ?.toLowerCase()
-                                .includes(search.toLowerCase()),
-                    )
-                    ?.map((item) => (
-                        <ListCard
-                            item={item}
-                            key={item?._id}
-                            onDelete={__handleDelete}
-                            onDone={() => __handleGetData(search)}
-                        />
-                    ))}
+            <View style={{}}>
+                <FlatList
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    ListHeaderComponent={
+                        <>
+                            {list.map((item) => (
+                                <CategoryCard
+                                    key={item._id}
+                                    item={item}
+                                    onAdd={(item) =>
+                                        console.log("Add child", item)
+                                    }
+                                    onDone={() => __handleGetData(search)}
+                                    onDelete={(item) => {
+                                        __handleDelete(item._id);
+                                    }}
+                                    onToggle={(item, value) =>
+                                        console.log("Toggle", item._id, value)
+                                    }
+                                />
+                            ))}
+                        </>
+                    }
+                    contentContainerStyle={{
+                        paddingHorizontal: Sizes.fixPadding,
+                    }}
+                />
             </View>
         );
     }
 };
 
-export default TaxTypes;
+export default TaxJurisdiction;
 
-const ListCard = ({ item, onDelete, onDone = () => {} }) => {
+const CategoryCard = ({
+    item,
+    level = 0,
+    onAdd,
+    onDone,
+    onDelete,
+    onToggle,
+}) => {
+    const [expanded, setExpanded] = useState(false);
     const [state, setState] = useState({
         isShowCreate: false,
+        isShowAdd: false,
+        loading: false,
     });
 
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
-    const { isShowCreate } = state;
+    const { isShowCreate, isShowAdd } = state;
+
     return (
-        <View style={styles.card}>
-            {/* Top Row */}
+        <View
+            style={[
+                styles.card,
+                { marginLeft: level * 16 },
+                level && {
+                    borderTopRightRadius: 0,
+                    borderBottomRightRadius: 0,
+                    borderRightWidth: 0,
+                },
+            ]}
+        >
+            <BottomPopup
+                isShow={isShowAdd}
+                title="Add Sub-Tax Jurisdiction"
+                onClose={() => updateState({ isShowAdd: false })}
+                component={
+                    <CreateTaxJurisdiction
+                        onClose={() => {
+                            updateState({ isShowAdd: false });
+                            onDone();
+                        }}
+                        parentId={item?._id || null}
+                    />
+                }
+            />
             <BottomPopup
                 isShow={isShowCreate}
-                title="Edit Tax Types"
+                title="Edit Tax Jurisdiction"
                 onClose={() => updateState({ isShowCreate: false })}
                 component={
-                    <CreateTaxType
+                    <CreateTaxJurisdiction
                         onClose={() => {
                             updateState({ isShowCreate: false });
                             onDone();
                         }}
                         isEdit
                         item={item}
+                        parentId={item?.parentId || null}
                     />
                 }
             />
-            <View style={styles.topRow}>
-                <View style={{ width: "80%" }}>
-                    <Text style={styles.hsnCode}>
-                        <Text
-                            style={{
-                                color: Colors.lightGrayColor,
-                                fontWeight: "400",
-                            }}
+            {/* Row */}
+            <View style={{ ...styles.row, marginBottom: expanded ? 10 : 0 }}>
+                {/* Left */}
+                <View style={styles.left}>
+                    {item.children?.length > 0 ? (
+                        <TouchableOpacity
+                            onPress={() => setExpanded(!expanded)}
                         >
-                            Tax Types:
-                        </Text>{" "}
-                        {item.name}
+                            <Feather
+                                name={
+                                    expanded ? "chevron-down" : "chevron-right"
+                                }
+                                size={18}
+                                color="#6B7280"
+                            />
+                        </TouchableOpacity>
+                    ) : (
+                        <View style={{ width: 18 }} />
+                    )}
+
+                    <MaterialIcons
+                        name="folder"
+                        size={20}
+                        color={Colors.primaryColor}
+                        style={{ marginLeft: 6 }}
+                    />
+
+                    <Text numberOfLines={1} style={styles.title}>
+                        {item.name} ({item?.code})
                     </Text>
                 </View>
 
-                <View style={styles.badge}>
-                    <Text style={styles.badgeText}>{item.code}</Text>
-                </View>
-            </View>
+                {/* Right */}
+                <View style={styles.right}>
+                    {item.enabled && (
+                        <View style={styles.activeBadge}>
+                            <Text style={styles.activeText}>Active</Text>
+                        </View>
+                    )}
 
-            {/* Bottom Row */}
-            <View style={styles.bottomRow}>
-                <View
-                    style={[
-                        styles.statusDot,
-                        {
-                            backgroundColor: item.isActive
-                                ? "#16A34A"
-                                : "#DC2626",
-                        },
-                    ]}
-                />
-                <Text style={styles.statusText}>
-                    {item.isActive ? "Active" : "Inactive"}
-                </Text>
-
-                <View style={styles.actionRow}>
                     <TouchableOpacity
-                        style={styles.iconBtn}
-                        onPress={() => {
-                            updateState({ isShowCreate: true });
-                        }}
+                        onPress={() => updateState({ isShowAdd: true })}
+                    >
+                        <Feather name="plus" size={18} color="#10B981" />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() => updateState({ isShowCreate: true })}
                     >
                         <Feather name="edit-2" size={18} color="#2563EB" />
                     </TouchableOpacity>
 
-                    <TouchableOpacity
-                        style={styles.iconBtn}
-                        onPress={() => onDelete(item?._id)}
-                    >
-                        <MaterialIcons
-                            name="delete-outline"
-                            size={20}
-                            color="#DC2626"
-                        />
+                    <TouchableOpacity onPress={() => onDelete(item)}>
+                        <Feather name="trash-2" size={18} color="#EF4444" />
                     </TouchableOpacity>
                 </View>
             </View>
+
+            {/* Children */}
+            {expanded &&
+                item.children?.map((child) => (
+                    <CategoryCard
+                        key={child._id}
+                        item={child}
+                        level={level + 1}
+                        onAdd={onAdd}
+                        onDone={onDone}
+                        onDelete={onDelete}
+                        onToggle={onToggle}
+                    />
+                ))}
         </View>
     );
 };
@@ -319,20 +393,16 @@ const styles = StyleSheet.create({
     header: {
         padding: Sizes.fixPadding,
     },
-
     subTitle: {
         marginTop: 4,
         ...Fonts.grayColor14Regular,
     },
-
-    /* ================= Stats Cards ================= */
 
     statsRow: {
         flexDirection: "row",
         paddingHorizontal: Sizes.fixPadding - 5,
         justifyContent: "space-between",
     },
-
     statCard: {
         flex: 1,
         borderRadius: Sizes.fixPadding,
@@ -342,33 +412,27 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
     },
-
     statTitle: {
         color: "#E5E7EB",
         fontSize: 12,
     },
-
     statValue: {
         color: "#fff",
         fontSize: 22,
         fontWeight: "bold",
         marginTop: 4,
     },
-
     statIcon: {
         backgroundColor: "rgba(255,255,255,0.25)",
         padding: 10,
         borderRadius: 12,
     },
 
-    /* ================= Search + Add ================= */
-
     searchRow: {
         flexDirection: "row",
         alignItems: "center",
         padding: Sizes.fixPadding,
     },
-
     searchBox: {
         flex: 1,
         flexDirection: "row",
@@ -379,7 +443,6 @@ const styles = StyleSheet.create({
         height: 45,
         marginRight: 10,
     },
-
     searchInput: {
         flex: 1,
         marginLeft: 8,
@@ -393,83 +456,113 @@ const styles = StyleSheet.create({
         borderRadius: Sizes.fixPadding,
         alignItems: "center",
     },
-
     addText: {
         color: Colors.whiteColor,
         marginLeft: 6,
         fontWeight: "600",
     },
 
-    /* ================= Attribute Set Card ================= */
-    card: {
-        backgroundColor: "#fff",
-        borderRadius: 14,
-        padding: 14,
-        marginBottom: 12,
-        // elevation: 2,
-    },
-
-    topRow: {
+    attributeCard: {
+        backgroundColor: Colors.whiteColor,
+        borderRadius: Sizes.fixPadding,
+        padding: Sizes.fixPadding,
+        marginBottom: Sizes.fixPadding,
         flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
+        elevation: 2,
     },
 
-    hsnCode: {
-        fontSize: 14,
-        fontWeight: "700",
-        color: "#2563EB",
+    attrTitleRow: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    attrTitle: {
+        marginLeft: 8,
+        ...Fonts.blackColor16Medium,
     },
 
-    description: {
-        ...Fonts.grayColor14Medium,
-        fontSize: 12,
-        color: Colors.lightGrayColor,
-        marginTop: 4,
-        maxWidth: "90%",
+    valuesRow: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        marginTop: 8,
     },
-
-    badge: {
-        backgroundColor: "#EFF6FF",
+    valueChip: {
+        backgroundColor: "#F3F4F6",
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 20,
-        // flex: 1,
-    },
-
-    badgeText: {
-        fontSize: 12,
-        fontWeight: "600",
-        color: "#2563EB",
-    },
-
-    bottomRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginTop: 12,
-    },
-
-    statusDot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
         marginRight: 6,
+        marginBottom: 6,
     },
-
-    statusText: {
+    valueText: {
         fontSize: 12,
-        color: "#6B7280",
     },
 
+    rightSection: {
+        alignItems: "flex-end",
+        justifyContent: "space-between",
+    },
+    activeBadge: {
+        backgroundColor: "#3B82F6",
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 20,
+    },
+    activeText: {
+        color: "#fff",
+        fontSize: 12,
+    },
     actionRow: {
         flexDirection: "row",
-        marginLeft: "auto",
+        marginTop: 10,
+    },
+    // card
+    card: {
+        backgroundColor: Colors.whiteColor,
+        borderRadius: 10,
+        padding: 12,
+        paddingEnd: 0,
+        marginBottom: 8,
+        borderWidth: 1,
+        borderColor: "#E5E7EB",
     },
 
-    iconBtn: {
-        padding: 6,
+    row: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 10,
+    },
+
+    left: {
+        flexDirection: "row",
+        alignItems: "center",
+        flex: 1,
+        gap: 6,
+    },
+
+    title: {
+        ...Fonts.blackColor14Medium,
         marginLeft: 6,
-        backgroundColor: "#F3F4F6",
-        borderRadius: 8,
+        flexShrink: 1,
+    },
+
+    right: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 10,
+        marginEnd: 10,
+    },
+
+    activeBadge: {
+        backgroundColor: "#D1FAE5",
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 12,
+    },
+
+    activeText: {
+        fontSize: 11,
+        color: "#065F46",
+        fontWeight: "600",
     },
 });

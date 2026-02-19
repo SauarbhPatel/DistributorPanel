@@ -16,9 +16,9 @@ import { useEffect, useState } from "react";
 import CommonHeader from "../../components/common/CommonHeader";
 import { __deleteApiData, __getApiData, __postApiData } from "../../utils/api";
 import BottomPopup from "../../components/common/BottomPopup";
-import CreateTaxType from "../../components/form/CreateTaxType";
-import { Loader } from "../../modules";
 import CreateTax from "../../components/form/CreateTax";
+import { __formatDate } from "../../utils/funtion";
+import { Loader } from "../../modules";
 
 const TaxMaster = ({ navigation }) => {
     const [search, setSearch] = useState("");
@@ -42,10 +42,13 @@ const TaxMaster = ({ navigation }) => {
         variantAttributes,
     } = state;
 
-    const __handleGetData = async (ser) => {
+    const __handleGetData = async (ser = "") => {
         try {
-            updateState({ loading: true });
-            const res = await __getApiData(`/taxes/getAllTax`);
+            updateState({ loading: ser == "" ? true : false });
+            // const res = await __getApiData(`/taxes/getAllTax`);
+            const res = await __getApiData(
+                `/taxes/getAllTaxSlabs?page=1&limit=100&search=${ser}&sortBy=name&sortOrder=desc`,
+            );
             console.log(JSON.stringify(res));
             if (res?.success) {
                 updateState({
@@ -60,8 +63,8 @@ const TaxMaster = ({ navigation }) => {
     };
 
     useEffect(() => {
-        __handleGetData();
-    }, []);
+        __handleGetData(search);
+    }, [search]);
 
     const __handleDelete = (id) => {
         Alert.alert(
@@ -81,7 +84,7 @@ const TaxMaster = ({ navigation }) => {
                             console.log(id);
 
                             const res = await __deleteApiData(
-                                `/taxes/deleteTaxById/${id}`,
+                                `/taxes/deleteTaxSlabById/${id}`,
                             );
                             if (res?.success) {
                                 __handleGetData(search);
@@ -254,9 +257,7 @@ const ListCard = ({ item, onDone, onDelete }) => {
                 <View>
                     <Text style={styles.taxName}>{item?.name}</Text>
                     <View style={styles.typeBadge}>
-                        <Text style={styles.typeText}>
-                            {item?.taxTypeId?.name}
-                        </Text>
+                        <Text style={styles.typeText}>{item?.taxTypeName}</Text>
                     </View>
                 </View>
 
@@ -270,38 +271,68 @@ const ListCard = ({ item, onDone, onDelete }) => {
 
             {/* Details */}
             <View style={styles.row}>
-                <Text style={styles.label}>Country</Text>
-                <Text style={styles.value}>{item?.countryId?.name}</Text>
+                <Text style={styles.label}>Effective From</Text>
+                <Text style={styles.value}>
+                    {item?.effectiveFrom
+                        ? __formatDate(item?.effectiveFrom)
+                        : "-"}
+                </Text>
             </View>
 
             <View style={styles.row}>
-                <Text style={styles.label}>Ledger</Text>
+                <Text style={styles.label}>Effective To</Text>
                 <Text style={styles.value} numberOfLines={1}>
-                    {item?.ledgerId?.name}
+                    {item?.effectiveUpTo
+                        ? __formatDate(item?.effectiveUpTo)
+                        : "-"}
                 </Text>
             </View>
 
             {/* Actions */}
-            <View style={styles.actions}>
-                <TouchableOpacity
-                    style={styles.iconBtn}
-                    onPress={() => {
-                        updateState({ isShowCreate: true });
-                    }}
-                >
-                    <Feather
-                        name="edit-2"
-                        size={18}
-                        color={Colors.primaryColor}
-                    />
-                </TouchableOpacity>
+            <View
+                style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginTop: 12,
+                }}
+            >
+                <View
+                    style={[
+                        {
+                            width: 8,
+                            height: 8,
+                            borderRadius: 4,
+                            marginRight: 6,
+                            backgroundColor: item.isActive
+                                ? "#16A34A"
+                                : "#DC2626",
+                        },
+                    ]}
+                />
+                <Text style={{ fontSize: 12, color: "#6B7280" }}>
+                    {item.isActive ? "Active" : "Inactive"}
+                </Text>
+                <View style={styles.actions}>
+                    <TouchableOpacity
+                        style={styles.iconBtn}
+                        onPress={() => {
+                            updateState({ isShowCreate: true });
+                        }}
+                    >
+                        <Feather
+                            name="edit-2"
+                            size={18}
+                            color={Colors.primaryColor}
+                        />
+                    </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={[styles.iconBtn, styles.deleteBtn]}
-                    onPress={() => onDelete(item?._id)}
-                >
-                    <Feather name="trash-2" size={18} color="#EF4444" />
-                </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.iconBtn, styles.deleteBtn]}
+                        onPress={() => onDelete(item?._id)}
+                    >
+                        <Feather name="trash-2" size={18} color="#EF4444" />
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
     );
@@ -479,9 +510,8 @@ const styles = StyleSheet.create({
 
     actions: {
         flexDirection: "row",
-        justifyContent: "flex-end",
-        marginTop: 10,
         gap: 12,
+        marginLeft: "auto",
     },
 
     iconBtn: {

@@ -1,20 +1,32 @@
 import { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Switch, Alert } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
-import { Loader, TextAreaBox } from "../../modules";
+import { DropDownTextAreaBox, Loader, TextAreaBox } from "../../modules";
 import { __patchApiData, __postApiData } from "../../utils/api";
+import { __getTaxJurisdictionsList } from "../../utils/api/commonApi";
 
 const CreateTaxType = ({ onClose = () => {}, isEdit = false, item = null }) => {
     const [state, setState] = useState({
         taxTypeName: "",
         taxTypeCode: "",
+        description: "",
         isActive: true,
         loading: false,
+        categoryList: [],
+        category: null,
     });
 
     const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
 
-    const { loading, taxTypeName, taxTypeCode, isActive } = state;
+    const {
+        loading,
+        taxTypeName,
+        taxTypeCode,
+        description,
+        isActive,
+        categoryList,
+        category,
+    } = state;
 
     const validateForm = () => {
         if (!taxTypeName?.trim()) {
@@ -52,6 +64,9 @@ const CreateTaxType = ({ onClose = () => {}, isEdit = false, item = null }) => {
         __postApiData("/taxTypes/createTaxType", {
             name: taxTypeName,
             code: taxTypeCode,
+            description: description,
+            ...(category && { jurisdictionId: category?.id }),
+            isActive: isActive,
         })
             .then((res) => {
                 if (res?.success) {
@@ -75,6 +90,9 @@ const CreateTaxType = ({ onClose = () => {}, isEdit = false, item = null }) => {
         __postApiData("/taxTypes/updateTaxTypeById/" + item?._id, {
             name: taxTypeName,
             code: taxTypeCode,
+            description: description,
+            ...(category && { jurisdictionId: category?.id }),
+            isActive: isActive,
         })
             .then((res) => {
                 if (res?.success) {
@@ -93,12 +111,31 @@ const CreateTaxType = ({ onClose = () => {}, isEdit = false, item = null }) => {
 
     useEffect(() => {
         if (isEdit) {
+            console.log(item);
             updateState({
                 taxTypeName: item?.name,
                 taxTypeCode: item?.code,
+                description: item?.description,
+                isActive: item?.isActive,
+                category: item?.jurisdiction
+                    ? {
+                          id: item?.jurisdiction?._id,
+                          name: item?.jurisdiction?.name,
+                      }
+                    : null,
             });
         }
     }, [isEdit, item]);
+    const __handleGetData = async () => {
+        try {
+            const code = await __getTaxJurisdictionsList();
+            updateState({ categoryList: code });
+        } catch (error) {}
+    };
+
+    useEffect(() => {
+        __handleGetData();
+    }, []);
 
     return (
         <>
@@ -139,19 +176,46 @@ const CreateTaxType = ({ onClose = () => {}, isEdit = false, item = null }) => {
                         />
                     </View>
                 </View>
+                <DropDownTextAreaBox
+                    type="select"
+                    title={"Jurisdiction (optional)"}
+                    placeholder={"Select Jurisdiction"}
+                    list={categoryList}
+                    value={category}
+                    isSearchable
+                    titleCustomStyle={{
+                        marginHorizontal: 0,
+                        marginTop: 0,
+                    }}
+                    inputCustomStyle={inputStyle}
+                    onSelected={(value) => {
+                        updateState({
+                            category: value,
+                        });
+                    }}
+                />
+                <TextAreaBox
+                    title="Description"
+                    placeholder="Goods and Services Tax (India)"
+                    value={description}
+                    valuekey="description"
+                    onChangeText={updateState}
+                    titleCustomStyle={{ marginHorizontal: 0, marginTop: 0 }}
+                    inputCustomStyle={{
+                        ...inputStyle,
+                        height: 100,
+                        textAlignVertical: "top",
+                    }}
+                    customInputProps={{
+                        textAlignVertical: "top",
+                        multiline: true,
+                        numberOfLines: 6,
+                    }}
+                />
 
                 {/* Active Status */}
-                {/* <View style={styles.statusBox}>
-                    <View>
-                        <Text style={Fonts.blackColor15Medium}>
-                            Active Status
-                        </Text>
-                        <Text
-                            style={{ ...Fonts.grayColor14Medium, fontSize: 10 }}
-                        >
-                            Enable or disable this tax type
-                        </Text>
-                    </View>
+                <View style={styles.statusBox}>
+                    <Text style={Fonts.blackColor15Medium}>Active</Text>
                     <Switch
                         value={isActive}
                         onValueChange={(value) =>
@@ -162,7 +226,7 @@ const CreateTaxType = ({ onClose = () => {}, isEdit = false, item = null }) => {
                             true: Colors.primaryColor,
                         }}
                     />
-                </View> */}
+                </View>
 
                 {/* Action Buttons */}
                 <View style={styles.footer}>

@@ -4,10 +4,11 @@ import { Colors, Fonts, Sizes } from "../../constants/styles";
 import { DropDownTextAreaBox, Loader, TextAreaBox } from "../../modules";
 import { __patchApiData, __postApiData } from "../../utils/api";
 import {
-    __getCountryList,
-    __getLedgersList,
+    __getTaxJurisdictionsList,
     __getTaxTypeList,
 } from "../../utils/api/commonApi";
+import { __formatDate, __formatDate2 } from "../../utils/funtion";
+import { FontAwesome6 } from "@expo/vector-icons";
 
 const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
     const [state, setState] = useState({
@@ -15,13 +16,14 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
         name: "",
         code: "",
         rate: "",
-        country: null,
+        effectiveFrom: null,
         taxTypeId: null,
-        ledgerId: null,
+        effectiveUpTo: null,
+        description: "",
+        isActive: true,
         //
-        countryList: [],
         taxTypeList: [],
-        ledgerList: [],
+        taxJurisdictionsList: [],
     });
 
     const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -31,13 +33,14 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
         name,
         code,
         rate,
-        country,
+        effectiveFrom,
         taxTypeId,
-        ledgerId,
+        effectiveUpTo,
+        description,
+        isActive,
         //
-        countryList,
         taxTypeList,
-        ledgerList,
+        taxJurisdictionsList,
     } = state;
 
     const validateForm = () => {
@@ -59,8 +62,12 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
             return false;
         }
 
-        if (!country) {
-            Alert.alert("Validation Error", "Please select country");
+        if (!effectiveFrom) {
+            Alert.alert("Validation Error", "Please select Effective From");
+            return false;
+        }
+        if (!effectiveUpTo) {
+            Alert.alert("Validation Error", "Please select Effective UpTo");
             return false;
         }
 
@@ -68,9 +75,8 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
             Alert.alert("Validation Error", "Please select tax type");
             return false;
         }
-
-        if (!ledgerId) {
-            Alert.alert("Validation Error", "Please select connected ledger");
+        if (!description?.trim()) {
+            Alert.alert("Validation Error", "description should not be empty");
             return false;
         }
 
@@ -80,17 +86,23 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
     const __handleSave = () => {
         if (!validateForm()) return;
         try {
+            updateState({ isLoading: true });
+
             const payload = {
                 name: name.trim(),
                 code: code.trim(),
-                rate: rate.trim(),
-                taxTypeId: taxTypeId?.id || null,
-                countryId: country?.id || null,
-                ledgerId: ledgerId?.id || null,
+                rate: Number(rate.trim()),
+                taxTypeId: taxTypeId?.id,
+                taxTypeName: taxTypeId?.name,
+                effectiveFrom: new Date(effectiveFrom),
+                ...(effectiveUpTo && {
+                    effectiveUpTo: new Date(effectiveUpTo),
+                }),
+                description: description,
+                isActive: isActive,
             };
-            console.log(payload);
 
-            __postApiData("/taxes/createTax", payload)
+            __postApiData("/taxes/createTaxSlab", payload)
                 .then((res) => {
                     if (res?.success) {
                         Alert.alert("Success", res.message);
@@ -108,21 +120,19 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
     const __handleEditSave = () => {
         if (!validateForm()) return;
         updateState({ isLoading: true });
-        console.log(item?._id, {
+
+        __patchApiData("/taxes/updateTaxSlabById/" + item?._id, {
             name: name.trim(),
             code: code.trim(),
             rate: Number(rate.trim()),
-            taxTypeId: taxTypeId?.id || null,
-            countryId: country?.id || null,
-            ledgerId: ledgerId?.id || null,
-        });
-        __patchApiData("/taxes/updateTaxById/" + item?._id, {
-            name: name.trim(),
-            code: code.trim(),
-            rate: Number(rate.trim()),
-            taxTypeId: taxTypeId?.id || null,
-            countryId: country?.id || null,
-            ledgerId: ledgerId?.id || null,
+            taxTypeId: taxTypeId?.id,
+            taxTypeName: taxTypeId?.name,
+            effectiveFrom: new Date(effectiveFrom),
+            ...(effectiveUpTo && {
+                effectiveUpTo: new Date(effectiveUpTo),
+            }),
+            description: description,
+            isActive: isActive,
         })
             .then((res) => {
                 console.log(JSON.stringify(res));
@@ -144,42 +154,28 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
     useEffect(() => {
         if (isEdit) {
             updateState({
-                // name: item?.name,
-                // values: item?.allowedValues,
                 name: item?.name,
                 code: item?.code,
                 rate: String(item?.rate),
-                country: item?.countryId
-                    ? {
-                          ...item?.countryId,
-                          id: item?.countryId?._id,
-                      }
-                    : null,
+                effectiveFrom: item?.effectiveFrom,
+                effectiveUpTo: item?.effectiveUpTo || null,
                 taxTypeId: item?.taxTypeId
                     ? {
                           ...item?.taxTypeId,
                           id: item?.taxTypeId?._id,
                       }
                     : null,
-                ledgerId: item?.ledgerId
-                    ? {
-                          ...item?.ledgerId,
-                          id: item?.ledgerId?._id,
-                      }
-                    : null,
+                description: item?.description,
+                isActive: item?.isActive,
             });
         }
     }, [isEdit, item]);
 
     const __handleGetData = async () => {
         try {
-            const country = await __getCountryList();
             const taxType = await __getTaxTypeList();
-            const ledgers = await __getLedgersList();
             updateState({
-                countryList: country,
                 taxTypeList: taxType,
-                ledgerList: ledgers,
             });
         } catch (error) {}
     };
@@ -266,12 +262,15 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
 
                     <View style={{ flexDirection: "row", gap: 10 }}>
                         <DropDownTextAreaBox
-                            type="select"
-                            title={"Country"}
-                            placeholder={"Select Country"}
-                            list={countryList}
-                            value={country}
-                            isSearchable
+                            type="date"
+                            title={"Effective From"}
+                            required
+                            placeholder={"Pick Date"}
+                            value={
+                                effectiveFrom
+                                    ? __formatDate2(effectiveFrom)
+                                    : null
+                            }
                             titleCustomStyle={{
                                 marginHorizontal: 0,
                                 marginTop: 10,
@@ -279,17 +278,28 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
                             inputCustomStyle={inputStyle}
                             onSelected={(value) => {
                                 updateState({
-                                    country: value,
+                                    effectiveFrom: value,
                                 });
                             }}
                             customStyle={{ marginBottom: 5, flex: 1 }}
+                            rightIcon={
+                                <FontAwesome6
+                                    name="calendar-days"
+                                    size={20}
+                                    color={Colors.lightGrayColor}
+                                />
+                            }
                         />
                         <DropDownTextAreaBox
-                            type="select"
-                            title={"Connected Ledger"}
-                            placeholder={"Select"}
-                            list={ledgerList}
-                            value={ledgerId}
+                            type="date"
+                            title={"Effective To (optional)"}
+                            placeholder={"Pick Date"}
+                            required
+                            value={
+                                effectiveUpTo
+                                    ? __formatDate2(effectiveUpTo)
+                                    : null
+                            }
                             isSearchable
                             titleCustomStyle={{
                                 marginHorizontal: 0,
@@ -298,12 +308,54 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
                             inputCustomStyle={inputStyle}
                             onSelected={(value) => {
                                 updateState({
-                                    ledgerId: value,
+                                    effectiveUpTo: value,
                                 });
                             }}
                             customStyle={{ marginBottom: 5, flex: 1 }}
+                            rightIcon={
+                                <FontAwesome6
+                                    name="calendar-days"
+                                    size={20}
+                                    color={Colors.lightGrayColor}
+                                />
+                            }
                         />
                     </View>
+                </View>
+
+                <TextAreaBox
+                    title="Description"
+                    placeholder="e.g. Standard rate (electronics)"
+                    required
+                    value={description}
+                    valuekey="description"
+                    onChangeText={updateState}
+                    titleCustomStyle={{ marginHorizontal: 0, marginTop: 0 }}
+                    inputCustomStyle={{
+                        ...inputStyle,
+                        height: 100,
+                        textAlignVertical: "top",
+                    }}
+                    customInputProps={{
+                        textAlignVertical: "top",
+                        multiline: true,
+                        numberOfLines: 6,
+                    }}
+                />
+
+                {/* Active Status */}
+                <View style={styles.statusBox}>
+                    <Text style={Fonts.blackColor15Medium}>Active</Text>
+                    <Switch
+                        value={isActive}
+                        onValueChange={(value) =>
+                            updateState({ isActive: value })
+                        }
+                        trackColor={{
+                            false: "#ccc",
+                            true: Colors.primaryColor,
+                        }}
+                    />
                 </View>
 
                 {/* Action Buttons */}

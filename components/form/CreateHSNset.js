@@ -13,6 +13,8 @@ const CreateHSNset = ({ onClose = () => {}, isEdit = false, item = null }) => {
         country: [],
         description: "",
         code: "",
+        isActive: true,
+
         //
         countryList: [],
     });
@@ -52,6 +54,7 @@ const CreateHSNset = ({ onClose = () => {}, isEdit = false, item = null }) => {
                 name: code,
                 description: description,
                 hsnCodes: country?.map((hsn) => hsn?.id),
+                isActive: isActive,
             };
             updateState({ isLoading: true });
 
@@ -100,8 +103,9 @@ const CreateHSNset = ({ onClose = () => {}, isEdit = false, item = null }) => {
 
     useEffect(() => {
         if (isEdit) {
+            console.log(item);
             updateState({
-                country: item?.hsnCodes?.map((hsn) => ({
+                country: item?.hsnCodesDetails?.map((hsn) => ({
                     ...item,
                     id: hsn?._id,
                     name: hsn?.code,
@@ -187,6 +191,20 @@ const CreateHSNset = ({ onClose = () => {}, isEdit = false, item = null }) => {
                         }}
                         inputCustomStyle={inputStyle}
                         customStyle={{ flex: 1 }}
+                    />
+                </View>
+                {/* Active Status */}
+                <View style={styles.statusBox}>
+                    <Text style={Fonts.blackColor15Medium}>Active</Text>
+                    <Switch
+                        value={isActive}
+                        onValueChange={(value) =>
+                            updateState({ isActive: value })
+                        }
+                        trackColor={{
+                            false: "#ccc",
+                            true: Colors.primaryColor,
+                        }}
                     />
                 </View>
 

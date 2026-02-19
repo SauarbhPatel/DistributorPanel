@@ -76,7 +76,7 @@ const __getTaxTypeList = async () => {
     return __getApiData(`/taxTypes/getAllTaxTypes`)
         .then((res) => {
             if (res.success) {
-                return res?.data?.map((item) => ({
+                return res?.data?.records?.map((item) => ({
                     ...item,
                     id: item?._id,
                     // name: `${item?.name} (${item?.code})`,
@@ -89,7 +89,9 @@ const __getTaxTypeList = async () => {
         });
 };
 const __getTaxList = async () => {
-    return __getApiData(`/taxes/getAllTax`)
+    return __getApiData(
+        `/taxes/getAllTaxSlabs?page=1&limit=100&search=${""}&sortBy=name&sortOrder=desc`,
+    )
         .then((res) => {
             if (res.success) {
                 return res?.data?.map((item) => ({
@@ -256,6 +258,18 @@ const __getProductCategoryList = async () => {
             return [];
         });
 };
+const __getTaxJurisdictionsList = async () => {
+    return __getApiData(`/jurisdictions/getAllJurisdictions?page=1&limit=10`)
+        .then((res) => {
+            if (res.success) {
+                return createCategoryList(res?.data?.records);
+            }
+            return [];
+        })
+        .catch((error) => {
+            return [];
+        });
+};
 
 export {
     __uploadImage,
@@ -272,4 +286,5 @@ export {
     __getProductRegularAttributeSetList,
     __getProductCategoryList,
     __getBrandList,
+    __getTaxJurisdictionsList,
 };
