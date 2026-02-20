@@ -65,7 +65,7 @@ const CreateTaxType = ({ onClose = () => {}, isEdit = false, item = null }) => {
             name: taxTypeName,
             code: taxTypeCode,
             description: description,
-            ...(category && { jurisdictionId: category?.id }),
+            // ...(category && { jurisdictionId: category?.id }),
             isActive: isActive,
         })
             .then((res) => {
@@ -91,7 +91,7 @@ const CreateTaxType = ({ onClose = () => {}, isEdit = false, item = null }) => {
             name: taxTypeName,
             code: taxTypeCode,
             description: description,
-            ...(category && { jurisdictionId: category?.id }),
+            // ...(category && { jurisdictionId: category?.id }),
             isActive: isActive,
         })
             .then((res) => {
@@ -117,25 +117,25 @@ const CreateTaxType = ({ onClose = () => {}, isEdit = false, item = null }) => {
                 taxTypeCode: item?.code,
                 description: item?.description,
                 isActive: item?.isActive,
-                category: item?.jurisdiction
-                    ? {
-                          id: item?.jurisdiction?._id,
-                          name: item?.jurisdiction?.name,
-                      }
-                    : null,
+                // category: item?.jurisdiction
+                //     ? {
+                //           id: item?.jurisdiction?._id,
+                //           name: item?.jurisdiction?.name,
+                //       }
+                //     : null,
             });
         }
     }, [isEdit, item]);
-    const __handleGetData = async () => {
-        try {
-            const code = await __getTaxJurisdictionsList();
-            updateState({ categoryList: code });
-        } catch (error) {}
-    };
+    // const __handleGetData = async () => {
+    //     try {
+    //         const code = await __getTaxJurisdictionsList();
+    //         updateState({ categoryList: code });
+    //     } catch (error) {}
+    // };
 
-    useEffect(() => {
-        __handleGetData();
-    }, []);
+    // useEffect(() => {
+    //     __handleGetData();
+    // }, []);
 
     return (
         <>
@@ -176,7 +176,7 @@ const CreateTaxType = ({ onClose = () => {}, isEdit = false, item = null }) => {
                         />
                     </View>
                 </View>
-                <DropDownTextAreaBox
+                {/* <DropDownTextAreaBox
                     type="select"
                     title={"Jurisdiction (optional)"}
                     placeholder={"Select Jurisdiction"}
@@ -193,7 +193,7 @@ const CreateTaxType = ({ onClose = () => {}, isEdit = false, item = null }) => {
                             category: value,
                         });
                     }}
-                />
+                /> */}
                 <TextAreaBox
                     title="Description"
                     placeholder="Goods and Services Tax (India)"

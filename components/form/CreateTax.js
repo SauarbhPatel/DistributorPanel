@@ -9,7 +9,31 @@ import {
 } from "../../utils/api/commonApi";
 import { __formatDate, __formatDate2 } from "../../utils/funtion";
 import { FontAwesome6 } from "@expo/vector-icons";
+import TaxComponentsBox from "./com/TaxComponentsBox";
+const validateTaxComponents = (list = []) => {
+    if (!Array.isArray(list) || list.length === 0) return false;
 
+    for (let i = 0; i < list.length; i++) {
+        const { taxComponent, rate, jurisdiction } = list[i];
+
+        // tax component required
+        if (!taxComponent) {
+            return false;
+        }
+
+        // rate required & must be number
+        if (rate === "" || rate === null || isNaN(rate) || Number(rate) <= -1) {
+            return false;
+        }
+
+        // jurisdiction required
+        if (!jurisdiction) {
+            return false;
+        }
+    }
+
+    return true;
+};
 const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
     const [state, setState] = useState({
         isLoading: false,
@@ -18,9 +42,11 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
         rate: "",
         effectiveFrom: null,
         taxTypeId: null,
+        taxJurId: null,
         effectiveUpTo: null,
         description: "",
         isActive: true,
+        taxComponents: [{ taxComponent: null, rate: "", jurisdiction: null }],
         //
         taxTypeList: [],
         taxJurisdictionsList: [],
@@ -35,9 +61,11 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
         rate,
         effectiveFrom,
         taxTypeId,
+        taxJurId,
         effectiveUpTo,
         description,
         isActive,
+        taxComponents,
         //
         taxTypeList,
         taxJurisdictionsList,
@@ -75,11 +103,21 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
             Alert.alert("Validation Error", "Please select tax type");
             return false;
         }
+        if (!taxJurId) {
+            Alert.alert("Validation Error", "Please select tax Jurisdiction");
+            return false;
+        }
         if (!description?.trim()) {
             Alert.alert("Validation Error", "description should not be empty");
             return false;
         }
-
+        if (!validateTaxComponents(state.taxComponents)) {
+            Alert.alert(
+                "Validation Error",
+                "Please complete all tax component fields",
+            );
+            return false;
+        }
         return true;
     };
 
@@ -91,49 +129,73 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
             const payload = {
                 name: name.trim(),
                 code: code.trim(),
+                description: description,
                 rate: Number(rate.trim()),
                 taxTypeId: taxTypeId?.id,
                 taxTypeName: taxTypeId?.name,
+                jurisdictionId: taxJurId?.id,
+                jurisdictionName: taxJurId?.name,
                 effectiveFrom: new Date(effectiveFrom),
                 ...(effectiveUpTo && {
                     effectiveUpTo: new Date(effectiveUpTo),
                 }),
-                description: description,
                 isActive: isActive,
+                components: taxComponents.map((taxC) => ({
+                    type: taxC?.taxComponent?.id,
+                    typeName: taxC?.taxComponent?.name,
+                    rate: Number(taxC?.rate.trim()),
+                    applicableWhen: taxC?.jurisdiction?.id,
+                })),
             };
 
-            __postApiData("/taxes/createTaxSlab", payload)
+            __postApiData("/taxSlabs/createTaxSlab", payload)
                 .then((res) => {
+                    updateState({ isLoading: false });
+
                     if (res?.success) {
                         Alert.alert("Success", res.message);
                         onClose();
                     } else {
                         Alert.alert("Error", res?.message || "Failed");
+                        updateState({ isLoading: false });
                     }
                 })
                 .catch(() => {
                     Alert.alert("Error", "Something went wrong");
+                    updateState({ isLoading: false });
                 });
-        } catch (error) {}
+        } catch (error) {
+            updateState({ isLoading: false });
+        }
     };
 
     const __handleEditSave = () => {
         if (!validateForm()) return;
         updateState({ isLoading: true });
-
-        __patchApiData("/taxes/updateTaxSlabById/" + item?._id, {
+        const payload = {
             name: name.trim(),
             code: code.trim(),
+            description: description,
             rate: Number(rate.trim()),
             taxTypeId: taxTypeId?.id,
             taxTypeName: taxTypeId?.name,
+            jurisdictionId: taxJurId?.id,
+            jurisdictionName: taxJurId?.name,
             effectiveFrom: new Date(effectiveFrom),
             ...(effectiveUpTo && {
                 effectiveUpTo: new Date(effectiveUpTo),
             }),
-            description: description,
             isActive: isActive,
-        })
+            components: taxComponents.map((taxC) => ({
+                type: taxC?.taxComponent?.id,
+                typeName: taxC?.taxComponent?.name,
+                rate: Number(taxC?.rate.trim()),
+                applicableWhen: taxC?.jurisdiction?.id,
+            })),
+        };
+        console.log(JSON.stringify(payload));
+
+        __patchApiData("/taxSlabs/updateTaxSlabById/" + item?._id, payload)
             .then((res) => {
                 console.log(JSON.stringify(res));
                 updateState({ isLoading: false });
@@ -167,6 +229,23 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
                     : null,
                 description: item?.description,
                 isActive: item?.isActive,
+                taxComponents: item?.components?.map((taxC) => ({
+                    taxComponent: {
+                        id: taxC?.type?._id,
+                        name: taxC?.type?.name,
+                    },
+                    rate: String(taxC?.rate),
+                    jurisdiction: {
+                        id: taxC?.applicableWhen,
+                        name: taxC?.applicableWhen?.split("_").join(" "),
+                    },
+                })),
+                taxJurId: item?.jurisdictionId
+                    ? {
+                          ...item?.jurisdictionId,
+                          id: item?.jurisdictionId?._id,
+                      }
+                    : null,
             });
         }
     }, [isEdit, item]);
@@ -174,8 +253,10 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
     const __handleGetData = async () => {
         try {
             const taxType = await __getTaxTypeList();
+            const taxJur = await __getTaxJurisdictionsList();
             updateState({
                 taxTypeList: taxType,
+                taxJurisdictionsList: taxJur,
             });
         } catch (error) {}
     };
@@ -208,21 +289,38 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
                         inputCustomStyle={inputStyle}
                         customStyle={{ flex: 1 }}
                     />
+                    <View style={{ flexDirection: "row", gap: 10 }}>
+                        <TextAreaBox
+                            title="Code"
+                            placeholder="Enter Code"
+                            required
+                            value={code}
+                            valuekey="code"
+                            onChangeText={updateState}
+                            titleCustomStyle={{
+                                marginHorizontal: 0,
+                                marginTop: 10,
+                            }}
+                            inputCustomStyle={inputStyle}
+                            customStyle={{ flex: 1 }}
+                        />
+                        <TextAreaBox
+                            title="Rate (%)"
+                            placeholder="0"
+                            value={rate}
+                            valuekey="rate"
+                            onChangeText={updateState}
+                            titleCustomStyle={{
+                                marginHorizontal: 0,
+                                marginTop: 10,
+                            }}
+                            inputCustomStyle={inputStyle}
+                            customStyle={{ flex: 1 }}
+                            rightIcon={<Text>%</Text>}
+                            keyboardType="number-pad"
+                        />
+                    </View>
 
-                    <TextAreaBox
-                        title="Code"
-                        placeholder="Enter Code"
-                        required
-                        value={code}
-                        valuekey="code"
-                        onChangeText={updateState}
-                        titleCustomStyle={{
-                            marginHorizontal: 0,
-                            marginTop: 10,
-                        }}
-                        inputCustomStyle={inputStyle}
-                        customStyle={{ flex: 1 }}
-                    />
                     <View style={{ flexDirection: "row", gap: 10 }}>
                         <DropDownTextAreaBox
                             type="select"
@@ -243,20 +341,24 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
                             }}
                             customStyle={{ marginBottom: 5, flex: 1 }}
                         />
-                        <TextAreaBox
-                            title="Rate (%)"
-                            placeholder="0"
-                            value={rate}
-                            valuekey="rate"
-                            onChangeText={updateState}
+                        <DropDownTextAreaBox
+                            type="select"
+                            title={"Jurisdiction"}
+                            placeholder={"Select Jurisdiction"}
+                            list={taxJurisdictionsList}
+                            value={taxJurId}
+                            isSearchable
                             titleCustomStyle={{
                                 marginHorizontal: 0,
                                 marginTop: 10,
                             }}
                             inputCustomStyle={inputStyle}
-                            customStyle={{ flex: 1 }}
-                            rightIcon={<Text>%</Text>}
-                            keyboardType="number-pad"
+                            onSelected={(value) => {
+                                updateState({
+                                    taxJurId: value,
+                                });
+                            }}
+                            customStyle={{ marginBottom: 5, flex: 1 }}
                         />
                     </View>
 
@@ -341,6 +443,14 @@ const CreateTax = ({ onClose = () => {}, isEdit = false, item = null }) => {
                         multiline: true,
                         numberOfLines: 6,
                     }}
+                />
+                <TaxComponentsBox
+                    value={taxComponents}
+                    onChange={(list) => {
+                        console.log(list);
+                        updateState({ taxComponents: list });
+                    }}
+                    taxTypeList={taxTypeList}
                 />
 
                 {/* Active Status */}

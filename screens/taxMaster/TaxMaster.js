@@ -47,7 +47,7 @@ const TaxMaster = ({ navigation }) => {
             updateState({ loading: ser == "" ? true : false });
             // const res = await __getApiData(`/taxes/getAllTax`);
             const res = await __getApiData(
-                `/taxes/getAllTaxSlabs?page=1&limit=100&search=${ser}&sortBy=name&sortOrder=desc`,
+                `/taxSlabs/getAllTaxSlabs?page=1&limit=100&search=${ser}&sortBy=name&sortOrder=desc`,
             );
             console.log(JSON.stringify(res));
             if (res?.success) {
@@ -84,7 +84,7 @@ const TaxMaster = ({ navigation }) => {
                             console.log(id);
 
                             const res = await __deleteApiData(
-                                `/taxes/deleteTaxSlabById/${id}`,
+                                `/taxSlabs/deleteTaxSlabById/${id}`,
                             );
                             if (res?.success) {
                                 __handleGetData(search);
