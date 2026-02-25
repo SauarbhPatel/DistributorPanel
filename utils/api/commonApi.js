@@ -90,7 +90,7 @@ const __getTaxTypeList = async () => {
 };
 const __getTaxList = async () => {
     return __getApiData(
-        `/taxes/getAllTaxSlabs?page=1&limit=100&search=${""}&sortBy=name&sortOrder=desc`,
+        `/taxSlabs/getAllTaxSlabs?page=1&limit=100&search=${""}&sortBy=name&sortOrder=desc`,
     )
         .then((res) => {
             if (res.success) {
@@ -107,10 +107,12 @@ const __getTaxList = async () => {
         });
 };
 const __getHsnCodeList = async (taxRate) => {
-    return __getApiData(`/hsnCodes/getAllHsnCode`)
+    return __getApiData(
+        `/hsnCodes/getAllHsnCode?page=1&limit=200&isActive=true&sortBy=createdAt&sortOrder=asc`,
+    )
         .then((res) => {
             if (res.success) {
-                return res?.data?.map((item) => ({
+                return res?.data?.records?.map((item) => ({
                     ...item,
                     id: item?._id,
                     name: taxRate
@@ -129,6 +131,23 @@ const __getHsnSetList = async () => {
         .then((res) => {
             if (res.success) {
                 return res?.data?.map((item) => ({
+                    ...item,
+                    id: item?._id,
+                }));
+            }
+            return [];
+        })
+        .catch((error) => {
+            return [];
+        });
+};
+const __getAllComplianceDocumentList = async () => {
+    return __getApiData(
+        `/complianceDocument/getAllComplianceDocument?page=1&limit=100&status=ACTIVE&sortBy=name&sortOrder=desc`,
+    )
+        .then((res) => {
+            if (res.success) {
+                return res?.data?.records?.map((item) => ({
                     ...item,
                     id: item?._id,
                 }));
@@ -249,8 +268,10 @@ const __getBrandList = async () => {
 const __getProductCategoryList = async () => {
     return __getApiData(`/categories/getCategoryTree?page=1&limit=10`)
         .then((res) => {
+            console.log(res);
             if (res.success) {
-                return createCategoryList(res?.data?.nestedData);
+                // return createCategoryList(res?.data?.nestedData);
+                return createCategoryList(res?.data);
             }
             return [];
         })
@@ -287,4 +308,5 @@ export {
     __getProductCategoryList,
     __getBrandList,
     __getTaxJurisdictionsList,
+    __getAllComplianceDocumentList,
 };

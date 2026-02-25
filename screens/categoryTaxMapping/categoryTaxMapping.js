@@ -14,13 +14,14 @@ import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import CommonHeader from "../../components/common/CommonHeader";
-import { __deleteApiData, __getApiData } from "../../utils/api";
-import CreateProductAttribute from "../../components/form/CreateProductAttribute";
+import { __deleteApiData, __getApiData, __postApiData } from "../../utils/api";
 import BottomPopup from "../../components/common/BottomPopup";
-import CreateHSNcode from "../../components/form/CreateHSNcode";
+import CreateTax from "../../components/form/CreateTax";
+import { __formatDate } from "../../utils/funtion";
 import { Loader } from "../../modules";
+import CreateCategoryHsnMapping from "../../components/form/CreateCategoryHsnMapping";
 
-const HsnCodes = ({ navigation }) => {
+const CategoryTaxMapping = ({ navigation }) => {
     const [search, setSearch] = useState("");
     const [state, setState] = useState({
         loading: false,
@@ -42,16 +43,17 @@ const HsnCodes = ({ navigation }) => {
         variantAttributes,
     } = state;
 
-    const __handleGetData = async (ser) => {
+    const __handleGetData = async (ser = "") => {
         try {
-            updateState({ loading: true });
+            updateState({ loading: ser == "" ? true : false });
+            // const res = await __getApiData(`/taxes/getAllTax`);
             const res = await __getApiData(
-                `/hsnCodes/getAllHsnCode?page=1&limit=100&search=${ser}&sortBy=createdAt&sortOrder=asc`,
+                `/taxSlabs/getAllTaxSlabs?page=1&limit=100&search=${ser}&sortBy=name&sortOrder=desc`,
             );
             console.log(JSON.stringify(res));
             if (res?.success) {
                 updateState({
-                    list: res.data?.records,
+                    list: res.data,
                 });
             }
         } catch (error) {
@@ -61,13 +63,13 @@ const HsnCodes = ({ navigation }) => {
         }
     };
 
-    useEffect(() => {
-        __handleGetData(search);
-    }, [search]);
+    // useEffect(() => {
+    //     __handleGetData(search);
+    // }, [search]);
 
     const __handleDelete = (id) => {
         Alert.alert(
-            "Delete HSN Code",
+            "Delete Tax Master",
             "Are you sure you want to delete?",
             [
                 {
@@ -80,9 +82,10 @@ const HsnCodes = ({ navigation }) => {
                     onPress: async () => {
                         try {
                             updateState({ loading: true });
+                            console.log(id);
 
                             const res = await __deleteApiData(
-                                `/hsnCodes/deleteHsnCodeById/${id}`,
+                                `/taxSlabs/deleteTaxSlabById/${id}`,
                             );
                             if (res?.success) {
                                 __handleGetData(search);
@@ -104,8 +107,8 @@ const HsnCodes = ({ navigation }) => {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
             <CommonHeader
-                title={"HSN Codes"}
-                subTitle={"Manage HSN codes."}
+                title={"Category Tax Rules"}
+                subTitle={""}
                 navigation={navigation}
             />
             <Loader isShow={loading} />
@@ -118,14 +121,13 @@ const HsnCodes = ({ navigation }) => {
             </ScrollView>
             <BottomPopup
                 isShow={isShowCreate}
-                title="Add HSN Code"
-                // top="45%"
+                title="Add Category Hsn Mapping"
                 onClose={() => updateState({ isShowCreate: false })}
                 component={
-                    <CreateHSNcode
+                    <CreateCategoryHsnMapping
                         onClose={() => {
                             updateState({ isShowCreate: false });
-                            __handleGetData(search);
+                            // __handleGetData(search);
                         }}
                     />
                 }
@@ -142,22 +144,30 @@ const HsnCodes = ({ navigation }) => {
                     <>
                         <View style={styles.statsRow}>
                             <StatCard
-                                title="Total HSN Codes"
-                                value={totalAttributes}
+                                title="Total Tax Rates"
+                                value={6}
                                 colors={["#3B82F6", "#2563EB"]}
-                                icon="tag"
+                                icon="percent"
                             />
+
                             <StatCard
-                                title="With Tax Linked"
-                                value={filterableAttributes}
-                                colors={["#10B981", "#059669"]}
-                                icon="filter"
-                            />
-                            <StatCard
-                                title="Pending Tax"
-                                value={variantAttributes}
+                                title="GST Rates (India)"
+                                value={4}
                                 colors={["#8B5CF6", "#7C3AED"]}
-                                icon="layers"
+                                icon="percent"
+                            />
+                            <StatCard
+                                title="VAT Rates"
+                                value={2}
+                                colors={["#10B981", "#059669"]}
+                                icon="percent"
+                            />
+
+                            <StatCard
+                                title="Countries Covered"
+                                value={3}
+                                colors={["#F97316", "#EA580C"]}
+                                icon="globe"
                             />
                         </View>
                     </>
@@ -172,7 +182,7 @@ const HsnCodes = ({ navigation }) => {
                 <View style={styles.searchBox}>
                     <Feather name="search" size={18} color={Colors.grayColor} />
                     <TextInput
-                        placeholder="Search HSN codes..."
+                        placeholder="Search Category Tax Rules..."
                         style={styles.searchInput}
                         value={search}
                         onChangeText={setSearch}
@@ -184,7 +194,7 @@ const HsnCodes = ({ navigation }) => {
                     onPress={() => updateState({ isShowCreate: true })}
                 >
                     <Feather name="plus" size={18} color={Colors.whiteColor} />
-                    <Text style={styles.addText}>Add Code</Text>
+                    <Text style={styles.addText}>Add Mapping</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -193,22 +203,32 @@ const HsnCodes = ({ navigation }) => {
     function attributeCards() {
         return (
             <View style={{ paddingHorizontal: Sizes.fixPadding }}>
-                {list?.map((item) => (
-                    <ListCard
-                        item={item}
-                        key={item?._id}
-                        onDelete={__handleDelete}
-                        onDone={() => __handleGetData(search)}
-                    />
-                ))}
+                {list
+                    ?.filter(
+                        (item) =>
+                            item?.name
+                                ?.toLowerCase()
+                                .includes(search.toLowerCase()) ||
+                            item?.code
+                                ?.toLowerCase()
+                                .includes(search.toLowerCase()),
+                    )
+                    ?.map((item) => (
+                        <ListCard
+                            item={item}
+                            key={item?._id}
+                            onDelete={__handleDelete}
+                            onDone={() => __handleGetData(search)}
+                        />
+                    ))}
             </View>
         );
     }
 };
 
-export default HsnCodes;
+export default CategoryTaxMapping;
 
-const ListCard = ({ item, onDelete, onDone }) => {
+const ListCard = ({ item, onDone, onDelete }) => {
     const [state, setState] = useState({
         isShowCreate: false,
     });
@@ -216,16 +236,15 @@ const ListCard = ({ item, onDelete, onDone }) => {
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
     const { isShowCreate } = state;
-
     return (
         <View style={styles.card}>
-            {/* Edit Popup */}
+            {/* Header */}
             <BottomPopup
                 isShow={isShowCreate}
-                title="Edit HSN Code"
+                title="Edit Tax Master"
                 onClose={() => updateState({ isShowCreate: false })}
                 component={
-                    <CreateHSNcode
+                    <CreateTax
                         onClose={() => {
                             updateState({ isShowCreate: false });
                             onDone();
@@ -235,75 +254,84 @@ const ListCard = ({ item, onDelete, onDone }) => {
                     />
                 }
             />
-
-            {/* Top Section */}
-            <View style={styles.topRow}>
-                <View style={{ width: "75%" }}>
-                    <Text style={styles.hsnCode}>HSN: {item.code}</Text>
-
-                    <Text style={styles.description} numberOfLines={2}>
-                        {item.description}
-                    </Text>
-
-                    <Text style={styles.subText}>
-                        GST Slab: {item?.TaxSlabId?.name} (
-                        {item?.TaxSlabId?.code})
-                    </Text>
-
-                    <Text style={styles.subText}>
-                        Product Type: {item.productType}
-                    </Text>
+            <View style={styles.header}>
+                <View>
+                    <Text style={styles.taxName}>{item?.name}</Text>
+                    <View style={styles.typeBadge}>
+                        <Text style={styles.typeText}>{item?.taxTypeName}</Text>
+                    </View>
                 </View>
 
-                {/* Tax Badge */}
-                <View style={styles.badge}>
-                    <Text style={styles.badgeText}>{item.taxRate}%</Text>
+                <View style={styles.rateBox}>
+                    <Text style={styles.rate}>{item?.rate}%</Text>
                 </View>
             </View>
 
-            {/* Bottom Section */}
-            <View style={styles.bottomRow}>
-                {/* Status */}
+            {/* Divider */}
+            <View style={styles.divider} />
+
+            {/* Details */}
+            <View style={styles.row}>
+                <Text style={styles.label}>Effective From</Text>
+                <Text style={styles.value}>
+                    {item?.effectiveFrom
+                        ? __formatDate(item?.effectiveFrom)
+                        : "-"}
+                </Text>
+            </View>
+
+            <View style={styles.row}>
+                <Text style={styles.label}>Effective To</Text>
+                <Text style={styles.value} numberOfLines={1}>
+                    {item?.effectiveUpTo
+                        ? __formatDate(item?.effectiveUpTo)
+                        : "-"}
+                </Text>
+            </View>
+
+            {/* Actions */}
+            <View
+                style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginTop: 12,
+                }}
+            >
                 <View
                     style={[
-                        styles.statusPill,
                         {
+                            width: 8,
+                            height: 8,
+                            borderRadius: 4,
+                            marginRight: 6,
                             backgroundColor: item.isActive
-                                ? "#DCFCE7"
-                                : "#FEE2E2",
+                                ? "#16A34A"
+                                : "#DC2626",
                         },
                     ]}
-                >
-                    <Text
-                        style={[
-                            styles.statusText,
-                            {
-                                color: item.isActive ? "#16A34A" : "#DC2626",
-                            },
-                        ]}
-                    >
-                        {item.isActive ? "Active" : "Inactive"}
-                    </Text>
-                </View>
-
-                {/* Actions */}
-                <View style={styles.actionRow}>
+                />
+                <Text style={{ fontSize: 12, color: "#6B7280" }}>
+                    {item.isActive ? "Active" : "Inactive"}
+                </Text>
+                <View style={styles.actions}>
                     <TouchableOpacity
                         style={styles.iconBtn}
-                        onPress={() => updateState({ isShowCreate: true })}
+                        onPress={() => {
+                            updateState({ isShowCreate: true });
+                        }}
                     >
-                        <Feather name="edit-2" size={18} color="#2563EB" />
+                        <Feather
+                            name="edit-2"
+                            size={18}
+                            color={Colors.primaryColor}
+                        />
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        style={styles.iconBtn}
+                        style={[styles.iconBtn, styles.deleteBtn]}
                         onPress={() => onDelete(item?._id)}
                     >
-                        <MaterialIcons
-                            name="delete-outline"
-                            size={20}
-                            color="#DC2626"
-                        />
+                        <Feather name="trash-2" size={18} color="#EF4444" />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -410,85 +438,90 @@ const styles = StyleSheet.create({
 
     /* ================= Attribute Set Card ================= */
     card: {
-        backgroundColor: "#fff",
-        borderRadius: 14,
+        backgroundColor: Colors.whiteColor,
+        borderRadius: 12,
         padding: 14,
         marginBottom: 12,
-        // elevation: 2,
+        borderWidth: 1,
+        borderColor: "#e5e7eb",
     },
 
-    topRow: {
+    header: {
         flexDirection: "row",
         justifyContent: "space-between",
-        alignItems: "flex-start",
+        alignItems: "center",
     },
 
-    hsnCode: {
-        fontSize: 14,
-        fontWeight: "700",
-        color: "#2563EB",
+    taxName: {
+        ...Fonts.blackColor15Bold,
+        marginBottom: 6,
     },
 
-    description: {
-        ...Fonts.grayColor14Medium,
-        fontSize: 12,
-        color: Colors.lightGrayColor,
-        marginTop: 4,
-        maxWidth: "90%",
-    },
-
-    badge: {
-        backgroundColor: "#EFF6FF",
+    typeBadge: {
+        backgroundColor: "#E0ECFF",
+        alignSelf: "flex-start",
         paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 20,
-        // flex: 1,
+        borderRadius: 12,
     },
 
-    badgeText: {
+    typeText: {
         fontSize: 12,
-        fontWeight: "600",
         color: "#2563EB",
+        fontWeight: "600",
     },
 
-    bottomRow: {
+    rateBox: {
+        backgroundColor: "#F3F4F6",
+        paddingHorizontal: 14,
+        paddingVertical: 6,
+        borderRadius: 10,
+    },
+
+    rate: {
+        fontSize: 16,
+        fontWeight: "700",
+        color: Colors.blackColor,
+    },
+
+    divider: {
+        height: 1,
+        backgroundColor: "#e5e7eb",
+        marginVertical: 10,
+    },
+
+    row: {
         flexDirection: "row",
-        alignItems: "center",
-        marginTop: 12,
+        justifyContent: "space-between",
+        marginBottom: 6,
     },
 
-    statusDot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-        marginRight: 6,
-    },
-
-    statusText: {
+    label: {
         fontSize: 12,
         color: "#6B7280",
     },
 
-    actionRow: {
+    value: {
+        fontSize: 13,
+        color: Colors.blackColor,
+        fontWeight: "500",
+        maxWidth: "65%",
+        textAlign: "right",
+    },
+
+    actions: {
         flexDirection: "row",
+        gap: 12,
         marginLeft: "auto",
     },
 
     iconBtn: {
-        padding: 6,
-        marginLeft: 6,
-        backgroundColor: "#F3F4F6",
+        padding: 8,
         borderRadius: 8,
-    },
-    statusPill: {
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 20,
+        backgroundColor: "#F9FAFB",
     },
 
-    subText: {
-        fontSize: 12,
-        color: "#6B7280",
-        marginTop: 2,
+    deleteBtn: {
+        backgroundColor: "#FEF2F2",
     },
 });

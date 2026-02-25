@@ -11,10 +11,18 @@ import {
     __getProductCategoryList,
 } from "../../utils/api/commonApi";
 import MobileTabs from "./com/MobileTabs";
+import PackageManufacturingForm from "./com/PackageManufacturingForm";
+import BasicInfoPricingForm from "./com/BasicInfoPricingForm";
+import MediaUploadComponent from "./com/MediaUploadComponent";
+import TaxComplianceComponent from "./com/TaxComplianceComponent";
+import ProductDescriptionComponent from "./com/ProductDescriptionComponent";
 const STEPS = [
-    { key: "1", label: "Basic Info" },
-    { key: "2", label: "Category & Brand" },
-    { key: "3", label: "Product Type" },
+    { key: "1", label: "Category & Brand" },
+    { key: "2", label: "Basic Info" },
+    { key: "3", label: "Description" },
+    { key: "4", label: "Media Upload" },
+    { key: "5", label: "Tax & Compliance" },
+    { key: "6", label: "Package & Manufacturing" },
 ];
 const PRODUCT_TYPES = [
     {
@@ -161,6 +169,7 @@ const CreateGlobalProducts = ({
     const __handleEditSave = () => {
         if (!validateForm()) return;
         try {
+            return;
             updateState({ loading: true });
 
             __patchApiData("/categories/updateCategoryById/" + item?._id, {
@@ -247,56 +256,15 @@ const CreateGlobalProducts = ({
                     gap: 12,
                 }}
             >
-                {activeTab == "1" && (
-                    <View
-                        style={{
-                            ...inputStyle,
-                            paddingHorizontal: 10,
-                            borderRadius: 10,
-                            paddingBottom: 10,
-                            marginTop: 10,
-                        }}
-                    >
-                        <View style={{}}>
-                            <TextAreaBox
-                                title="Product Name"
-                                placeholder="e.g., Premium Smartphone X"
-                                required
-                                value={productName}
-                                valuekey="productName"
-                                onChangeText={updateState}
-                                titleCustomStyle={{
-                                    marginHorizontal: 0,
-                                    marginTop: 10,
-                                }}
-                                inputCustomStyle={inputStyle}
-                                customStyle={{ flex: 1 }}
-                            />
-                            <TextAreaBox
-                                title="Description"
-                                placeholder="Describe the product..."
-                                value={description}
-                                valuekey="description"
-                                onChangeText={updateState}
-                                titleCustomStyle={{
-                                    marginHorizontal: 0,
-                                    marginTop: 10,
-                                }}
-                                inputCustomStyle={{
-                                    ...inputStyle,
-                                    height: 100,
-                                }}
-                                customStyle={{ flex: 1 }}
-                                customInputProps={{
-                                    textAlignVertical: "top",
-                                    multiline: true,
-                                    numberOfLines: 6,
-                                }}
-                            />
-                        </View>
-                    </View>
-                )}
                 {activeTab == "2" && (
+                    <BasicInfoPricingForm
+                        value={null}
+                        onChange={(data) => {
+                            console.log("Updated:", data);
+                        }}
+                    />
+                )}
+                {activeTab == "1" && (
                     <View
                         style={{
                             ...inputStyle,
@@ -350,23 +318,33 @@ const CreateGlobalProducts = ({
                 )}
                 {activeTab == "3" && (
                     <View>
-                        {PRODUCT_TYPES.map((item) => (
-                            <ProductTypeCard
-                                key={item.key}
-                                item={item}
-                                selected={productType === item.key}
-                                onPress={() => setProductType(item.key)}
-                            />
-                        ))}
-                        <View
-                            style={{
-                                ...inputStyle,
-                                paddingHorizontal: 10,
-                                borderRadius: 10,
-                                paddingBottom: 10,
-                                marginTop: 10,
-                            }}
-                        ></View>
+                        <ProductDescriptionComponent />
+                    </View>
+                )}
+                {activeTab == "4" && (
+                    <View>
+                        <MediaUploadComponent
+                            mainImage={state?.mainImage}
+                            galleryImages={state?.galleryImages}
+                            shortVideo={state?.shortVideo}
+                            updateState={updateState}
+                        />
+                    </View>
+                )}
+                {activeTab == "5" && (
+                    <View>
+                        <TaxComplianceComponent
+                            hsnSearch={state.hsnSearch}
+                            selectedHsn={state.selectedHsn}
+                            hsnList={[]} // [{id, name}]
+                            // documentTypeList={[]} // [{id, name}]
+                            updateState={updateState}
+                        />
+                    </View>
+                )}
+                {activeTab == "6" && (
+                    <View>
+                        <PackageManufacturingForm />
                     </View>
                 )}
 
@@ -396,7 +374,7 @@ const CreateGlobalProducts = ({
                             <Text style={styles.createText}>Back</Text>
                         </TouchableOpacity>
                     )}
-                    {activeTab != "3" && (
+                    {activeTab != "6" && (
                         <TouchableOpacity
                             style={styles.createBtn}
                             onPress={() => {
@@ -413,7 +391,7 @@ const CreateGlobalProducts = ({
                             <Text style={styles.createText}>Next</Text>
                         </TouchableOpacity>
                     )}
-                    {activeTab == "3" && (
+                    {activeTab == "6" && (
                         <TouchableOpacity
                             style={styles.createBtn}
                             onPress={() =>

@@ -84,6 +84,8 @@ import GlobalProducts from "./screens/globalProducts/globalProducts";
 import GenericProducts from "./screens/genericProducts/genericProducts";
 import ProductListings from "./screens/productListings/productListings";
 import TaxJurisdiction from "./screens/taxJurisdiction/taxJurisdiction";
+import CategoryTaxMapping from "./screens/categoryTaxMapping/categoryTaxMapping";
+import DocumentMaster from "./screens/documentMaster/documentMaster";
 
 LogBox.ignoreAllLogs();
 
@@ -304,6 +306,14 @@ function App() {
                 <Stack.Screen
                     name="ProductListings"
                     component={ProductListings}
+                />
+                <Stack.Screen
+                    name="CategoryTaxMapping"
+                    component={CategoryTaxMapping}
+                />
+                <Stack.Screen
+                    name="DocumentMaster"
+                    component={DocumentMaster}
                 />
             </Stack.Navigator>
         </NavigationContainer>

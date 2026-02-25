@@ -55,7 +55,7 @@ const CategoryManagment = ({ navigation }) => {
 
             if (res?.success) {
                 updateState({
-                    list: res.data?.nestedData,
+                    list: res.data,
                     // ...res?.data?.stats,
                 });
             }
@@ -267,7 +267,6 @@ const CategoryCard = ({
 
         __patchApiData("/categories/updateCategoryById/" + item?._id, {
             isActive: status,
-            enabled: status,
         })
             .then((res) => {
                 console.log(JSON.stringify(res));
@@ -285,7 +284,7 @@ const CategoryCard = ({
             });
     };
     useEffect(() => {
-        if (item) updateState({ isActive: item.enabled });
+        if (item) updateState({ isActive: item.isActive });
     }, [item]);
 
     return (

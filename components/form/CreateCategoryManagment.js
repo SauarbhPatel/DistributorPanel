@@ -4,11 +4,14 @@ import { Colors, Fonts, Sizes } from "../../constants/styles";
 import { DropDownTextAreaBox, Loader, TextAreaBox } from "../../modules";
 import { __patchApiData, __postApiData } from "../../utils/api";
 import {
+    __getAllComplianceDocumentList,
     __getAttributeSetList,
     __getHsnCodeList,
     __getHsnSetList,
 } from "../../utils/api/commonApi";
 import SingleSelectTab from "../common/SingleSelectTab";
+import VariationRuleCard from "./com/VariationRuleCard";
+import CommissionConfigCard from "./com/CommissionConfigCard";
 
 const CreateCategoryManagment = ({
     onClose = () => {},
@@ -17,24 +20,50 @@ const CreateCategoryManagment = ({
     parentId = null,
 }) => {
     const [state, setState] = useState({
-        metaTitle: "",
-        metaDescription: "",
+        //
         categoryName: "",
         code: "",
-        hsnsetId: null,
-        attributeSetId: null,
         displayOrder: "1",
+        statusId: null,
         isActive: true,
-        status: true,
+        visibleForConsumer: true,
+        //
+        attributeSetId: null,
+        variantAttributes: [],
+        //
+        complianceDocuments: [],
+        //
+        hsnsetId: null,
+        //
+        commissionPercentage: "",
+        closingFees: "",
+        sellerTierOverrides: [
+            {
+                id: Date.now().toString(),
+                sellerTier: "",
+                commissionPercentage: "",
+            },
+        ],
+        //
+        canonicalUrl: "",
+        priorityScore: "0",
+        //
+
+        metaTitle: "",
+        metaDescription: "",
         loading: false,
         //
         hsnCodeList: [],
         attributeList: [],
+        complianceDocumentList: [],
     });
 
     const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
 
     const {
+        commissionPercentage,
+        closingFees,
+        sellerTierOverrides,
         loading,
         metaTitle,
         metaDescription,
@@ -42,71 +71,186 @@ const CreateCategoryManagment = ({
         code,
         displayOrder,
         isActive,
+        statusId,
         hsnsetId,
         attributeSetId,
-        status,
+        visibleForConsumer,
+        variantAttributes,
+        complianceDocuments,
+        canonicalUrl,
+        priorityScore,
         //
         hsnCodeList,
         attributeList,
+        complianceDocumentList,
     } = state;
 
     const validateForm = () => {
+        // 1. String & Text Field Validations
         if (!categoryName?.trim()) {
-            Alert.alert("Validation Error", "category name is required");
+            Alert.alert("Validation Error", "Category name is required");
+            return false;
+        }
+        if (categoryName?.trim().length < 2) {
+            Alert.alert(
+                "Validation Error",
+                "Category name must be at least 2 characters",
+            );
             return false;
         }
         if (!code?.trim()) {
-            Alert.alert("Validation Error", "code is required");
+            Alert.alert("Validation Error", "Code is required");
             return false;
         }
-        if (!attributeSetId) {
-            Alert.alert("Validation Error", "attribute set is required");
+
+        // 2. Dropdown / Object Reference Validations
+        if (!statusId || !statusId.id) {
+            Alert.alert("Validation Error", "Status is required");
             return false;
         }
-        if (!hsnsetId) {
+        if (!attributeSetId || !attributeSetId.id) {
+            Alert.alert("Validation Error", "Attribute set is required");
+            return false;
+        }
+        if (!hsnsetId || !hsnsetId.id) {
             Alert.alert("Validation Error", "HSN code is required");
             return false;
         }
 
-        if (categoryName?.trim().length < 2) {
+        // 3. Numeric Field Validations
+        // Check if displayOrder is empty or not a valid number
+        if (
+            displayOrder === "" ||
+            displayOrder === null ||
+            isNaN(Number(displayOrder))
+        ) {
             Alert.alert(
                 "Validation Error",
-                "category name must be at least 2 characters",
+                "Display order must be a valid number",
             );
             return false;
         }
 
+        // Commission Percentage should be a number between 0 and 100
+        const commPct = Number(commissionPercentage);
+        if (
+            commissionPercentage === "" ||
+            commissionPercentage === null ||
+            isNaN(commPct) ||
+            commPct < 0 ||
+            commPct > 100
+        ) {
+            Alert.alert(
+                "Validation Error",
+                "Commission percentage must be a valid number between 0 and 100",
+            );
+            return false;
+        }
+
+        // Closing Fees should be a valid positive number
+        const fees = Number(closingFees);
+        if (
+            closingFees === "" ||
+            closingFees === null ||
+            isNaN(fees) ||
+            fees < 0
+        ) {
+            Alert.alert(
+                "Validation Error",
+                "Closing fees must be a valid positive number",
+            );
+            return false;
+        }
+
+        if (
+            priorityScore === "" ||
+            priorityScore === null ||
+            isNaN(Number(priorityScore))
+        ) {
+            Alert.alert(
+                "Validation Error",
+                "Priority score must be a valid number",
+            );
+            return false;
+        }
+
+        // 4. Nested Array Validations (Seller Tiers)
+        if (sellerTierOverrides && sellerTierOverrides.length > 0) {
+            for (let i = 0; i < sellerTierOverrides.length; i++) {
+                const override = sellerTierOverrides[i];
+
+                if (!override?.sellerTier) {
+                    Alert.alert(
+                        "Validation Error",
+                        `Seller tier is required for override at row ${i + 1}`,
+                    );
+                    return false;
+                }
+
+                const overrideComm = Number(override?.commissionPercentage);
+                if (
+                    override?.commissionPercentage === "" ||
+                    override?.commissionPercentage === null ||
+                    isNaN(overrideComm) ||
+                    overrideComm < 0 ||
+                    overrideComm > 100
+                ) {
+                    Alert.alert(
+                        "Validation Error",
+                        `Please enter a valid commission percentage (0-100) for seller tier: ${override.sellerTier}`,
+                    );
+                    return false;
+                }
+            }
+        }
+
+        // If all checks pass
         return true;
     };
 
     const __handleSave = () => {
         if (!validateForm()) return;
-        updateState({ loading: true });
-        console.log({
+        const payload = {
             name: categoryName,
-            code,
-            parentId: parentId,
+            code: code,
+            ...(parentId && { parentId: parentId }),
+            status: statusId?.id,
             displayOrder: Number(displayOrder),
-            enabled: isActive,
             isActive: isActive,
-            metaTitle: metaTitle,
-            metaDescription: metaDescription,
-            hsnsetId: hsnsetId?.id || null,
-            attributeSetId: attributeSetId?.id || null,
-        });
+            visibleForConsumer: visibleForConsumer,
+            //
 
-        __postApiData("/categories/createCategory", {
-            name: categoryName,
-            code,
-            parentId: parentId,
-            displayOrder: Number(displayOrder),
-            enabled: isActive,
-            isActive: isActive,
+            attributeSetId: attributeSetId?.id,
+            variantAttributes: variantAttributes.map((ids) => {
+                const cloneData = ids;
+                delete cloneData?._id;
+                delete cloneData?.isMandatory;
+                return {
+                    ...cloneData,
+                };
+            }),
+            //
+            complianceDocuments: complianceDocuments.map((ids) => ({
+                complianceId: ids?.id,
+                documentName: ids?.name,
+            })),
+            hsnSetId: hsnsetId?.id,
+            commissionPercentage: Number(commissionPercentage),
+            closingFees: Number(closingFees),
+            sellerTierOverrides: sellerTierOverrides?.map((ids) => ({
+                sellerTier: ids?.sellerTier,
+                commissionPercentage: Number(ids?.commissionPercentage),
+            })),
+            shippingRuleId: null,
             metaTitle: metaTitle,
             metaDescription: metaDescription,
-            hsnsetId: hsnsetId?.id || null,
-            attributeSetId: attributeSetId?.id || null,
-        })
+            canonicalUrl: canonicalUrl,
+            priorityScore: Number(priorityScore),
+        };
+        console.log(JSON.stringify(payload));
+        updateState({ loading: true });
+
+        __postApiData("/categories/createCategory", payload)
             .then((res) => {
                 console.log(JSON.stringify(res));
                 if (res?.success) {
@@ -128,18 +272,48 @@ const CreateCategoryManagment = ({
         if (!validateForm()) return;
         try {
             updateState({ loading: true });
-
-            __patchApiData("/categories/updateCategoryById/" + item?._id, {
+            const payload = {
                 name: categoryName,
-                code,
+                code: code,
+
+                status: statusId?.id,
                 displayOrder: Number(displayOrder),
-                enabled: isActive,
                 isActive: isActive,
+                visibleForConsumer: visibleForConsumer,
+                //
+
+                attributeSetId: attributeSetId?.id,
+                variantAttributes: variantAttributes.map((ids) => {
+                    const cloneData = ids;
+                    delete cloneData?._id;
+                    delete cloneData?.isMandatory;
+                    return {
+                        ...cloneData,
+                    };
+                }),
+                //
+                complianceDocuments: complianceDocuments.map((ids) => ({
+                    complianceId: ids?.id,
+                    documentName: ids?.name,
+                })),
+                hsnSetId: hsnsetId?.id,
+                commissionPercentage: Number(commissionPercentage),
+                closingFees: Number(closingFees),
+                sellerTierOverrides: sellerTierOverrides?.map((ids) => ({
+                    sellerTier: ids?.sellerTier,
+                    commissionPercentage: Number(ids?.commissionPercentage),
+                })),
+                shippingRuleId: null,
                 metaTitle: metaTitle,
                 metaDescription: metaDescription,
-                hsnsetId: hsnsetId?.id || null,
-                attributeSetId: attributeSetId?.id || null,
-            })
+                canonicalUrl: canonicalUrl,
+                priorityScore: Number(priorityScore),
+            };
+
+            __patchApiData(
+                "/categories/updateCategoryById/" + item?._id,
+                payload,
+            )
                 .then((res) => {
                     console.log(JSON.stringify(res));
                     if (res?.success) {
@@ -163,29 +337,68 @@ const CreateCategoryManagment = ({
 
     useEffect(() => {
         if (isEdit) {
-            console.log(item);
+            console.log(JSON.stringify(item));
             updateState({
+                //
                 categoryName: item?.name,
                 code: item?.code,
+                displayOrder: String(item?.displayOrder),
+                statusId: {
+                    id: item?.status,
+                    name: item?.status,
+                },
+                isActive: item?.isActive,
+                visibleForConsumer: item?.visibleForConsumer,
+                //
+                attributeSetId: item?.attributeSetId
+                    ? {
+                          id: item?.attributeSetId,
+                          name: item?.attributeSetName,
+                      }
+                    : null,
+                variantAttributes: item?.variantAttributes,
+                //
+                complianceDocuments: item?.complianceDocuments?.map((ids) => ({
+                    id: ids?.complianceId,
+                    name: ids?.documentName,
+                })),
+                //
+                hsnsetId: item?.hsnSetId
+                    ? {
+                          id: item?.hsnSetId,
+                          name: item?.hsnSetName,
+                      }
+                    : null,
+                //
+                commissionPercentage: String(item?.commissionPercentage),
+                closingFees: String(item?.closingFees),
+                sellerTierOverrides: item?.sellerTierOverrides?.map((ids) => ({
+                    sellerTier: ids?.sellerTier,
+                    commissionPercentage: String(ids?.commissionPercentage),
+                })),
+                //
+
                 metaTitle: item?.metaTitle,
                 metaDescription: item?.metaDescription,
-                hsnsetId: item?.hsnsetId
-                    ? { id: item?.hsnsetId, name: item?.hsnSetName }
-                    : null,
-                attributeSetId: item?.attributeSetId
-                    ? { id: item?.attributeSetId, name: item?.attributeSetName }
-                    : null,
-                displayOrder: String(item?.displayOrder) || "1",
-                isActive: item?.isActive || false,
+                canonicalUrl: item?.canonicalUrl,
+                priorityScore: String(item?.priorityScore),
             });
         }
     }, [isEdit, item]);
 
     const __handleGetData = async () => {
         try {
+            updateState({ loading: true });
+
             const code = await __getHsnSetList(true);
             const attra = await __getAttributeSetList(true);
-            updateState({ hsnCodeList: code, attributeList: attra });
+            const compli = await __getAllComplianceDocumentList();
+            updateState({
+                hsnCodeList: code,
+                attributeList: attra,
+                complianceDocumentList: compli,
+                loading: false,
+            });
         } catch (error) {}
     };
 
@@ -214,7 +427,7 @@ const CreateCategoryManagment = ({
                         paddingBottom: 10,
                     }}
                 >
-                    <Text style={hintText}>Basic Information</Text>
+                    <Text style={hintText}>Hierarchy & Basic Information</Text>
 
                     <View style={{}}>
                         <TextAreaBox
@@ -232,7 +445,7 @@ const CreateCategoryManagment = ({
                             customStyle={{ flex: 1 }}
                         />
                         <TextAreaBox
-                            title="Code"
+                            title="Category Code"
                             placeholder=""
                             required
                             value={code}
@@ -261,7 +474,47 @@ const CreateCategoryManagment = ({
                             keyboardType="numeric"
                         />
                     </View>
+                    <DropDownTextAreaBox
+                        type="select"
+                        title={"Status"}
+                        required
+                        placeholder={"Select Status"}
+                        list={[
+                            { id: "DRAFT", name: "DRAFT" },
+                            { id: "SUBMIT", name: "SUBMIT" },
+                            { id: "APPROVED", name: "APPROVED" },
+                            { id: "REJECTED", name: "REJECTED" },
+                        ]}
+                        value={statusId}
+                        isSearchable
+                        titleCustomStyle={{
+                            marginHorizontal: 0,
+                            marginTop: 10,
+                        }}
+                        inputCustomStyle={inputStyle}
+                        onSelected={(value) => {
+                            updateState({
+                                statusId: value,
+                            });
+                        }}
+                        editable={!isEdit}
+                    />
                     {/* Active Status */}
+                    <View style={styles.statusBox}>
+                        <View>
+                            <Text style={Fonts.blackColor15Medium}>Active</Text>
+                        </View>
+                        <Switch
+                            value={isActive}
+                            onValueChange={(value) =>
+                                updateState({ isActive: value })
+                            }
+                            trackColor={{
+                                false: "#ccc",
+                                true: Colors.primaryColor,
+                            }}
+                        />
+                    </View>
                     <View style={styles.statusBox}>
                         <View>
                             <Text style={Fonts.blackColor15Medium}>
@@ -277,9 +530,9 @@ const CreateCategoryManagment = ({
                             </Text>
                         </View>
                         <Switch
-                            value={isActive}
+                            value={visibleForConsumer}
                             onValueChange={(value) =>
-                                updateState({ isActive: value })
+                                updateState({ visibleForConsumer: value })
                             }
                             trackColor={{
                                 false: "#ccc",
@@ -296,7 +549,77 @@ const CreateCategoryManagment = ({
                         paddingBottom: 10,
                     }}
                 >
-                    <Text style={hintText}>HSN Set & Attribute Set</Text>
+                    <Text style={hintText}>Attribute Set Configuration</Text>
+                    <DropDownTextAreaBox
+                        type="select"
+                        title={"Attribute Set"}
+                        placeholder={"Select Attribute Set"}
+                        required
+                        list={attributeList}
+                        value={attributeSetId}
+                        isSearchable
+                        titleCustomStyle={{
+                            marginHorizontal: 0,
+                            marginTop: 10,
+                        }}
+                        inputCustomStyle={inputStyle}
+                        onSelected={(value) => {
+                            updateState({
+                                attributeSetId: value,
+                                variantAttributes: [],
+                            });
+                        }}
+                    />
+                    {attributeSetId && (
+                        <VariationRuleCard
+                            attributes={attributeSetId?.attributes}
+                            onSelected={(value) =>
+                                updateState({
+                                    variantAttributes: value,
+                                })
+                            }
+                        />
+                    )}
+                </View>
+                <View
+                    style={{
+                        ...inputStyle,
+                        paddingHorizontal: 10,
+                        borderRadius: 10,
+                        paddingBottom: 10,
+                    }}
+                >
+                    <Text style={hintText}>Compliance Configuration</Text>
+
+                    <DropDownTextAreaBox
+                        type="select_multi"
+                        title={"Document types (from Compliance manager)"}
+                        required
+                        list={complianceDocumentList}
+                        value={complianceDocuments}
+                        isSearchable
+                        titleCustomStyle={{
+                            marginHorizontal: 0,
+                            marginTop: 10,
+                        }}
+                        inputCustomStyle={inputStyle}
+                        onSelected={(value) => {
+                            updateState({
+                                complianceDocuments: value,
+                            });
+                        }}
+                        editable={!isEdit}
+                    />
+                </View>
+                <View
+                    style={{
+                        ...inputStyle,
+                        paddingHorizontal: 10,
+                        borderRadius: 10,
+                        paddingBottom: 10,
+                    }}
+                >
+                    <Text style={hintText}>Tax Rules</Text>
                     <DropDownTextAreaBox
                         type="select"
                         title={"HSN Set"}
@@ -315,15 +638,47 @@ const CreateCategoryManagment = ({
                                 hsnsetId: value,
                             });
                         }}
-                        editable={!isEdit}
+                        // editable={!isEdit}
                     />
+                </View>
+                <View
+                    style={{
+                        ...inputStyle,
+                        paddingHorizontal: 10,
+                        borderRadius: 10,
+                        paddingBottom: 10,
+                    }}
+                >
+                    <Text style={hintText}>Commission & Pricing Control</Text>
+                    <CommissionConfigCard
+                        data={{
+                            commissionPercentage,
+                            closingFees,
+                            sellerTierOverrides,
+                        }}
+                        onChange={(value) => {
+                            console.log(value);
+                            updateState({ ...value });
+                            // {"closingFee": "9", "commissionPercentage": "5", "sellerTierOverrides": [{"commissionPercentage": "5", "id": "1771823235473", "sellerTier": "F"}]}
+                        }}
+                    />
+                </View>
+                <View
+                    style={{
+                        ...inputStyle,
+                        paddingHorizontal: 10,
+                        borderRadius: 10,
+                        paddingBottom: 10,
+                    }}
+                >
+                    <Text style={hintText}>Shipping & Logistics Rules</Text>
                     <DropDownTextAreaBox
                         type="select"
-                        title={"Attribute Set"}
+                        title={"Shipping Template"}
+                        placeholder={"Select Shipping Template"}
                         required
-                        placeholder={"Select Attribute Set"}
-                        list={attributeList}
-                        value={attributeSetId}
+                        list={[]}
+                        value={null}
                         isSearchable
                         titleCustomStyle={{
                             marginHorizontal: 0,
@@ -332,10 +687,10 @@ const CreateCategoryManagment = ({
                         inputCustomStyle={inputStyle}
                         onSelected={(value) => {
                             updateState({
-                                attributeSetId: value,
+                                hsnsetId: value,
                             });
                         }}
-                        editable={!isEdit}
+                        // editable={!isEdit}
                     />
                 </View>
                 <View
@@ -373,6 +728,33 @@ const CreateCategoryManagment = ({
                         }}
                         inputCustomStyle={inputStyle}
                         customStyle={{ flex: 1 }}
+                    />
+                    <TextAreaBox
+                        title="Canonical URL"
+                        placeholder=""
+                        value={canonicalUrl}
+                        valuekey="canonicalUrl"
+                        onChangeText={updateState}
+                        titleCustomStyle={{
+                            marginHorizontal: 0,
+                            marginTop: 10,
+                        }}
+                        inputCustomStyle={inputStyle}
+                        customStyle={{ flex: 1 }}
+                    />
+                    <TextAreaBox
+                        title="Priority Score (0–100)"
+                        placeholder=""
+                        value={priorityScore}
+                        valuekey="priorityScore"
+                        onChangeText={updateState}
+                        titleCustomStyle={{
+                            marginHorizontal: 0,
+                            marginTop: 10,
+                        }}
+                        inputCustomStyle={inputStyle}
+                        customStyle={{ flex: 1 }}
+                        keyboardType="number-pad"
                     />
                 </View>
 

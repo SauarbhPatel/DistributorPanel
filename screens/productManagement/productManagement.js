@@ -25,6 +25,11 @@ const PRODUCT_MENU = [
         icon: "category",
         screen: "CategoryManagment",
     },
+    {
+        title: "Category Tax Mapping",
+        icon: "category",
+        screen: "CategoryTaxMapping",
+    },
     { title: "Attribute Sets", icon: "layers", screen: "AttributeSets" },
     {
         title: "Brands Master",
@@ -40,7 +45,8 @@ const PRODUCT_MENU = [
     },
     { title: "Tax Master", icon: "receipt-long", screen: "TaxMaster" },
     { title: "Tax Type", icon: "percent", screen: "TaxTypes" },
-    { title: "Global Products", icon: "public", screen: "GlobalProducts" },
+    { title: "Document Master", icon: "view-list", screen: "DocumentMaster" },
+    { title: "Products", icon: "public", screen: "GlobalProducts" },
     { title: "Generic Products", icon: "inventory", screen: "GenericProducts" },
     { title: "Product Listing", icon: "view-list", screen: "ProductListings" },
 ];

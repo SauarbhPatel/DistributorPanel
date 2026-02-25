@@ -1,7 +1,10 @@
 const STEPS = [
-    { key: "1", label: "Basic Info" },
-    { key: "2", label: "Category & Brand" },
-    { key: "3", label: "Product Type" },
+    { key: "1", label: "Category & Brand" },
+    { key: "2", label: "Basic Info" },
+    { key: "3", label: "Description" },
+    { key: "4", label: "Media Upload" },
+    { key: "5", label: "Tax & Compliance" },
+    { key: "6", label: "Package & Manufacturing" },
 ];
 import {
     View,
