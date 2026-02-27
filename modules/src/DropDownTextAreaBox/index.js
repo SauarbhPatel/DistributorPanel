@@ -230,6 +230,7 @@ const DropDownTextAreaBox = React.memo(
                                 if (newevent?.type == "set") {
                                     onSelected(
                                         `${selectedDate.toDateString()}`,
+                                        selectedDate,
                                     );
                                 }
                             } catch (error) {

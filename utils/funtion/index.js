@@ -75,7 +75,7 @@ export function __formatDate2(date) {
     const year = inputDate.getFullYear();
     const hours = inputDate.getHours() % 12 || 12; // Convert to 12-hour format
 
-    const formattedDate = `${month} ${day}, ${year} ${hours}`;
+    const formattedDate = `${month} ${day}, ${year}`;
 
     return formattedDate;
 }
@@ -228,6 +228,8 @@ export function createCategoryList(categories) {
                 name: currentPath,
                 slug: node.slug,
                 isActive: node.isActive,
+                attributeSetId: node.attributeSetId,
+                attributeSetName: node.attributeSetName,
             });
 
             if (node.children && node.children.length > 0) {

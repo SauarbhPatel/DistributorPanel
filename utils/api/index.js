@@ -28,7 +28,7 @@ export function __apiHeaderFormDataNew() {
 }
 
 export const __getApiData = (endpoint) => {
-    // console.log(`${_HOST}${endpoint}`);
+    console.log(`${_HOST}${endpoint}`);
     return axios
         .get(`${_HOST}${endpoint}`, __apiHeaderNew())
         .then((response) => {

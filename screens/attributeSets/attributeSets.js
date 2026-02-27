@@ -44,10 +44,12 @@ const AttributeSets = ({ navigation }) => {
     const __handleGetData = async (ser) => {
         try {
             updateState({ loading: true });
-            const res = await __getApiData(`/attributeSet/getAllAttributeSet`);
+            const res = await __getApiData(
+                `/attributeSet/getAllAttributeSet?page=1&limit=100&sortBy=createdAt&sortOrder=asc`,
+            );
             if (res?.success) {
                 updateState({
-                    list: res.data?.map((item) => ({
+                    list: res.data?.records?.map((item) => ({
                         ...item,
                         attributesString: item?.attributes.map(
                             (variant) => variant?.name,

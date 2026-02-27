@@ -4,33 +4,30 @@ import { Colors, Fonts, Sizes } from "../../../constants/styles";
 import { TextAreaBox, DropDownTextAreaBox } from "../../../modules";
 
 const PackageManufacturingForm = ({ value = {}, onChange = () => {} }) => {
-    const [state, setState] = useState({
-        productLength: "",
-        productWidth: "",
-        productHeight: "",
-        productWeight: "",
-        productLengthUnit: "cm",
-        productWeightUnit: "kg",
-
-        shippingLength: "",
-        shippingWidth: "",
-        shippingHeight: "",
-        shippingWeight: "",
-        shippingLengthUnit: "cm",
-        shippingWeightUnit: "kg",
-
-        country: "",
-        manufacturer: "",
-        packer: "",
-        importer: "",
-        ...value,
-    });
+    // const [state, setState] = useState({
+    //     country: "",
+    //     manufacturer: "",
+    //     packer: "",
+    //     importer: "",
+    // });
 
     const updateState = (data) => {
-        const updated = { ...state, ...data };
-        setState(updated);
+        const updated = {
+            ...data,
+        };
         onChange(updated);
     };
+
+    const updateDimension = (type, key, val) => {
+        updateState({
+            [type]: {
+                ...value[type],
+                [key]: val,
+            },
+        });
+    };
+
+    console.log(value?.packageDimension);
 
     return (
         <View
@@ -46,64 +43,60 @@ const PackageManufacturingForm = ({ value = {}, onChange = () => {} }) => {
             {/* ================= PACKAGE DETAILS ================= */}
             <Text style={Fonts.blackColor16Bold}>PACKAGE DETAILS</Text>
 
-            {/* Product Dimensions */}
+            {/* PRODUCT DIMENSIONS */}
             <Text style={Fonts.blackColor14Bold}>Product Dimensions</Text>
 
             <View style={rowStyle}>
                 <TextAreaBox
                     title="Length"
-                    value={state.productLength}
-                    valuekey="productLength"
-                    onChangeText={updateState}
+                    value={value.productDimension.length}
+                    valuekey="text"
+                    onChangeText={(val) =>
+                        updateDimension("productDimension", "length", val?.text)
+                    }
                     keyboardType="number-pad"
                     inputCustomStyle={inputStyle}
                     customStyle={{ flex: 1 }}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
+                    titleCustomStyle={titleStyle}
                 />
                 <TextAreaBox
                     title="Width"
-                    value={state.productWidth}
-                    valuekey="productWidth"
-                    onChangeText={updateState}
+                    value={value.productDimension.width}
+                    valuekey="text"
+                    onChangeText={(val) =>
+                        updateDimension("productDimension", "width", val?.text)
+                    }
                     keyboardType="number-pad"
                     inputCustomStyle={inputStyle}
                     customStyle={{ flex: 1 }}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
+                    titleCustomStyle={titleStyle}
                 />
             </View>
 
             <View style={rowStyle}>
                 <TextAreaBox
                     title="Height"
-                    value={state.productHeight}
-                    valuekey="productHeight"
-                    onChangeText={updateState}
+                    value={value.productDimension.height}
+                    valuekey="text"
+                    onChangeText={(val) =>
+                        updateDimension("productDimension", "height", val?.text)
+                    }
                     keyboardType="number-pad"
                     inputCustomStyle={inputStyle}
                     customStyle={{ flex: 1 }}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
+                    titleCustomStyle={titleStyle}
                 />
                 <TextAreaBox
                     title="Weight"
-                    value={state.productWeight}
-                    valuekey="productWeight"
-                    onChangeText={updateState}
+                    value={value.productDimension.weight}
+                    valuekey="text"
+                    onChangeText={(val) =>
+                        updateDimension("productDimension", "weight", val?.text)
+                    }
                     keyboardType="number-pad"
                     inputCustomStyle={inputStyle}
                     customStyle={{ flex: 1 }}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
+                    titleCustomStyle={titleStyle}
                 />
             </View>
 
@@ -115,23 +108,20 @@ const PackageManufacturingForm = ({ value = {}, onChange = () => {} }) => {
                         { id: "cm", name: "cm" },
                         { id: "inch", name: "inch" },
                     ]}
-                    value={
-                        state.productLengthUnit
-                            ? {
-                                  id: state.productLengthUnit,
-                                  name: state.productLengthUnit,
-                              }
-                            : null
-                    }
+                    value={{
+                        id: value.productDimension.lengthUnit,
+                        name: value.productDimension.lengthUnit,
+                    }}
                     onSelected={(val) =>
-                        updateState({ productLengthUnit: val?.id })
+                        updateDimension(
+                            "productDimension",
+                            "lengthUnit",
+                            val?.id,
+                        )
                     }
                     inputCustomStyle={inputStyle}
                     customStyle={{ flex: 1 }}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
+                    titleCustomStyle={titleStyle}
                 />
                 <DropDownTextAreaBox
                     type="select"
@@ -140,27 +130,24 @@ const PackageManufacturingForm = ({ value = {}, onChange = () => {} }) => {
                         { id: "kg", name: "kg" },
                         { id: "lb", name: "lb" },
                     ]}
-                    value={
-                        state.productWeightUnit
-                            ? {
-                                  id: state.productWeightUnit,
-                                  name: state.productWeightUnit,
-                              }
-                            : null
-                    }
+                    value={{
+                        id: value?.productDimension.weightUnit,
+                        name: value?.productDimension.weightUnit,
+                    }}
                     onSelected={(val) =>
-                        updateState({ productWeightUnit: val?.id })
+                        updateDimension(
+                            "productDimension",
+                            "weightUnit",
+                            val?.id,
+                        )
                     }
                     inputCustomStyle={inputStyle}
                     customStyle={{ flex: 1 }}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
+                    titleCustomStyle={titleStyle}
                 />
             </View>
 
-            {/* Shipping Dimensions */}
+            {/* SHIPPING DIMENSIONS */}
             <Text style={Fonts.blackColor14Bold}>
                 Shipping Package Dimensions
             </Text>
@@ -168,58 +155,54 @@ const PackageManufacturingForm = ({ value = {}, onChange = () => {} }) => {
             <View style={rowStyle}>
                 <TextAreaBox
                     title="Length"
-                    value={state.shippingLength}
-                    valuekey="shippingLength"
-                    onChangeText={updateState}
+                    value={value?.packageDimension.length}
+                    valuekey="text"
+                    onChangeText={(val) =>
+                        updateDimension("packageDimension", "length", val?.text)
+                    }
                     keyboardType="number-pad"
                     inputCustomStyle={inputStyle}
                     customStyle={{ flex: 1 }}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
+                    titleCustomStyle={titleStyle}
                 />
                 <TextAreaBox
                     title="Width"
-                    value={state.shippingWidth}
-                    valuekey="shippingWidth"
-                    onChangeText={updateState}
+                    value={value?.packageDimension.width}
+                    valuekey="text"
+                    onChangeText={(val) =>
+                        updateDimension("packageDimension", "width", val?.text)
+                    }
                     keyboardType="number-pad"
                     inputCustomStyle={inputStyle}
                     customStyle={{ flex: 1 }}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
+                    titleCustomStyle={titleStyle}
                 />
             </View>
 
             <View style={rowStyle}>
                 <TextAreaBox
                     title="Height"
-                    value={state.shippingHeight}
-                    valuekey="shippingHeight"
-                    onChangeText={updateState}
+                    value={value?.packageDimension.height}
+                    valuekey="text"
+                    onChangeText={(val) =>
+                        updateDimension("packageDimension", "height", val?.text)
+                    }
                     keyboardType="number-pad"
                     inputCustomStyle={inputStyle}
                     customStyle={{ flex: 1 }}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
+                    titleCustomStyle={titleStyle}
                 />
                 <TextAreaBox
                     title="Weight"
-                    value={state.shippingWeight}
-                    valuekey="shippingWeight"
-                    onChangeText={updateState}
+                    value={value?.packageDimension.weight}
+                    valuekey="text"
+                    onChangeText={(val) =>
+                        updateDimension("packageDimension", "weight", val?.text)
+                    }
                     keyboardType="number-pad"
                     inputCustomStyle={inputStyle}
                     customStyle={{ flex: 1 }}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
+                    titleCustomStyle={titleStyle}
                 />
             </View>
 
@@ -231,23 +214,20 @@ const PackageManufacturingForm = ({ value = {}, onChange = () => {} }) => {
                         { id: "cm", name: "cm" },
                         { id: "inch", name: "inch" },
                     ]}
-                    value={
-                        state.shippingLengthUnit
-                            ? {
-                                  id: state.shippingLengthUnit,
-                                  name: state.shippingLengthUnit,
-                              }
-                            : null
-                    }
+                    value={{
+                        id: value?.packageDimension.lengthUnit,
+                        name: value?.packageDimension.lengthUnit,
+                    }}
                     onSelected={(val) =>
-                        updateState({ shippingLengthUnit: val?.id })
+                        updateDimension(
+                            "packageDimension",
+                            "lengthUnit",
+                            val?.id,
+                        )
                     }
                     inputCustomStyle={inputStyle}
                     customStyle={{ flex: 1 }}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
+                    titleCustomStyle={titleStyle}
                 />
                 <DropDownTextAreaBox
                     type="select"
@@ -256,28 +236,25 @@ const PackageManufacturingForm = ({ value = {}, onChange = () => {} }) => {
                         { id: "kg", name: "kg" },
                         { id: "lb", name: "lb" },
                     ]}
-                    value={
-                        state.shippingWeightUnit
-                            ? {
-                                  id: state.shippingWeightUnit,
-                                  name: state.shippingWeightUnit,
-                              }
-                            : null
-                    }
+                    value={{
+                        id: value?.packageDimension.weightUnit,
+                        name: value?.packageDimension.weightUnit,
+                    }}
                     onSelected={(val) =>
-                        updateState({ shippingWeightUnit: val?.id })
+                        updateDimension(
+                            "packageDimension",
+                            "weightUnit",
+                            val?.id,
+                        )
                     }
                     inputCustomStyle={inputStyle}
                     customStyle={{ flex: 1 }}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
+                    titleCustomStyle={titleStyle}
                 />
             </View>
 
             {/* ================= MANUFACTURING ================= */}
-            <Text style={Fonts.blackColor16Bold}>MANUFACTURING DETAILS</Text>
+            {/* <Text style={Fonts.blackColor16Bold}>MANUFACTURING DETAILS</Text>
 
             <DropDownTextAreaBox
                 type="select"
@@ -295,56 +272,44 @@ const PackageManufacturingForm = ({ value = {}, onChange = () => {} }) => {
                 }
                 onSelected={(val) => updateState({ country: val?.id })}
                 inputCustomStyle={inputStyle}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
+                titleCustomStyle={titleStyle}
             />
 
             <TextAreaBox
                 title="Manufacturer Name"
                 value={state.manufacturer}
-                valuekey="manufacturer"
-                onChangeText={updateState}
+                valuekey="text"
+                onChangeText={(val) => updateState({ manufacturer: val })}
                 inputCustomStyle={inputStyle}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
+                titleCustomStyle={titleStyle}
             />
 
             <TextAreaBox
                 title="Packer Details"
                 value={state.packer}
-                valuekey="packer"
-                onChangeText={updateState}
+                valuekey="text"
+                onChangeText={(val) => updateState({ packer: val })}
                 multiline
                 inputCustomStyle={inputStyle}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
+                titleCustomStyle={titleStyle}
             />
 
             <TextAreaBox
                 title="Importer Details"
                 value={state.importer}
-                valuekey="importer"
-                onChangeText={updateState}
+                valuekey="text"
+                onChangeText={(val) => updateState({ importer: val })}
                 multiline
                 inputCustomStyle={inputStyle}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
-            />
+                titleCustomStyle={titleStyle}
+            /> */}
         </View>
     );
 };
 
 export default PackageManufacturingForm;
 
-/* ================= Styles ================= */
+/* ================= STYLES ================= */
 
 const inputStyle = {
     marginHorizontal: 0,
@@ -358,4 +323,9 @@ const inputStyle = {
 const rowStyle = {
     flexDirection: "row",
     gap: 10,
+};
+
+const titleStyle = {
+    marginHorizontal: 0,
+    marginTop: 10,
 };

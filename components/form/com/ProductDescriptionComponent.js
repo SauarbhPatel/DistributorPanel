@@ -2,153 +2,197 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { TextAreaBox } from "../../../modules";
 import { Colors } from "../../../constants/styles";
+import DynamicAttributeForm from "./DynamicAttributeForm";
 
 const MAX_CHAR = 1500;
 
-const ProductDescriptionComponent = React.memo(() => {
-    const [bullets, setBullets] = useState({
-        bullet1: "",
-        bullet2: "",
-        bullet3: "",
-        bullet4: "",
-        bullet5: "",
-    });
+const ProductDescriptionComponent = React.memo(
+    ({ value, onChange = () => {} }) => {
+        const [bullets, setBullets] = useState({
+            bullet1: "",
+            bullet2: "",
+            bullet3: "",
+            bullet4: "",
+            bullet5: "",
+        });
 
-    const [fullDescription, setFullDescription] = useState("");
-    const [sections, setSections] = useState([]);
+        // const updateBullet = (key, value) => {
+        //     if (value.length <= MAX_CHAR) {
+        //         setBullets((prev) => ({ ...prev, [key]: value }));
+        //     }
+        // };
+        const updateBullet = (key, value) => {
+            if (value.length > MAX_CHAR) return;
 
-    const updateBullet = (key, value) => {
-        if (value.length <= MAX_CHAR) {
-            setBullets((prev) => ({ ...prev, [key]: value }));
-        }
-    };
+            setBullets((prev) => {
+                const updated = {
+                    ...prev,
+                    [key]: value,
+                };
+                // Build bullet description
+                const description = Object.values(updated)
+                    .filter((text) => text && text?.trim()?.length > 0)
+                    .map((text) => `• ${text?.trim()}`)
+                    .join("\n");
 
-    const addSection = () => {
-        setSections((prev) => [
-            ...prev,
-            { id: Date.now(), title: "", content: "" },
-        ]);
-    };
+                onChange({
+                    description,
+                });
 
-    const updateSection = (id, key, value) => {
-        setSections((prev) =>
-            prev.map((s) => (s.id === id ? { ...s, [key]: value } : s)),
-        );
-    };
+                return updated;
+            });
+        };
 
-    const removeSection = (id) => {
-        setSections((prev) => prev.filter((s) => s.id !== id));
-    };
+        const addSection = () => {
+            onChange({
+                dynamicSection: [
+                    ...value?.dynamicSection,
+                    { title: "", content: "" },
+                ],
+            });
+        };
 
-    return (
-        <View style={containerStyle}>
-            <Text style={sectionTitle}>Description</Text>
+        const updateSection = (index, key, text) => {
+            onChange({
+                dynamicSection: value?.dynamicSection?.map((item, i) =>
+                    i === index ? { ...item, [key]: text } : item,
+                ),
+            });
+        };
 
-            {/* INFO BOX */}
-            <View style={infoBox}>
-                <Text style={infoText}>
-                    Select Mobile Phones or Electronics in Step 1 to load
-                    attribute mapping.
-                </Text>
-            </View>
+        const removeSection = (index) => {
+            onChange({
+                dynamicSection: value?.dynamicSection?.filter(
+                    (_, i) => i !== index,
+                ),
+            });
+        };
 
-            {/* ================= SHORT DESCRIPTION ================= */}
-            <Text style={subTitle}>DESCRIPTION</Text>
+        return (
+            <View style={containerStyle}>
+                <Text style={sectionTitle}>Description</Text>
 
-            <Text style={helperText}>
-                Short description bullets (~200 words each), full HTML
-                description with formatting, and optional custom sections (e.g.,
-                Warranty, Technical Details).
-            </Text>
-
-            <Text style={label}>
-                Short Description (5 bullet points){" "}
-                <Text style={{ color: "red" }}>*</Text>
-            </Text>
-
-            {Object.keys(bullets).map((key, index) => (
-                <View key={key} style={{ marginBottom: 14 }}>
-                    <TextAreaBox
-                        placeholder={`Bullet ${index + 1}`}
-                        value={bullets[key]}
-                        onChangeText={(value) => updateBullet(key, value)}
-                        inputCustomStyle={inputStyle}
-                    />
-                    <Text style={counterText}>
-                        {bullets[key].length} / {MAX_CHAR}
+                {/* INFO BOX */}
+                {/* <View style={infoBox}>
+                    <Text style={infoText}>
+                        Select Mobile Phones or Electronics in Step 1 to load
+                        attribute mapping.
                     </Text>
-                </View>
-            ))}
+                </View> */}
+                <DynamicAttributeForm
+                    data={value?.regularAttributes || []}
+                    onChange={(updatedData) => {
+                        onChange({
+                            regularAttributes: updatedData,
+                        });
+                    }}
+                />
 
-            {/* ================= FULL DESCRIPTION ================= */}
-            <Text style={[label, { marginTop: 10 }]}>
-                Full Description (HTML)
-            </Text>
-
-            <TextAreaBox
-                placeholder="Enter HTML content. Use the toolbar above for bold, italic, lists, and links."
-                value={fullDescription}
-                onChangeText={setFullDescription}
-                multiline
-                inputCustomStyle={inputStyle}
-            />
-
-            {/* ================= DYNAMIC SECTIONS ================= */}
-            <View style={{ marginTop: 20 }}>
-                <View style={dynamicHeader}>
-                    <Text style={label}>Dynamic Sections (optional)</Text>
-
-                    <TouchableOpacity
-                        onPress={addSection}
-                        style={addSectionBtn}
-                    >
-                        <Text style={addSectionText}>+ Add Section</Text>
-                    </TouchableOpacity>
-                </View>
+                <Text style={subTitle}>DESCRIPTION</Text>
 
                 <Text style={helperText}>
-                    Add custom sections like Warranty, Technical Details, or
-                    Legal.
+                    Short description bullets (~200 words each), full HTML
+                    description with formatting, and optional custom sections
+                    (e.g., Warranty, Technical Details).
                 </Text>
 
-                {sections.map((section) => (
-                    <View key={section.id} style={sectionCard}>
+                <Text style={label}>
+                    Short Description (5 bullet points){" "}
+                    <Text style={{ color: "red" }}>*</Text>
+                </Text>
+
+                {Object.keys(bullets).map((key, index) => (
+                    <View key={key} style={{ marginBottom: 14 }}>
                         <TextAreaBox
-                            placeholder="Section title (e.g. Warranty)"
-                            value={section.title}
+                            placeholder={`Bullet ${index + 1}`}
+                            value={bullets[key]}
+                            valuekey="text"
                             onChangeText={(value) =>
-                                updateSection(section.id, "title", value)
+                                updateBullet(key, value?.text)
                             }
                             inputCustomStyle={inputStyle}
+                            // editable={false}
+                            // customStyle={{ flex: 1, opacity: 0.6 }}
                         />
-
-                        <TextAreaBox
-                            placeholder="Section content"
-                            value={section.content}
-                            onChangeText={(value) =>
-                                updateSection(section.id, "content", value)
-                            }
-                            multiline
-                            inputCustomStyle={inputStyle}
-                        />
-
-                        <TouchableOpacity
-                            onPress={() => removeSection(section.id)}
-                        >
-                            <Text style={{ color: Colors.redColor }}>
-                                Delete
-                            </Text>
-                        </TouchableOpacity>
+                        <Text style={counterText}>
+                            {bullets[key].length} / {MAX_CHAR}
+                        </Text>
                     </View>
                 ))}
+
+                <Text style={[label, { marginTop: 10 }]}>
+                    Full Description (HTML)
+                </Text>
+
+                <TextAreaBox
+                    placeholder="Enter HTML content. Use the toolbar above for bold, italic, lists, and links."
+                    value={value?.fullDescriptionHtmlContent}
+                    valuekey="fullDescriptionHtmlContent"
+                    onChangeText={onChange}
+                    multiline
+                    inputCustomStyle={inputStyle}
+                    numberOfLines={10}
+                />
+
+                <View style={{ marginTop: 20 }}>
+                    <View style={dynamicHeader}>
+                        <Text style={label}>Dynamic Sections (optional)</Text>
+
+                        <TouchableOpacity
+                            onPress={addSection}
+                            style={addSectionBtn}
+                        >
+                            <Text style={addSectionText}>+ Add Section</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <Text style={helperText}>
+                        Add custom sections like Warranty, Technical Details, or
+                        Legal.
+                    </Text>
+
+                    {value?.dynamicSection?.map((section, index) => (
+                        <View
+                            key={index + "dynamicSection"}
+                            style={sectionCard}
+                        >
+                            <TextAreaBox
+                                placeholder="Section title (e.g. Warranty)"
+                                value={section.title}
+                                valuekey="text"
+                                onChangeText={(value) =>
+                                    updateSection(index, "title", value?.text)
+                                }
+                                inputCustomStyle={inputStyle}
+                            />
+
+                            <TextAreaBox
+                                placeholder="Section content"
+                                value={section.content}
+                                valuekey="text"
+                                onChangeText={(value) =>
+                                    updateSection(index, "content", value?.text)
+                                }
+                                multiline
+                                inputCustomStyle={inputStyle}
+                            />
+
+                            <TouchableOpacity
+                                onPress={() => removeSection(index)}
+                            >
+                                <Text style={{ color: Colors.redColor }}>
+                                    Delete
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    ))}
+                </View>
             </View>
-        </View>
-    );
-});
+        );
+    },
+);
 
 export default ProductDescriptionComponent;
-
-/* ================= STYLES ================= */
 
 const containerStyle = {
     backgroundColor: "#fff",
@@ -259,3 +303,38 @@ const inputStyle = {
     backgroundColor: Colors.whiteColor,
     paddingVertical: 6,
 };
+
+// const [bullets, setBullets] = useState({
+//         bullet1: "",
+//         bullet2: "",
+//         bullet3: "",
+//         bullet4: "",
+//         bullet5: "",
+//     });
+
+//     const updateBullet = (key, value) => {
+//         if (value.length <= MAX_CHAR) {
+//             setBullets((prev) => ({ ...prev, [key]: value }));
+//         }
+//     };
+
+//     this is i have to take bullet discription , i want that you update this  funtion where
+
+//         const updateBullet = (key, value) => {
+//         if (value.length <= MAX_CHAR) {
+//             setBullets((prev) => ({ ...prev, [key]: value }));
+//             onChange({
+//             description:`•${bullet1}\n•${bullet2}` , //like this
+//         });
+//         }
+//     };
+
+//     this is just a example make it proper
+
+//     i want that my data looks llike this
+
+//     • Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, doloribus.
+//     • Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, doloribus.
+//     • Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, doloribus.
+//     • Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, doloribus.
+//     • Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, doloribus.

@@ -55,7 +55,7 @@ const CategoryManagment = ({ navigation }) => {
 
             if (res?.success) {
                 updateState({
-                    list: res.data,
+                    list: res.data?.records,
                     // ...res?.data?.stats,
                 });
             }

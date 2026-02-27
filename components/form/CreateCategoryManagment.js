@@ -8,6 +8,7 @@ import {
     __getAttributeSetList,
     __getHsnCodeList,
     __getHsnSetList,
+    __getShippingList,
 } from "../../utils/api/commonApi";
 import SingleSelectTab from "../common/SingleSelectTab";
 import VariationRuleCard from "./com/VariationRuleCard";
@@ -47,6 +48,7 @@ const CreateCategoryManagment = ({
         //
         canonicalUrl: "",
         priorityScore: "0",
+        shippingRuleId: null,
         //
 
         metaTitle: "",
@@ -56,6 +58,7 @@ const CreateCategoryManagment = ({
         hsnCodeList: [],
         attributeList: [],
         complianceDocumentList: [],
+        shippingList: [],
     });
 
     const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -79,10 +82,12 @@ const CreateCategoryManagment = ({
         complianceDocuments,
         canonicalUrl,
         priorityScore,
+        shippingRuleId,
         //
         hsnCodeList,
         attributeList,
         complianceDocumentList,
+        shippingList,
     } = state;
 
     const validateForm = () => {
@@ -241,7 +246,7 @@ const CreateCategoryManagment = ({
                 sellerTier: ids?.sellerTier,
                 commissionPercentage: Number(ids?.commissionPercentage),
             })),
-            shippingRuleId: null,
+            // shippingRuleId: shippingRuleId?.id,
             metaTitle: metaTitle,
             metaDescription: metaDescription,
             canonicalUrl: canonicalUrl,
@@ -303,12 +308,14 @@ const CreateCategoryManagment = ({
                     sellerTier: ids?.sellerTier,
                     commissionPercentage: Number(ids?.commissionPercentage),
                 })),
-                shippingRuleId: null,
+                // shippingRuleId: shippingRuleId?.id,
                 metaTitle: metaTitle,
                 metaDescription: metaDescription,
                 canonicalUrl: canonicalUrl,
                 priorityScore: Number(priorityScore),
             };
+
+            console.log(JSON.stringify(payload));
 
             __patchApiData(
                 "/categories/updateCategoryById/" + item?._id,
@@ -393,10 +400,12 @@ const CreateCategoryManagment = ({
             const code = await __getHsnSetList(true);
             const attra = await __getAttributeSetList(true);
             const compli = await __getAllComplianceDocumentList();
+            const shipin = await __getShippingList();
             updateState({
                 hsnCodeList: code,
                 attributeList: attra,
                 complianceDocumentList: compli,
+                shippingList: shipin,
                 loading: false,
             });
         } catch (error) {}
@@ -663,7 +672,7 @@ const CreateCategoryManagment = ({
                         }}
                     />
                 </View>
-                <View
+                {/* <View
                     style={{
                         ...inputStyle,
                         paddingHorizontal: 10,
@@ -677,8 +686,8 @@ const CreateCategoryManagment = ({
                         title={"Shipping Template"}
                         placeholder={"Select Shipping Template"}
                         required
-                        list={[]}
-                        value={null}
+                        list={shippingList}
+                        value={shippingRuleId}
                         isSearchable
                         titleCustomStyle={{
                             marginHorizontal: 0,
@@ -687,12 +696,12 @@ const CreateCategoryManagment = ({
                         inputCustomStyle={inputStyle}
                         onSelected={(value) => {
                             updateState({
-                                hsnsetId: value,
+                                shippingRuleId: value,
                             });
                         }}
                         // editable={!isEdit}
                     />
-                </View>
+                </View> */}
                 <View
                     style={{
                         ...inputStyle,

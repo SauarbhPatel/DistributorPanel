@@ -52,7 +52,7 @@ const TaxMaster = ({ navigation }) => {
             console.log(JSON.stringify(res));
             if (res?.success) {
                 updateState({
-                    list: res.data,
+                    list: res.data?.records,
                 });
             }
         } catch (error) {
@@ -202,24 +202,14 @@ const TaxMaster = ({ navigation }) => {
     function attributeCards() {
         return (
             <View style={{ paddingHorizontal: Sizes.fixPadding }}>
-                {list
-                    ?.filter(
-                        (item) =>
-                            item?.name
-                                ?.toLowerCase()
-                                .includes(search.toLowerCase()) ||
-                            item?.code
-                                ?.toLowerCase()
-                                .includes(search.toLowerCase()),
-                    )
-                    ?.map((item) => (
-                        <ListCard
-                            item={item}
-                            key={item?._id}
-                            onDelete={__handleDelete}
-                            onDone={() => __handleGetData(search)}
-                        />
-                    ))}
+                {list?.map((item) => (
+                    <ListCard
+                        item={item}
+                        key={item?._id}
+                        onDelete={__handleDelete}
+                        onDone={() => __handleGetData(search)}
+                    />
+                ))}
             </View>
         );
     }

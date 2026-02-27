@@ -3,27 +3,45 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { Colors } from "../../../constants/styles";
+import { __uploadImage } from "../../../utils/api/commonApi";
 
 const MediaUploadComponent = ({
+    value,
     mainImage,
     galleryImages = [],
     shortVideo,
-    updateState,
+    onChange,
 }) => {
+    const __handleImageUpload = async (data, key) => {
+        onChange({ loading: true });
+        const image = await __uploadImage(
+            data?.uri,
+            data?.mimeType,
+            data?.fileName,
+        );
+        if (!image) return onChange({ loading: false });
+
+        onChange({
+            loading: false,
+            [key]:
+                key == "galleryImageUrls"
+                    ? [...value?.galleryImageUrls, image]
+                    : image,
+        });
+    };
     // Pick Image
     const pickImage = async (type = "main") => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsMultipleSelection: type === "gallery",
+            // allowsMultipleSelection: type === "gallery",
             quality: 0.8,
         });
 
         if (!result.canceled) {
             if (type === "main") {
-                updateState({ mainImage: result.assets[0] });
+                __handleImageUpload(result.assets[0], "mainImageUrl");
             } else {
-                const images = result.assets.slice(0, 10);
-                updateState({ galleryImages: images });
+                __handleImageUpload(result.assets[0], "galleryImageUrls");
             }
         }
     };
@@ -36,7 +54,9 @@ const MediaUploadComponent = ({
         });
 
         if (!result.canceled) {
-            updateState({ shortVideo: result.assets[0] });
+            // onChange({ shortVideo: result.assets[0] });
+            console.log(result.assets[0]);
+            __handleImageUpload(result.assets[0], "shortVideoUrl");
         }
     };
 
@@ -70,9 +90,9 @@ const MediaUploadComponent = ({
                 style={styles.dropBox}
                 onPress={() => pickImage("main")}
             >
-                {mainImage ? (
+                {value?.mainImageUrl ? (
                     <Image
-                        source={{ uri: mainImage.uri }}
+                        source={{ uri: value?.mainImageUrl }}
                         style={styles.mainImage}
                     />
                 ) : (
@@ -83,7 +103,7 @@ const MediaUploadComponent = ({
                             color={Colors.grayColor}
                         />
                         <Text style={styles.dropText}>
-                            Drop main image here or click to browse
+                            Tap here to add the main image
                         </Text>
                     </>
                 )}
@@ -102,21 +122,19 @@ const MediaUploadComponent = ({
                 />
             </TouchableOpacity>
 
-            {galleryImages.length > 0 && (
+            {value?.galleryImageUrls?.length > 0 && (
                 <View style={styles.galleryPreview}>
-                    {galleryImages.map((item, index) => (
+                    {value?.galleryImageUrls?.map((item, index) => (
                         <Image
                             key={index}
-                            source={{ uri: item.uri }}
+                            source={{ uri: item }}
                             style={styles.galleryImage}
                         />
                     ))}
                 </View>
             )}
 
-            <Text style={styles.helperText}>
-                Min 1200×1200px recommended. Drag to reorder.
-            </Text>
+            <Text style={styles.helperText}>Min 1200×1200px recommended.</Text>
         </View>
     );
 };

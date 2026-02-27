@@ -1,128 +1,61 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, Text, Switch } from "react-native";
 import { Colors, Fonts, Sizes } from "../../../constants/styles";
 import { TextAreaBox, DropDownTextAreaBox } from "../../../modules";
+import { calculateDiscountPercent } from "../functions";
 
 const BasicInfoPricingForm = ({ value = {}, onChange = () => {} }) => {
-    const [state, setState] = useState({
-        category: "",
-        brand: "",
-
-        productTitle: "",
-        modelName: "",
-        sku: "",
-        isVariableProduct: false,
-
-        ean: "",
-        gtin: "",
-
-        quantityInBox: "1",
-        mrpBoxPrice: "",
-        sellingBoxPrice: "",
-        unitMrp: "0.00",
-        unitSellingPrice: "0.00",
-        discountPercent: "0",
-
-        minOrderQty: "1",
-        listingStatus: "ACTIVE",
-        stockQty: "",
-        fulfillmentType: "WAREHOUSE",
-        shippingProvider: "",
-
-        ...value,
-    });
-
     const updateState = (data) => {
-        const updated = { ...state, ...data };
-        setState(updated);
+        const updated = { ...data };
         onChange(updated);
     };
-
-    /* ---------------- Auto Calculations ---------------- */
-    useEffect(() => {
-        const qty = Number(state.quantityInBox || 1);
-        const mrp = Number(state.mrpBoxPrice || 0);
-        const sell = Number(state.sellingBoxPrice || 0);
-
-        const unitMrp = qty ? (mrp / qty).toFixed(2) : "0.00";
-        const unitSell = qty ? (sell / qty).toFixed(2) : "0.00";
-
-        const discount =
-            mrp > 0 ? (((mrp - sell) / mrp) * 100).toFixed(2) : "0";
-
-        updateState({
-            unitMrp,
-            unitSellingPrice: unitSell,
-            discountPercent: discount,
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [state.quantityInBox, state.mrpBoxPrice, state.sellingBoxPrice]);
 
     return (
         <View style={containerStyle}>
             {/* ================= BASIC INFO ================= */}
             <Text style={Fonts.blackColor16Bold}>BASIC INFO</Text>
 
-            <View style={rowStyle}>
-                <TextAreaBox
-                    title="Category (read-only)"
-                    value={state.category}
-                    editable={false}
-                    inputCustomStyle={inputStyle}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
-                    customStyle={{ flex: 1 }}
-                />
-                <TextAreaBox
-                    title="Brand (read-only)"
-                    value={state.brand}
-                    editable={false}
-                    inputCustomStyle={inputStyle}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
-                    customStyle={{ flex: 1 }}
-                />
-            </View>
-
             <TextAreaBox
-                title="Product Title"
+                title="Product Title (0/200)"
+                placeholder="e.g. Samsung Galaxy S21"
                 required
-                value={state.productTitle}
-                valuekey="productTitle"
+                value={value?.title}
+                valuekey="title"
                 onChangeText={updateState}
                 inputCustomStyle={inputStyle}
                 titleCustomStyle={{
                     marginHorizontal: 0,
-                    marginTop: 10,
+                    marginTop: 0,
+                }}
+                customInputProps={{
+                    maxLength: 200,
                 }}
             />
 
             <TextAreaBox
                 title="Model Name"
-                value={state.modelName}
+                placeholder="e.g. SM-G991B"
+                value={value?.modelName}
                 valuekey="modelName"
                 onChangeText={updateState}
                 inputCustomStyle={inputStyle}
                 titleCustomStyle={{
                     marginHorizontal: 0,
-                    marginTop: 10,
+                    marginTop: 0,
                 }}
             />
 
             <TextAreaBox
                 title="SKU"
+                placeholder="e.g. SAM-ELEC-S21"
                 required
-                value={state.sku}
+                value={value.sku}
                 valuekey="sku"
                 onChangeText={updateState}
                 inputCustomStyle={inputStyle}
                 titleCustomStyle={{
                     marginHorizontal: 0,
-                    marginTop: 10,
+                    marginTop: 0,
                 }}
             />
 
@@ -131,7 +64,7 @@ const BasicInfoPricingForm = ({ value = {}, onChange = () => {} }) => {
                     Is this a variable product?
                 </Text>
                 <Switch
-                    value={state.isVariableProduct}
+                    value={value?.isVariableProduct}
                     onValueChange={(val) =>
                         updateState({ isVariableProduct: val })
                     }
@@ -141,213 +74,340 @@ const BasicInfoPricingForm = ({ value = {}, onChange = () => {} }) => {
                     }}
                 />
             </View>
+            {!value?.isVariableProduct && (
+                <View>
+                    <View style={rowStyle}>
+                        <TextAreaBox
+                            title="EAN"
+                            value={value.ean}
+                            valuekey="ean"
+                            onChangeText={updateState}
+                            inputCustomStyle={inputStyle}
+                            titleCustomStyle={{
+                                marginHorizontal: 0,
+                                marginTop: 10,
+                            }}
+                            customStyle={{ flex: 1 }}
+                        />
+                        <TextAreaBox
+                            title="GTIN"
+                            // value={state.gtin}
+                            valuekey="gtin"
+                            onChangeText={updateState}
+                            inputCustomStyle={inputStyle}
+                            titleCustomStyle={{
+                                marginHorizontal: 0,
+                                marginTop: 10,
+                            }}
+                            editable={false}
+                            customStyle={{ flex: 1, opacity: 0.6 }}
+                        />
+                    </View>
 
-            <View style={rowStyle}>
-                <TextAreaBox
-                    title="EAN"
-                    value={state.ean}
-                    valuekey="ean"
-                    onChangeText={updateState}
-                    inputCustomStyle={inputStyle}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
-                    customStyle={{ flex: 1 }}
-                />
-                <TextAreaBox
-                    title="GTIN"
-                    value={state.gtin}
-                    valuekey="gtin"
-                    onChangeText={updateState}
-                    inputCustomStyle={inputStyle}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
-                    customStyle={{ flex: 1 }}
-                />
-            </View>
+                    {/* ================= PRICING & INVENTORY ================= */}
+                    <Text style={{ ...Fonts.blackColor16Bold, marginTop: 10 }}>
+                        PRICING & INVENTORY
+                    </Text>
+                    <Text style={Fonts.lightGrayColor12Medium}>
+                        MRP and Selling Price are Box prices. Unit prices are
+                        calculated per item in the box.
+                    </Text>
 
-            {/* ================= PRICING & INVENTORY ================= */}
-            <Text style={Fonts.blackColor16Bold}>PRICING & INVENTORY</Text>
+                    <TextAreaBox
+                        title="Quantity in the Box"
+                        required
+                        value={value?.quantityPerBox}
+                        valuekey="quantityPerBox"
+                        keyboardType="number-pad"
+                        onChangeText={(text) => {
+                            // 1. Remove non-numeric characters
+                            let newvalue = text?.quantityPerBox?.replace(
+                                /[^0-9]/g,
+                                "",
+                            );
 
-            <TextAreaBox
-                title="Quantity in the Box"
-                required
-                value={state.quantityInBox}
-                valuekey="quantityInBox"
-                keyboardType="number-pad"
-                onChangeText={updateState}
-                inputCustomStyle={inputStyle}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
-            />
+                            // 2. Remove leading zeros
+                            newvalue = newvalue.replace(/^0+(?=\d)/, "");
 
-            <View style={rowStyle}>
-                <TextAreaBox
-                    title="MRP (₹) – Box price"
-                    required
-                    value={state.mrpBoxPrice}
-                    valuekey="mrpBoxPrice"
-                    keyboardType="number-pad"
-                    onChangeText={updateState}
-                    inputCustomStyle={inputStyle}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
-                    customStyle={{ flex: 1 }}
-                />
-                <TextAreaBox
-                    title="Unit MRP (auto)"
-                    value={state.unitMrp}
-                    editable={false}
-                    inputCustomStyle={inputStyle}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
-                    customStyle={{ flex: 1 }}
-                />
-            </View>
+                            // 3. Allow empty while typing, but block zero
+                            if (newvalue === "0") return;
 
-            <View style={rowStyle}>
-                <TextAreaBox
-                    title="Selling Price(₹) – Box price"
-                    required
-                    value={state.sellingBoxPrice}
-                    valuekey="sellingBoxPrice"
-                    keyboardType="number-pad"
-                    onChangeText={updateState}
-                    inputCustomStyle={inputStyle}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
-                    customStyle={{ flex: 1 }}
-                />
-                <TextAreaBox
-                    title="Unit Selling Price (auto)"
-                    value={state.unitSellingPrice}
-                    editable={false}
-                    inputCustomStyle={inputStyle}
-                    titleCustomStyle={{
-                        marginHorizontal: 0,
-                        marginTop: 10,
-                    }}
-                    customStyle={{ flex: 1 }}
-                />
-            </View>
+                            updateState({ quantityPerBox: newvalue });
+                        }}
+                        inputCustomStyle={inputStyle}
+                        titleCustomStyle={{
+                            marginHorizontal: 0,
+                            marginTop: 10,
+                        }}
+                    />
 
-            <TextAreaBox
-                title="Discount % (auto)"
-                value={state.discountPercent}
-                editable={false}
-                inputCustomStyle={inputStyle}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
-            />
+                    <View style={rowStyle}>
+                        <TextAreaBox
+                            title="MRP (₹) – Box price"
+                            required
+                            value={value?.boxMrp}
+                            valuekey="boxMrp"
+                            keyboardType="decimal-pad"
+                            onChangeText={(text) => {
+                                let val = text?.boxMrp?.replace(/[^0-9.]/g, "");
 
-            <TextAreaBox
-                title="Minimum Order Quantity"
-                value={state.minOrderQty}
-                valuekey="minOrderQty"
-                keyboardType="number-pad"
-                onChangeText={updateState}
-                inputCustomStyle={inputStyle}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
-            />
+                                // Allow only one decimal point
+                                const parts = val.split(".");
+                                if (parts.length > 2) {
+                                    val =
+                                        parts[0] +
+                                        "." +
+                                        parts.slice(1).join("");
+                                }
 
-            <DropDownTextAreaBox
-                type="select"
-                title="Listing Status"
-                list={[
-                    { id: "ACTIVE", name: "Active" },
-                    { id: "INACTIVE", name: "Inactive" },
-                ]}
-                value={
-                    state.listingStatus
-                        ? {
-                              id: state.listingStatus,
-                              name: state.listingStatus,
-                          }
-                        : null
-                }
-                onSelected={(val) => updateState({ listingStatus: val?.id })}
-                inputCustomStyle={inputStyle}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
-            />
+                                // Limit to 2 decimal places
+                                if (parts[1]?.length > 2) {
+                                    val = parts[0] + "." + parts[1].slice(0, 2);
+                                }
+                                updateState({
+                                    boxMrp: val,
+                                    discountValue: calculateDiscountPercent(
+                                        val,
+                                        value?.boxSellingPrice,
+                                    ),
+                                });
+                            }}
+                            inputCustomStyle={inputStyle}
+                            titleCustomStyle={{
+                                marginHorizontal: 0,
+                                marginTop: 10,
+                            }}
+                            customStyle={{ flex: 1.3 }}
+                        />
+                        <TextAreaBox
+                            title={"Unit MRP (auto)"}
+                            value={
+                                value?.quantityPerBox && value?.boxMrp
+                                    ? String(
+                                          (Number(value?.boxMrp) || 0) /
+                                              (Number(value?.quantityPerBox) ||
+                                                  0),
+                                      )
+                                    : "0.00"
+                            }
+                            editable={false}
+                            inputCustomStyle={inputStyle}
+                            titleCustomStyle={{
+                                marginHorizontal: 0,
+                                marginTop: 10,
+                            }}
+                            customStyle={{ flex: 1, opacity: 0.6 }}
+                        />
+                    </View>
 
-            <TextAreaBox
-                title="Stock Quantity"
-                required
-                value={state.stockQty}
-                valuekey="stockQty"
-                keyboardType="number-pad"
-                onChangeText={updateState}
-                inputCustomStyle={inputStyle}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
-            />
+                    <View style={rowStyle}>
+                        <TextAreaBox
+                            title="Selling Price(₹) – Box price"
+                            required
+                            value={value?.boxSellingPrice}
+                            valuekey="boxSellingPrice"
+                            keyboardType="decimal-pad"
+                            onChangeText={(text) => {
+                                let val = text?.boxSellingPrice?.replace(
+                                    /[^0-9.]/g,
+                                    "",
+                                );
 
-            <DropDownTextAreaBox
-                type="select"
-                title="Fulfillment Type"
-                list={[
-                    { id: "WAREHOUSE", name: "Warehouse" },
-                    { id: "SELLER", name: "Seller" },
-                ]}
-                value={
-                    state.fulfillmentType
-                        ? {
-                              id: state.fulfillmentType,
-                              name: state.fulfillmentType,
-                          }
-                        : null
-                }
-                onSelected={(val) => updateState({ fulfillmentType: val?.id })}
-                inputCustomStyle={inputStyle}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
-            />
+                                // Allow only one decimal point
+                                const parts = val?.split(".");
+                                console.log(parts, val);
+                                if (parts && parts?.length > 2) {
+                                    val =
+                                        parts[0] +
+                                        "." +
+                                        parts.slice(1).join("");
+                                }
 
-            <DropDownTextAreaBox
-                type="select"
-                title="Shipping Service Provider"
-                list={[
-                    { id: "BAOFENG", name: "Baofeng" },
-                    { id: "DELHIVERY", name: "Delhivery" },
-                ]}
-                value={
-                    state.shippingProvider
-                        ? {
-                              id: state.shippingProvider,
-                              name: state.shippingProvider,
-                          }
-                        : null
-                }
-                onSelected={(val) => updateState({ shippingProvider: val?.id })}
-                inputCustomStyle={inputStyle}
-                titleCustomStyle={{
-                    marginHorizontal: 0,
-                    marginTop: 10,
-                }}
-            />
+                                // Limit to 2 decimal places
+                                if (parts && parts[1]?.length > 2) {
+                                    val = parts[0] + "." + parts[1].slice(0, 2);
+                                }
+                                updateState({
+                                    boxSellingPrice: val,
+                                    discountValue: calculateDiscountPercent(
+                                        value?.boxMrp,
+                                        val,
+                                    ),
+                                });
+                            }}
+                            inputCustomStyle={inputStyle}
+                            titleCustomStyle={{
+                                marginHorizontal: 0,
+                                marginTop: 10,
+                            }}
+                            customStyle={{ flex: 1.3 }}
+                        />
+                        <TextAreaBox
+                            title="Unit Selling Price (auto)"
+                            value={
+                                value?.quantityPerBox && value?.boxSellingPrice
+                                    ? String(
+                                          (Number(value?.boxSellingPrice) ||
+                                              0) /
+                                              (Number(value?.quantityPerBox) ||
+                                                  0),
+                                      )
+                                    : "0.00"
+                            }
+                            editable={false}
+                            inputCustomStyle={inputStyle}
+                            titleCustomStyle={{
+                                marginHorizontal: 0,
+                                marginTop: 10,
+                            }}
+                            customStyle={{ flex: 1, opacity: 0.6 }}
+                        />
+                    </View>
+
+                    <TextAreaBox
+                        title="Discount % (auto)"
+                        value={value?.discountValue}
+                        editable={false}
+                        inputCustomStyle={inputStyle}
+                        titleCustomStyle={{
+                            marginHorizontal: 0,
+                            marginTop: 10,
+                        }}
+                        customStyle={{ flex: 1, opacity: 0.6 }}
+                    />
+
+                    <TextAreaBox
+                        title="Minimum Order Quantity"
+                        value={value.minOrderQuantity}
+                        valuekey="minOrderQuantity"
+                        keyboardType="number-pad"
+                        onChangeText={(text) => {
+                            // 1. Remove non-numeric characters
+                            let newvalue = text?.minOrderQuantity?.replace(
+                                /[^0-9]/g,
+                                "",
+                            );
+
+                            // 2. Remove leading zeros
+                            newvalue = newvalue.replace(/^0+(?=\d)/, "");
+
+                            // 3. Allow empty while typing, but block zero
+                            if (newvalue === "0") return;
+
+                            updateState({ minOrderQuantity: newvalue });
+                        }}
+                        inputCustomStyle={inputStyle}
+                        titleCustomStyle={{
+                            marginHorizontal: 0,
+                            marginTop: 10,
+                        }}
+                    />
+                    {/* DRAFT, ACTIVE, INACTIVE, BLOCKED, OUT_OF_STOCK */}
+                    <DropDownTextAreaBox
+                        type="select"
+                        title="Listing Status"
+                        list={[
+                            { id: "DRAFT", name: "DRAFT" },
+                            { id: "ACTIVE", name: "ACTIVE" },
+                            { id: "INACTIVE", name: "INACTIVE" },
+                            { id: "BLOCKED", name: "BLOCKED" },
+                            { id: "OUT_OF_STOCK", name: "OUT_OF_STOCK" },
+                        ]}
+                        value={
+                            value.listingStatus
+                                ? {
+                                      id: value.listingStatus,
+                                      name: value.listingStatus,
+                                  }
+                                : null
+                        }
+                        onSelected={(val) =>
+                            updateState({ listingStatus: val?.id })
+                        }
+                        inputCustomStyle={inputStyle}
+                        titleCustomStyle={{
+                            marginHorizontal: 0,
+                            marginTop: 10,
+                        }}
+                        isSearchable
+                    />
+
+                    <TextAreaBox
+                        title="Stock Quantity"
+                        required
+                        value={value.stock}
+                        valuekey="stock"
+                        keyboardType="number-pad"
+                        onChangeText={(text) => {
+                            // 1. Remove non-numeric characters
+                            let newvalue = text?.stock?.replace(/[^0-9]/g, "");
+
+                            // 2. Remove leading zeros
+                            newvalue = newvalue.replace(/^0+(?=\d)/, "");
+
+                            updateState({ stock: newvalue });
+                        }}
+                        inputCustomStyle={inputStyle}
+                        titleCustomStyle={{
+                            marginHorizontal: 0,
+                            marginTop: 10,
+                        }}
+                    />
+
+                    <DropDownTextAreaBox
+                        type="select"
+                        title="Fulfillment Type"
+                        list={[
+                            // { id: "WAREHOUSE", name: "Warehouse" },
+                            { id: "SELLER", name: "SELLER" },
+                        ]}
+                        value={
+                            value.fulfilledBy
+                                ? {
+                                      id: value.fulfilledBy,
+                                      name: value.fulfilledBy,
+                                  }
+                                : null
+                        }
+                        onSelected={(val) =>
+                            updateState({ fulfilledBy: val?.id })
+                        }
+                        inputCustomStyle={inputStyle}
+                        titleCustomStyle={{
+                            marginHorizontal: 0,
+                            marginTop: 10,
+                        }}
+                        isSearchable
+                    />
+
+                    <DropDownTextAreaBox
+                        type="select"
+                        title="Shipping Service Provider"
+                        list={[
+                            { id: "BAOFENG", name: "Baofeng" },
+                            { id: "DELHIVERY", name: "Delhivery" },
+                        ]}
+                        // value={
+                        //     state.shippingProvider
+                        //         ? {
+                        //               id: state.shippingProvider,
+                        //               name: state.shippingProvider,
+                        //           }
+                        //         : null
+                        // }
+                        onSelected={(val) =>
+                            updateState({ shippingProvider: val?.id })
+                        }
+                        inputCustomStyle={inputStyle}
+                        titleCustomStyle={{
+                            marginHorizontal: 0,
+                            marginTop: 10,
+                        }}
+                        editable={false}
+                        customStyle={{ flex: 1, opacity: 0.6 }}
+                    />
+                </View>
+            )}
         </View>
     );
 };

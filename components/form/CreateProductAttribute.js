@@ -34,6 +34,13 @@ const CreateProductAttribute = ({
         isComparable: false,
         isVisibleOnFrontend: true,
         isEditableAfterApproval: false,
+        //
+        pills: false,
+        radioButton: false,
+        select: false,
+        color: false,
+        multiCheckbox: false,
+        thumbnail: false,
     });
 
     const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -60,6 +67,13 @@ const CreateProductAttribute = ({
         isComparable,
         isVisibleOnFrontend,
         isEditableAfterApproval,
+        //
+        pills,
+        radioButton,
+        select,
+        color,
+        multiCheckbox,
+        thumbnail,
     } = state;
 
     const validateForm = () => {
@@ -134,6 +148,44 @@ const CreateProductAttribute = ({
         if (!validateForm()) return;
         updateState({ loading: true });
 
+        console.log({
+            name: attributeName,
+            code: code,
+            abbreviation: abbreviation,
+            description: description,
+            type: attributeType,
+            status: status,
+            scope: scope,
+            ...(attributeType === "TEXT" &&
+                characterLimit != null &&
+                characterLimit != "" && {
+                    characterLimit: Number(characterLimit),
+                }),
+
+            ...(["NUMBER", "UNIT_RANGE"].includes(attributeType) &&
+                minRangeValue != null &&
+                minRangeValue != "" && {
+                    minRangeValue: Number(minRangeValue),
+                }),
+            ...(["NUMBER", "UNIT_RANGE"].includes(attributeType) &&
+                maxRangeValue != null &&
+                maxRangeValue != "" && {
+                    maxRangeValue: Number(maxRangeValue),
+                }),
+            ...(attributeType === "UNIT_RANGE" &&
+                unit != null &&
+                unit != "" && { unit: unit }),
+            //
+            isFilterable: isFilterable,
+            isVariant: isVariant,
+            isSearchable: isSearchable,
+            isSortable: isSortable,
+            isComparable: isComparable,
+            isVisibleOnFrontend: isVisibleOnFrontend,
+            isEditableAfterApproval: isEditableAfterApproval,
+            isActive: isActive,
+        });
+
         __postApiData("/productAttributes/createAttribute", {
             name: attributeName,
             code: code,
@@ -170,6 +222,14 @@ const CreateProductAttribute = ({
             isVisibleOnFrontend: isVisibleOnFrontend,
             isEditableAfterApproval: isEditableAfterApproval,
             isActive: isActive,
+            displayType: {
+                pills,
+                radioButton,
+                select,
+                color,
+                multiCheckbox,
+                thumbnail,
+            },
         })
             .then((res) => {
                 console.log(JSON.stringify(res));
@@ -233,6 +293,14 @@ const CreateProductAttribute = ({
             isVisibleOnFrontend: isVisibleOnFrontend,
             isEditableAfterApproval: isEditableAfterApproval,
             isActive: isActive,
+            displayType: {
+                pills,
+                radioButton,
+                select,
+                color,
+                multiCheckbox,
+                thumbnail,
+            },
         })
             .then((res) => {
                 console.log(JSON.stringify(res));
@@ -273,6 +341,13 @@ const CreateProductAttribute = ({
                 isVisibleOnFrontend: item?.isVisibleOnFrontend || false,
                 isEditableAfterApproval: item?.isEditableAfterApproval || false,
                 isActive: item?.isActive || false,
+
+                pills: item?.displayType?.pills || false,
+                radioButton: item?.displayType?.radioButton || false,
+                select: item?.displayType?.select || false,
+                color: item?.displayType?.color || false,
+                multiCheckbox: item?.displayType?.multiCheckbox || false,
+                thumbnail: item?.displayType?.thumbnail || false,
             });
         }
     }, [isEdit, item]);
@@ -612,6 +687,102 @@ const CreateProductAttribute = ({
                     }}
                     customStyle={{ marginBottom: 5, flex: 1 }}
                 />
+                <View
+                    style={{
+                        padding: 10,
+                        borderWidth: 1,
+                        borderColor: Colors.borderColor,
+                        borderRadius: 10,
+                        backgroundColor: Colors.bodyColor,
+                        gap: 10,
+                    }}
+                >
+                    <Text style={{ ...hintText, fontSize: 12 }}>
+                        Display type
+                    </Text>
+                    <View style={styles.statusBox}>
+                        <Text style={Fonts.blackColor15Medium}>Pills</Text>
+                        <Switch
+                            value={pills}
+                            onValueChange={(value) =>
+                                updateState({ pills: value })
+                            }
+                            trackColor={{
+                                false: "#ccc",
+                                true: Colors.primaryColor,
+                            }}
+                        />
+                    </View>
+                    <View style={styles.statusBox}>
+                        <Text style={Fonts.blackColor15Medium}>
+                            Radio button
+                        </Text>
+                        <Switch
+                            value={radioButton}
+                            onValueChange={(value) =>
+                                updateState({ radioButton: value })
+                            }
+                            trackColor={{
+                                false: "#ccc",
+                                true: Colors.primaryColor,
+                            }}
+                        />
+                    </View>
+                    <View style={styles.statusBox}>
+                        <Text style={Fonts.blackColor15Medium}>Select</Text>
+                        <Switch
+                            value={select}
+                            onValueChange={(value) =>
+                                updateState({ select: value })
+                            }
+                            trackColor={{
+                                false: "#ccc",
+                                true: Colors.primaryColor,
+                            }}
+                        />
+                    </View>
+                    <View style={styles.statusBox}>
+                        <Text style={Fonts.blackColor15Medium}>Color</Text>
+                        <Switch
+                            value={color}
+                            onValueChange={(value) =>
+                                updateState({ color: value })
+                            }
+                            trackColor={{
+                                false: "#ccc",
+                                true: Colors.primaryColor,
+                            }}
+                        />
+                    </View>
+                    <View style={styles.statusBox}>
+                        <Text style={Fonts.blackColor15Medium}>
+                            Multi checkbox
+                        </Text>
+                        <Switch
+                            value={multiCheckbox}
+                            onValueChange={(value) =>
+                                updateState({ multiCheckbox: value })
+                            }
+                            trackColor={{
+                                false: "#ccc",
+                                true: Colors.primaryColor,
+                            }}
+                        />
+                    </View>
+                    <View style={styles.statusBox}>
+                        <Text style={Fonts.blackColor15Medium}>Thumbnail</Text>
+                        <Switch
+                            value={thumbnail}
+                            onValueChange={(value) =>
+                                updateState({ thumbnail: value })
+                            }
+                            trackColor={{
+                                false: "#ccc",
+                                true: Colors.primaryColor,
+                            }}
+                        />
+                    </View>
+                </View>
                 <View
                     style={{
                         padding: 10,

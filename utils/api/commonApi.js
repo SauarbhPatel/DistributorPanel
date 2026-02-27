@@ -3,6 +3,11 @@ import { createCategoryList } from "../funtion";
 
 const __uploadImage = async (img, type, name) => {
     const formData = new FormData();
+    console.log({
+        uri: img,
+        type: type,
+        name: name,
+    });
     formData.append("file", {
         uri: img,
         type: type,
@@ -12,23 +17,14 @@ const __uploadImage = async (img, type, name) => {
     return __postApiData(`/s3upload/uploadSingleFile`, formData, "from")
         .then((res) => {
             console.log("AddImage", res);
-            if (res.url) {
-                return {
-                    fullUrl: res.url,
-                    path: res.url,
-                };
+            if (res.data) {
+                return res.data;
             }
-            return {
-                fullUrl: null,
-                path: null,
-            };
+            return null;
         })
         .catch((error) => {
             console.log(error);
-            return {
-                fullUrl: null,
-                path: null,
-            };
+            return null;
         });
 };
 
@@ -94,7 +90,7 @@ const __getTaxList = async () => {
     )
         .then((res) => {
             if (res.success) {
-                return res?.data?.map((item) => ({
+                return res?.data?.records?.map((item) => ({
                     ...item,
                     id: item?._id,
                     name: `${item?.rate}%`,
@@ -127,7 +123,26 @@ const __getHsnCodeList = async (taxRate) => {
         });
 };
 const __getHsnSetList = async () => {
-    return __getApiData(`/hsnSets/getAllHsnSets`)
+    return __getApiData(
+        `/hsnSets/getAllHsnSets?page=1&limit=100&isActive=true&sortBy=createdAt&sortOrder=desc`,
+    )
+        .then((res) => {
+            if (res.success) {
+                return res?.data?.record?.map((item) => ({
+                    ...item,
+                    id: item?._id,
+                }));
+            }
+            return [];
+        })
+        .catch((error) => {
+            return [];
+        });
+};
+const __getAllComplianceDocumentList = async () => {
+    return __getApiData(
+        `/complianceDocument/getAllComplianceDocumentForDropdown`,
+    )
         .then((res) => {
             if (res.success) {
                 return res?.data?.map((item) => ({
@@ -141,15 +156,15 @@ const __getHsnSetList = async () => {
             return [];
         });
 };
-const __getAllComplianceDocumentList = async () => {
-    return __getApiData(
-        `/complianceDocument/getAllComplianceDocument?page=1&limit=100&status=ACTIVE&sortBy=name&sortOrder=desc`,
-    )
+
+const __getShippingList = async () => {
+    return __getApiData(`/shippingMethods/getAllShippingMethods`)
         .then((res) => {
             if (res.success) {
-                return res?.data?.records?.map((item) => ({
+                return res?.data?.shippingMethods?.map((item) => ({
                     ...item,
                     id: item?._id,
+                    name: item?.methodName,
                 }));
             }
             return [];
@@ -175,10 +190,12 @@ const __getLedgersList = async () => {
         });
 };
 const __getAttributeSetList = async () => {
-    return __getApiData(`/attributeSet/getAllAttributeSet`)
+    return __getApiData(
+        `/attributeSet/getAllAttributeSet?page=1&limit=100&sortBy=createdAt&sortOrder=asc`,
+    )
         .then((res) => {
             if (res.success) {
-                return res?.data?.map((item) => ({
+                return res?.data?.records?.map((item) => ({
                     ...item,
                     id: item?._id,
                 }));
@@ -250,11 +267,14 @@ const __getProductRegularAttributeSetList = async () => {
         });
 };
 const __getBrandList = async () => {
-    return __getApiData(`/brands/getAllBrand`)
+    // return __getApiData(`/brands/getAllBrand`)
+    return __getApiData(
+        `/brands/getAllBrand?page=1&limit=100&sortBy=name&sortOrder=desc`,
+    )
         .then((res) => {
             console.log(res);
             if (res.success) {
-                return res?.data?.map((item) => ({
+                return res?.data?.records?.map((item) => ({
                     ...item,
                     id: item?._id,
                 }));
@@ -266,17 +286,31 @@ const __getBrandList = async () => {
         });
 };
 const __getProductCategoryList = async () => {
-    return __getApiData(`/categories/getCategoryTree?page=1&limit=10`)
+    return __getApiData(`/categories/getCategoryTree?page=1&limit=100`)
         .then((res) => {
-            console.log(res);
+            // console.log(JSON.stringify(res));
             if (res.success) {
                 // return createCategoryList(res?.data?.nestedData);
-                return createCategoryList(res?.data);
+                return createCategoryList(res?.data?.records);
             }
             return [];
         })
         .catch((error) => {
             return [];
+        });
+};
+const __getAttributeSetById = async (id) => {
+    return __getApiData(`/attributeSet/getAttributeSetById/${id}`)
+        .then((res) => {
+            // console.log(JSON.stringify(res));
+            if (res.success) {
+                // return createCategoryList(res?.data?.nestedData);
+                return res?.data;
+            }
+            return null;
+        })
+        .catch((error) => {
+            return null;
         });
 };
 const __getTaxJurisdictionsList = async () => {
@@ -309,4 +343,6 @@ export {
     __getBrandList,
     __getTaxJurisdictionsList,
     __getAllComplianceDocumentList,
+    __getAttributeSetById,
+    __getShippingList,
 };

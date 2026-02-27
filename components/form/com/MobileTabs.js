@@ -1,11 +1,3 @@
-const STEPS = [
-    { key: "1", label: "Category & Brand" },
-    { key: "2", label: "Basic Info" },
-    { key: "3", label: "Description" },
-    { key: "4", label: "Media Upload" },
-    { key: "5", label: "Tax & Compliance" },
-    { key: "6", label: "Package & Manufacturing" },
-];
 import {
     View,
     Text,
@@ -15,7 +7,7 @@ import {
 } from "react-native";
 import { Colors } from "../../../constants/styles";
 
-const MobileTabs = ({ activeStep, onChange }) => {
+const MobileTabs = ({ activeStep, onChange, STEPS = [] }) => {
     const activeIndex = STEPS.findIndex((s) => s.key === activeStep);
 
     return (

@@ -44,11 +44,12 @@ const HsnSet = ({ navigation }) => {
     const __handleGetData = async (ser) => {
         try {
             updateState({ loading: true });
-            const res = await __getApiData(`/hsnSets/getAllHsnSets`);
-            console.log(JSON.stringify(res));
+            const res = await __getApiData(
+                `/hsnSets/getAllHsnSets?page=1&limit=100&search=${ser}&sortBy=createdAt&sortOrder=desc`,
+            );
             if (res?.success) {
                 updateState({
-                    list: res.data,
+                    list: res.data?.record,
                 });
             }
         } catch (error) {
