@@ -308,7 +308,7 @@ const GlobalProducts = ({ navigation }) => {
                         }}
                     />
                 }
-                top="10%"
+                top="2%"
             />
         </SafeAreaView>
     );

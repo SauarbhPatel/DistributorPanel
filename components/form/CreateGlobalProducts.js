@@ -18,6 +18,7 @@ import MediaUploadComponent from "./com/MediaUploadComponent";
 import TaxComplianceComponent from "./com/TaxComplianceComponent";
 import ProductDescriptionComponent from "./com/ProductDescriptionComponent";
 import { productValidateForm } from "./functions";
+import VariationAttributes from "./com/VariationAttributes";
 
 const STEPS = [
     { key: "1", label: "Category & Brand" },
@@ -52,6 +53,7 @@ const initalState = {
     modelName: "",
     sku: "",
     // PRICING & INVENTORY (if isVariableProduct: false,)
+    // ****
     ean: "",
     quantityPerBox: "1",
     boxMrp: "",
@@ -94,6 +96,10 @@ const initalState = {
     },
     metaTitle: "",
     metaDescription: "",
+
+    //** **/
+    variantAttributes: [],
+    variants: [],
 
     // other
     categoryList: [],
@@ -305,6 +311,13 @@ const CreateGlobalProducts = ({
                                                     values: [],
                                                 }),
                                             ) || [],
+                                        variantAttributes:
+                                            attributeData?.variantAttributes?.map(
+                                                (ite) => ({
+                                                    ...ite,
+                                                    values: [],
+                                                }),
+                                            ) || [],
                                     });
                             }}
                             // editable={!isEdit}
@@ -341,29 +354,44 @@ const CreateGlobalProducts = ({
                         onChange={(data) => updateState(data)}
                     />
                 )}
-                {activeTab === (state?.isVariableProduct ? "4" : "3") && (
-                    <ProductDescriptionComponent
-                        value={state}
-                        onChange={(data) => updateState(data)}
-                    />
-                )}
-                {activeTab === (state?.isVariableProduct ? "5" : "4") && (
-                    <MediaUploadComponent
-                        value={state}
-                        onChange={updateState}
-                    />
-                )}
-                {activeTab === (state?.isVariableProduct ? "6" : "5") && (
-                    <TaxComplianceComponent
-                        value={state}
-                        onChange={updateState}
-                    />
-                )}
-                {activeTab === (state?.isVariableProduct ? "7" : "6") && (
-                    <PackageManufacturingForm
-                        value={state}
-                        onChange={updateState}
-                    />
+
+                {state?.isVariableProduct ? (
+                    <>
+                        {activeTab === "3" && (
+                            <VariationAttributes
+                                value={state}
+                                onChange={(data) => updateState(data)}
+                            />
+                        )}
+                    </>
+                ) : (
+                    <>
+                        {activeTab === "3" && (
+                            <ProductDescriptionComponent
+                                value={state}
+                                onChange={(data) => updateState(data)}
+                            />
+                        )}
+
+                        {activeTab === "4" && (
+                            <MediaUploadComponent
+                                value={state}
+                                onChange={updateState}
+                            />
+                        )}
+                        {activeTab === "5" && (
+                            <TaxComplianceComponent
+                                value={state}
+                                onChange={updateState}
+                            />
+                        )}
+                        {activeTab === "6" && (
+                            <PackageManufacturingForm
+                                value={state}
+                                onChange={updateState}
+                            />
+                        )}
+                    </>
                 )}
 
                 <View style={styles.footer}>
@@ -397,7 +425,7 @@ const CreateGlobalProducts = ({
                         </TouchableOpacity>
                     )}
 
-                    {activeTab !== (state?.isVariableProduct ? "7" : "6") ? (
+                    {activeTab !== (state?.isVariableProduct ? "3" : "6") ? (
                         <TouchableOpacity
                             style={styles.createBtn}
                             onPress={() => {

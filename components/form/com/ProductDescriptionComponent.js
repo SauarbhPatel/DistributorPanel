@@ -88,7 +88,7 @@ const ProductDescriptionComponent = React.memo(
                     }}
                 />
 
-                <Text style={subTitle}>DESCRIPTION</Text>
+                {/* <Text style={subTitle}>DESCRIPTION</Text> */}
 
                 <Text style={helperText}>
                     Short description bullets (~200 words each), full HTML
