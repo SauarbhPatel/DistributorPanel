@@ -406,6 +406,32 @@ const BasicInfoPricingForm = ({ value = {}, onChange = () => {} }) => {
                         editable={false}
                         customStyle={{ flex: 1, opacity: 0.6 }}
                     />
+
+                    <TextAreaBox
+                        title="Meta Title"
+                        value={value.metaTitle}
+                        valuekey="metaTitle"
+                        onChangeText={onChange}
+                        inputCustomStyle={inputStyle}
+                        customStyle={{ flex: 1 }}
+                        titleCustomStyle={{
+                            marginHorizontal: 0,
+                            marginTop: 10,
+                        }}
+                    />
+                    <TextAreaBox
+                        title="Meta Description"
+                        value={value.metaDescription}
+                        valuekey="metaDescription"
+                        onChangeText={onChange}
+                        inputCustomStyle={inputStyle}
+                        customStyle={{ flex: 1 }}
+                        titleCustomStyle={{
+                            marginHorizontal: 0,
+                            marginTop: 10,
+                        }}
+                        multiline
+                    />
                 </View>
             )}
         </View>

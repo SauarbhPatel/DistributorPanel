@@ -18,6 +18,185 @@ import { __deleteApiData, __getApiData } from "../../utils/api";
 import BottomPopup from "../../components/common/BottomPopup";
 import { Loader } from "../../modules";
 import CreateGlobalProducts from "../../components/form/CreateGlobalProducts";
+import { Image } from "react-native";
+
+const SAMPLE_PRODUCTS = [
+    {
+        _id: "prod_101",
+        name: "Wireless Bluetooth Earphone",
+        image: "https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg",
+        sku: "SKU-WB-101",
+        psn: "PSN-WB-001",
+        lid: "LID-SEL-001",
+        isActive: true,
+        totalStock: 120,
+        mrp: 2999,
+        price: 2499,
+        inventory: [
+            { locationId: "loc1", name: "Gurgaon", stock: 40 },
+            { locationId: "loc2", name: "Delhi", stock: 35 },
+            { locationId: "loc3", name: "Tauru", stock: 20 },
+            { locationId: "loc4", name: "Chennai", stock: 25 },
+        ],
+        variants: [
+            {
+                _id: "var_101a",
+                name: "Black Edition",
+                image: "https://images.unsplash.com/photo-1608156639585-b3a032ef9689?w=500",
+                sku: "SKU-WB-BLK",
+                psn: "PSN-WB-002",
+                lid: "LID-SEL-002",
+                isActive: true,
+                stock: 70,
+                mrp: 2999,
+                price: 2499,
+                inventory: [
+                    { locationId: "loc1", name: "Gurgaon", stock: 25 },
+                    { locationId: "loc2", name: "Delhi", stock: 20 },
+                    { locationId: "loc3", name: "Tauru", stock: 10 },
+                    { locationId: "loc4", name: "Chennai", stock: 15 },
+                ],
+            },
+            {
+                _id: "var_101b",
+                name: "White Edition",
+                image: "https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg",
+                sku: "SKU-WB-WHT",
+                psn: "PSN-WB-003",
+                lid: "LID-SEL-003",
+                isActive: true,
+                stock: 50,
+                mrp: 2899,
+                price: 2399,
+                inventory: [
+                    { locationId: "loc1", name: "Gurgaon", stock: 15 },
+                    { locationId: "loc2", name: "Delhi", stock: 15 },
+                    { locationId: "loc3", name: "Tauru", stock: 10 },
+                    { locationId: "loc4", name: "Chennai", stock: 10 },
+                ],
+            },
+        ],
+    },
+
+    {
+        _id: "prod_102",
+        name: "Portable SSD 1TB",
+        image: "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500",
+        sku: "SKU-SSD-1TB",
+        psn: "PSN-SSD-001",
+        lid: "LID-SEL-010",
+        isActive: true,
+        totalStock: 60,
+        mrp: 5999,
+        price: 5499,
+        inventory: [
+            { locationId: "loc1", name: "Gurgaon", stock: 20 },
+            { locationId: "loc2", name: "Delhi", stock: 15 },
+            { locationId: "loc3", name: "Tauru", stock: 10 },
+            { locationId: "loc4", name: "Chennai", stock: 15 },
+        ],
+        variants: [],
+    },
+
+    {
+        _id: "prod_103",
+        name: "Smart Fitness Band",
+        image: "https://images.pexels.com/photos/267394/pexels-photo-267394.jpeg",
+        sku: "SKU-FB-2026",
+        psn: "PSN-FB-001",
+        lid: "LID-SEL-020",
+        isActive: false,
+        totalStock: 35,
+        mrp: 3999,
+        price: 3499,
+        inventory: [
+            { locationId: "loc1", name: "Gurgaon", stock: 10 },
+            { locationId: "loc2", name: "Delhi", stock: 8 },
+            { locationId: "loc3", name: "Tauru", stock: 7 },
+            { locationId: "loc4", name: "Chennai", stock: 10 },
+        ],
+        variants: [
+            {
+                _id: "var_103a",
+                name: "Black Strap",
+                image: "https://images.pexels.com/photos/267394/pexels-photo-267394.jpeg",
+                sku: "SKU-FB-BLK",
+                psn: "PSN-FB-002",
+                lid: "LID-SEL-021",
+                isActive: true,
+                stock: 20,
+                mrp: 3999,
+                price: 3499,
+                inventory: [
+                    { locationId: "loc1", name: "Gurgaon", stock: 6 },
+                    { locationId: "loc2", name: "Delhi", stock: 5 },
+                    { locationId: "loc3", name: "Tauru", stock: 4 },
+                    { locationId: "loc4", name: "Chennai", stock: 5 },
+                ],
+            },
+        ],
+    },
+
+    {
+        _id: "prod_104",
+        name: "Gaming Mechanical Keyboard",
+        image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500",
+        sku: "SKU-GMK-001",
+        psn: "PSN-GMK-001",
+        lid: "LID-SEL-030",
+        isActive: true,
+        totalStock: 45,
+        mrp: 4999,
+        price: 4599,
+        inventory: [
+            { locationId: "loc1", name: "Gurgaon", stock: 15 },
+            { locationId: "loc2", name: "Delhi", stock: 10 },
+            { locationId: "loc3", name: "Tauru", stock: 8 },
+            { locationId: "loc4", name: "Chennai", stock: 12 },
+        ],
+        variants: [],
+    },
+
+    {
+        _id: "prod_105",
+        name: "Wireless Gaming Mouse",
+        image: "https://images.pexels.com/photos/2115256/pexels-photo-2115256.jpeg",
+        sku: "SKU-WGM-001",
+        psn: "PSN-WGM-001",
+        lid: "LID-SEL-040",
+        isActive: true,
+        totalStock: 80,
+        mrp: 2999,
+        price: 2699,
+        inventory: [
+            { locationId: "loc1", name: "Gurgaon", stock: 25 },
+            { locationId: "loc2", name: "Delhi", stock: 20 },
+            { locationId: "loc3", name: "Tauru", stock: 15 },
+            { locationId: "loc4", name: "Chennai", stock: 20 },
+        ],
+        variants: [],
+    },
+
+    {
+        _id: "prod_106",
+        name: "USB-C Fast Charger 65W",
+        image: "https://images.unsplash.com/photo-1580894908361-967195033215?w=500",
+        sku: "SKU-CHG-65W",
+        psn: "PSN-CHG-001",
+        lid: "LID-SEL-050",
+        isActive: true,
+        totalStock: 150,
+        mrp: 1999,
+        price: 1799,
+        inventory: [
+            { locationId: "loc1", name: "Gurgaon", stock: 40 },
+            { locationId: "loc2", name: "Delhi", stock: 35 },
+            { locationId: "loc3", name: "Tauru", stock: 30 },
+            { locationId: "loc4", name: "Chennai", stock: 45 },
+        ],
+        variants: [],
+    },
+];
 
 const GlobalProducts = ({ navigation }) => {
     const [search, setSearch] = useState("");
@@ -62,7 +241,7 @@ const GlobalProducts = ({ navigation }) => {
     };
 
     useEffect(() => {
-        __handleGetData(search);
+        // __handleGetData(search);
     }, [search]);
 
     const __handleDeleteProducts = (id) => {
@@ -197,15 +376,28 @@ const GlobalProducts = ({ navigation }) => {
         );
     }
 
+    // function ProductsCards() {
+    //     return (
+    //         <View style={{ paddingHorizontal: Sizes.fixPadding }}>
+    //             {list?.map((item) => (
+    //                 <ListCard
+    //                     item={item}
+    //                     key={item?._id}
+    //                     __handleDeleteProducts={__handleDeleteProducts}
+    //                     onDone={() => __handleGetData(search)}
+    //                 />
+    //             ))}
+    //         </View>
+    //     );
+    // }
     function ProductsCards() {
         return (
             <View style={{ paddingHorizontal: Sizes.fixPadding }}>
-                {list?.map((item) => (
-                    <ListCard
+                {SAMPLE_PRODUCTS?.map((item) => (
+                    <ProductCard
+                        key={item._id}
                         item={item}
-                        key={item?._id}
-                        __handleDeleteProducts={__handleDeleteProducts}
-                        onDone={() => __handleGetData(search)}
+                        onDelete={() => __handleDeleteProducts(item._id)}
                     />
                 ))}
             </View>
@@ -214,94 +406,164 @@ const GlobalProducts = ({ navigation }) => {
 };
 
 export default GlobalProducts;
+const ProductCard = ({ item, onDelete }) => {
+    const [expanded, setExpanded] = useState(false);
 
-const ListCard = ({ item, onView, onEdit, onDelete }) => {
     return (
-        <View style={styles.card}>
-            {/* Top Row */}
-            <View style={styles.topRow}>
-                <View style={{ flex: 1 }}>
-                    <Text style={styles.title} numberOfLines={1}>
+        <View style={styles.productContainer}>
+            {/* ================= MAIN PRODUCT ROW ================= */}
+            <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => setExpanded(!expanded)}
+                style={styles.productRow}
+            >
+                {/* Left - Image */}
+                <Image
+                    source={{ uri: item.image }}
+                    style={styles.productImage}
+                />
+
+                {/* Middle - Info */}
+                <View style={{ flex: 1, marginHorizontal: 10 }}>
+                    <Text style={styles.productName} numberOfLines={1}>
                         {item.name}
                     </Text>
 
-                    {item.description ? (
-                        <Text style={styles.subtitle} numberOfLines={2}>
-                            {item.description}
-                        </Text>
-                    ) : null}
-                </View>
+                    <Text style={styles.metaText}>SKU: {item.sku}</Text>
+                    <Text style={styles.metaText}>PSN: {item.psn}</Text>
+                    <Text style={styles.metaText}>LID: {item.lid}</Text>
 
-                <View
-                    style={[
-                        styles.statusPill,
-                        !item.isActive && styles.statusInactive,
-                    ]}
-                >
-                    <Text
+                    {/* Status */}
+                    <View
                         style={[
-                            styles.statusText,
-                            !item.isActive && styles.statusTextInactive,
+                            styles.statusBadge,
+                            !item.isActive && styles.inactiveBadge,
                         ]}
                     >
-                        {item.isActive ? "Active" : "Inactive"}
+                        <Text
+                            style={[
+                                styles.statusText,
+                                !item.isActive && styles.inactiveText,
+                            ]}
+                        >
+                            {item.isActive ? "ACTIVE" : "INACTIVE"}
+                        </Text>
+                    </View>
+
+                    {/* Stock */}
+                    <Text style={styles.stockLabel}>Total Stock</Text>
+                    <Text style={styles.stockValue}>
+                        {item.totalStock} units
                     </Text>
+
+                    {/* Price */}
+                    <Text style={styles.mrpText}>MRP: ₹{item.mrp} / piece</Text>
+
+                    <View style={styles.priceBadge}>
+                        <Text style={styles.priceText}>
+                            ₹ {item.price} / piece
+                        </Text>
+                    </View>
+                </View>
+
+                {/* Right - Actions */}
+                <View style={styles.actionColumn}>
+                    <Feather name="eye" size={18} color="#2563EB" />
+                    <Feather name="edit" size={18} color="#10B981" />
+                    <Feather name="copy" size={18} color="#8B5CF6" />
+                    <TouchableOpacity onPress={onDelete}>
+                        <Feather name="trash-2" size={18} color="#EF4444" />
+                    </TouchableOpacity>
+                </View>
+            </TouchableOpacity>
+
+            {/* ================= EXPANDED SECTION ================= */}
+            {expanded && (
+                <View style={styles.expandedSection}>
+                    {/* Inventory */}
+                    <Text style={styles.sectionTitle}>
+                        Inventory by Location
+                    </Text>
+
+                    <View style={styles.inventoryGrid}>
+                        {item.inventory?.map((loc) => (
+                            <View
+                                key={loc.locationId}
+                                style={styles.inventoryCard}
+                            >
+                                <Text style={styles.locationName}>
+                                    {loc.name}
+                                </Text>
+
+                                <Text style={styles.locationStock}>
+                                    {loc.stock}
+                                </Text>
+
+                                <TouchableOpacity
+                                    style={styles.updateBtn}
+                                    onPress={() =>
+                                        console.log("Update", loc.locationId)
+                                    }
+                                >
+                                    <Text style={styles.updateText}>
+                                        Update
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        ))}
+                    </View>
+
+                    {/* Variants */}
+                    {item.variants?.length > 0 && (
+                        <>
+                            <Text style={styles.sectionTitle}>Variants</Text>
+
+                            {item.variants.map((variant) => (
+                                <VariantCard
+                                    key={variant._id}
+                                    variant={variant}
+                                />
+                            ))}
+                        </>
+                    )}
+                </View>
+            )}
+        </View>
+    );
+};
+
+const VariantCard = ({ variant }) => {
+    return (
+        <View style={styles.variantContainer}>
+            <Image
+                source={{ uri: variant.image }}
+                style={styles.variantImage}
+            />
+
+            <View style={{ flex: 1, marginHorizontal: 10 }}>
+                <Text style={styles.variantName}>{variant.name}</Text>
+
+                <Text style={styles.metaText}>SKU: {variant.sku}</Text>
+
+                <Text style={styles.stockValue}>{variant.stock} units</Text>
+
+                <Text style={styles.mrpText}>MRP: ₹{variant.mrp}</Text>
+
+                <View style={styles.priceBadgeSmall}>
+                    <Text style={styles.priceTextSmall}>₹ {variant.price}</Text>
                 </View>
             </View>
 
-            {/* Type Chip */}
-            <View style={styles.typeChip}>
-                <Text style={styles.typeText}>{item.productType}</Text>
-            </View>
-
-            {/* Meta Grid */}
-            <View style={styles.metaGrid}>
-                <MetaItem label="HSN" value={item.hsn?.code} />
-                <MetaItem label="Tax" value={`${item.hsn?.taxRate}%`} />
-                <MetaItem
-                    label="Variants"
-                    value={item.variantProductss?.length || 0}
-                />
-                <MetaItem
-                    label="Productss"
-                    value={item.regularProductss?.length || 0}
-                />
-            </View>
-
-            {/* Footer Actions */}
-            <View style={styles.footer}>
-                <Action icon="eye" label="View" onPress={onView} />
-                <Action icon="edit-2" label="Edit" onPress={onEdit} />
-                <Action
-                    icon="trash-2"
-                    label="Delete"
-                    danger
-                    onPress={onDelete}
-                />
+            <View style={styles.actionColumn}>
+                <Feather name="eye" size={16} color="#2563EB" />
+                <Feather name="edit" size={16} color="#10B981" />
+                <Feather name="copy" size={16} color="#8B5CF6" />
+                <Feather name="trash-2" size={16} color="#EF4444" />
             </View>
         </View>
     );
 };
 
-const MetaItem = ({ label, value }) => (
-    <View style={styles.metaItem}>
-        <Text style={styles.metaLabel}>{label}</Text>
-        <Text style={styles.metaValue}>{value}</Text>
-    </View>
-);
-
-const Action = ({ icon, label, danger, onPress }) => (
-    <TouchableOpacity style={styles.actionBtn} onPress={onPress}>
-        <Feather
-            name={icon}
-            size={18}
-            color={danger ? "#EF4444" : Colors.primaryColor}
-        />
-        <Text style={[styles.actionText, danger && { color: "#EF4444" }]}>
-            {label}
-        </Text>
-    </TouchableOpacity>
-);
 const StatCard = ({ title, value, colors, icon }) => (
     <LinearGradient colors={colors} style={styles.statCard}>
         <View style={{ marginEnd: 10 }}>
@@ -398,111 +660,179 @@ const styles = StyleSheet.create({
         marginLeft: 6,
         fontWeight: "600",
     },
+    //
 
-    /* ================= Products Set Card ================= */
-    card: {
+    productContainer: {
         backgroundColor: "#FFF",
         borderRadius: 16,
-        padding: 16,
-        marginBottom: 14,
+        padding: 14,
+        marginBottom: 16,
         elevation: 3,
     },
 
-    topRow: {
+    productRow: {
         flexDirection: "row",
-        alignItems: "flex-start",
-        gap: 10,
     },
 
-    title: {
-        fontSize: 17,
+    productImage: {
+        width: 70,
+        height: 70,
+        borderRadius: 12,
+    },
+
+    productName: {
+        fontSize: 16,
         fontFamily: Fonts.medium,
         color: "#111",
     },
 
-    subtitle: {
-        fontSize: 13,
+    metaText: {
+        fontSize: 12,
         color: "#6B7280",
-        marginTop: 4,
     },
 
-    statusPill: {
+    statusBadge: {
         backgroundColor: "#DCFCE7",
-        paddingHorizontal: 10,
-        paddingVertical: 4,
+        paddingHorizontal: 8,
+        paddingVertical: 3,
         borderRadius: 20,
+        alignSelf: "flex-start",
+        marginTop: 6,
     },
 
-    statusInactive: {
+    inactiveBadge: {
         backgroundColor: "#FEE2E2",
     },
 
     statusText: {
-        fontSize: 12,
-        fontFamily: Fonts.medium,
+        fontSize: 10,
         color: "#16A34A",
+        fontFamily: Fonts.medium,
     },
 
-    statusTextInactive: {
+    inactiveText: {
         color: "#DC2626",
     },
 
-    typeChip: {
-        alignSelf: "flex-start",
-        backgroundColor: "#E0EAFF",
-        paddingHorizontal: 10,
+    stockLabel: {
+        marginTop: 6,
+        fontSize: 11,
+        color: "#6B7280",
+    },
+
+    stockValue: {
+        fontSize: 14,
+        fontFamily: Fonts.medium,
+    },
+
+    mrpText: {
+        fontSize: 11,
+        color: "#6B7280",
+        marginTop: 4,
+    },
+
+    priceBadge: {
+        backgroundColor: "#FFF1E6",
+        paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 8,
-        marginTop: 10,
+        alignSelf: "flex-start",
+        marginTop: 4,
     },
 
-    typeText: {
+    priceText: {
+        color: "#EA580C",
         fontSize: 12,
         fontFamily: Fonts.medium,
-        color: "#2563EB",
     },
 
-    metaGrid: {
+    actionColumn: {
+        justifyContent: "space-between",
+        marginLeft: 6,
+    },
+
+    expandedSection: {
         marginTop: 14,
+        borderTopWidth: 1,
+        borderTopColor: "#E5E7EB",
+        paddingTop: 12,
+    },
+
+    sectionTitle: {
+        fontSize: 14,
+        fontFamily: Fonts.medium,
+        marginBottom: 10,
+    },
+
+    inventoryGrid: {
         flexDirection: "row",
         flexWrap: "wrap",
-        gap: 12,
+        justifyContent: "space-between",
     },
 
-    metaItem: {
+    inventoryCard: {
+        backgroundColor: "#F3F4F6",
         width: "48%",
+        borderRadius: 12,
+        padding: 10,
+        marginBottom: 10,
     },
 
-    metaLabel: {
+    locationName: {
         fontSize: 12,
         color: "#6B7280",
     },
 
-    metaValue: {
-        fontSize: 14,
+    locationStock: {
+        fontSize: 18,
         fontFamily: Fonts.medium,
-        color: "#111",
-        marginTop: 2,
+        marginVertical: 4,
     },
 
-    footer: {
-        marginTop: 16,
-        paddingTop: 12,
-        borderTopWidth: 1,
-        borderTopColor: "#E5E7EB",
-        flexDirection: "row",
-        justifyContent: "space-between",
-    },
-
-    actionBtn: {
-        flexDirection: "row",
+    updateBtn: {
+        backgroundColor: "#E0EAFF",
+        paddingVertical: 4,
+        borderRadius: 6,
         alignItems: "center",
-        gap: 6,
     },
 
-    actionText: {
+    updateText: {
+        fontSize: 12,
+        color: "#2563EB",
+        fontFamily: Fonts.medium,
+    },
+
+    variantContainer: {
+        flexDirection: "row",
+        backgroundColor: "#F9FAFB",
+        borderRadius: 12,
+        padding: 10,
+        marginBottom: 10,
+    },
+
+    variantImage: {
+        width: 50,
+        height: 50,
+        borderRadius: 8,
+    },
+
+    variantName: {
         fontSize: 14,
         fontFamily: Fonts.medium,
-        color: Colors.primaryColor,
+    },
+
+    priceBadgeSmall: {
+        backgroundColor: "#E0EAFF",
+        paddingHorizontal: 6,
+        paddingVertical: 3,
+        borderRadius: 6,
+        alignSelf: "flex-start",
+        marginTop: 4,
+    },
+
+    priceTextSmall: {
+        fontSize: 11,
+        color: "#2563EB",
+        fontFamily: Fonts.medium,
     },
 });

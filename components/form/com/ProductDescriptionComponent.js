@@ -47,7 +47,7 @@ const ProductDescriptionComponent = React.memo(
             onChange({
                 dynamicSection: [
                     ...value?.dynamicSection,
-                    { title: "", content: "" },
+                    { sectionTitle: "", content: "" },
                 ],
             });
         };
@@ -158,10 +158,14 @@ const ProductDescriptionComponent = React.memo(
                         >
                             <TextAreaBox
                                 placeholder="Section title (e.g. Warranty)"
-                                value={section.title}
+                                value={section.sectionTitle}
                                 valuekey="text"
                                 onChangeText={(value) =>
-                                    updateSection(index, "title", value?.text)
+                                    updateSection(
+                                        index,
+                                        "sectionTitle",
+                                        value?.text,
+                                    )
                                 }
                                 inputCustomStyle={inputStyle}
                             />

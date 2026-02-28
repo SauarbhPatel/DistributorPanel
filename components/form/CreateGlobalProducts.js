@@ -31,10 +31,6 @@ const VariantSTEPS = [
     { key: "1", label: "Category & Brand" },
     { key: "2", label: "Basic Info" },
     { key: "3", label: "Variation Attributes" },
-    { key: "4", label: "Description" },
-    { key: "5", label: "Media Upload" },
-    { key: "6", label: "Tax & Compliance" },
-    { key: "7", label: "Package & Manufacturing" },
 ];
 const initalState = {
     activeTab: "1",
@@ -55,8 +51,8 @@ const initalState = {
     title: "",
     modelName: "",
     sku: "",
-    ean: "",
     // PRICING & INVENTORY (if isVariableProduct: false,)
+    ean: "",
     quantityPerBox: "1",
     boxMrp: "",
     boxSellingPrice: "",
@@ -71,6 +67,7 @@ const initalState = {
     dynamicSection: [],
     description: "",
     fullDescriptionHtmlContent: "",
+
     // tab 4
     shortVideoUrl: "",
     mainImageUrl: "",
@@ -95,6 +92,8 @@ const initalState = {
         lengthUnit: "cm",
         weightUnit: "kg",
     },
+    metaTitle: "",
+    metaDescription: "",
 
     // other
     categoryList: [],
@@ -129,30 +128,93 @@ const CreateGlobalProducts = ({
         brandList,
     } = state;
 
-    const validateForm = () => {
-        if (!productName?.trim())
-            return Alert.alert("Validation Error", "Product name is required");
+    const __handleSave = async (productStatus) => {
+        try {
+            console.log("first");
+            const singleProductData = {
+                sku: state?.sku,
+                ean: state?.ean,
+                pricing: {
+                    quantityPerBox: Number(state?.quantityPerBox),
+                    boxMrp: Number(state?.boxMrp),
+                    boxSellingPrice: Number(state?.boxSellingPrice),
+                    discountType: state?.discountType,
+                    discountValue: Number(state?.discountValue),
+                    minOrderQuantity: Number(state?.minOrderQuantity),
+                    stock: Number(state?.stock),
+                },
+                listingStatus: state?.listingStatus,
+                fulfilledBy: state?.fulfilledBy,
+                metaTitle: state?.metaTitle,
+                metaDescription: state?.metaDescription,
+                // tab 3
+                regularAttributes: state?.regularAttributes.map((attr) => {
+                    delete attr._id;
+                    delete attr.isMandatory;
+                    return { ...attr };
+                }),
+                dynamicSection: state?.dynamicSection,
+                description: state?.description,
+                fullDescriptionHtmlContent: state?.fullDescriptionHtmlContent,
+                // tab 4
+                shortVideoUrl: state?.shortVideoUrl,
+                mainImageUrl: state?.mainImageUrl,
+                galleryImageUrls: state?.galleryImageUrls,
+                // tab 5
+                hsn: state?.hsn
+                    ? {
+                          hsnCodeId: state?.hsn?._id,
+                          code: state?.hsn?.code,
+                          taxRate: state?.hsn?.taxRate,
+                      }
+                    : null,
+                complianceDocuments: state?.complianceDocuments?.map((ite) => ({
+                    complianceId: ite?._id,
+                    documentName: ite?.name,
+                    isMandatory: ite?.isMandatory,
+                    url: ite?.url,
+                    issueDate: ite?.issueDate || null,
+                    expiryDate: ite?.expiryDate,
+                })),
 
-        if (!code?.trim())
-            return Alert.alert("Validation Error", "Code is required");
+                // tab 6
+                productDimension: {
+                    length: Number(state?.productDimension?.length),
+                    width: Number(state?.productDimension?.width),
+                    height: Number(state?.productDimension?.height),
+                    weight: Number(state?.productDimension?.weight),
+                    lengthUnit: state?.productDimension?.lengthUnit,
+                    weightUnit: state?.productDimension?.weightUnit,
+                },
+                packageDimension: {
+                    length: Number(state?.packageDimension?.length),
+                    width: Number(state?.packageDimension?.width),
+                    height: Number(state?.packageDimension?.height),
+                    weight: Number(state?.packageDimension?.weight),
+                    lengthUnit: state?.packageDimension?.lengthUnit,
+                    weightUnit: state?.packageDimension?.weightUnit,
+                },
 
-        if (!attributeSetId)
-            return Alert.alert("Validation Error", "Brand is required");
-
-        if (!hsnsetId)
-            return Alert.alert("Validation Error", "Category is required");
-
-        if (productName.trim().length < 2)
-            return Alert.alert(
-                "Validation Error",
-                "Product name must be at least 2 characters",
-            );
-
-        return true;
-    };
-
-    const __handleSave = async () => {
-        if (!validateForm()) return;
+                productStatus: productStatus || "DRAFT",
+                isActive: true,
+            };
+            const payload = {
+                // tab 1
+                categoryId: state?.categoryId?.id,
+                brandId: state?.brandId?.id,
+                // tab 2
+                title: state?.title,
+                modelName: state?.modelName,
+                sku: state?.sku,
+                ...(state?.isVariableProduct
+                    ? {}
+                    : { productType: "SINGLE", singleProductData }),
+            };
+            console.log(JSON.stringify(payload));
+        } catch (error) {
+            console.log(error);
+        }
+        return;
 
         updateState({ loading: true });
 
@@ -366,7 +428,16 @@ const CreateGlobalProducts = ({
                     ) : (
                         <TouchableOpacity
                             style={styles.createBtn}
-                            onPress={__handleSave}
+                            onPress={() => {
+                                if (
+                                    !productValidateForm(
+                                        Number(activeTab),
+                                        state,
+                                    )
+                                )
+                                    return;
+                                __handleSave("SUBMIT");
+                            }}
                         >
                             <Text style={styles.createText}>Create</Text>
                         </TouchableOpacity>

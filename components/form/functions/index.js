@@ -36,6 +36,8 @@ export const productValidateForm = (
         stock,
         listingStatus,
         fulfilledBy,
+        metaTitle,
+        metaDescription,
 
         // TAB 3
         regularAttributes = [],
@@ -57,7 +59,7 @@ export const productValidateForm = (
         packageDimension = {},
     },
 ) => {
-    if ([2].includes(tab)) return true;
+    // if ([2].includes(tab)) return true;
     /* ---------------- TAB 1 ---------------- */
     if (tab === 1) {
         if (!categoryId)
@@ -217,13 +219,13 @@ export const productValidateForm = (
                 if (!doc.url?.trim())
                     return Alert.alert(
                         "Validation Error",
-                        `${doc.documentName} document is required`,
+                        `${doc.name} document is required(Upload document)`,
                     );
 
                 if (!doc.expiryDate)
                     return Alert.alert(
                         "Validation Error",
-                        `${doc.documentName} expiry date is required`,
+                        `${doc.name} expiry date is required`,
                     );
             }
         }
