@@ -29,12 +29,12 @@ const CreateCategoryManagment = ({
         isActive: true,
         visibleForConsumer: true,
         //
-        attributeSetId: null,
+        attributeSetId: [],
         variantAttributes: [],
         //
         complianceDocuments: [],
         //
-        hsnsetId: null,
+        hsnsetId: [],
         //
         commissionPercentage: "",
         closingFees: "",
@@ -113,11 +113,11 @@ const CreateCategoryManagment = ({
             Alert.alert("Validation Error", "Status is required");
             return false;
         }
-        if (!attributeSetId || !attributeSetId.id) {
+        if (attributeSetId.length == 0) {
             Alert.alert("Validation Error", "Attribute set is required");
             return false;
         }
-        if (!hsnsetId || !hsnsetId.id) {
+        if (hsnsetId.length == 0) {
             Alert.alert("Validation Error", "HSN code is required");
             return false;
         }
@@ -225,7 +225,7 @@ const CreateCategoryManagment = ({
             visibleForConsumer: visibleForConsumer,
             //
 
-            attributeSetId: attributeSetId?.id,
+            attributeSetIds: attributeSetId?.map((ite) => ite.id),
             variantAttributes: variantAttributes.map((ids) => {
                 const cloneData = ids;
                 delete cloneData?._id;
@@ -239,7 +239,7 @@ const CreateCategoryManagment = ({
                 complianceId: ids?.id,
                 documentName: ids?.name,
             })),
-            hsnSetId: hsnsetId?.id,
+            hsnSetIds: hsnsetId?.map((ite) => ite.id),
             commissionPercentage: Number(commissionPercentage),
             closingFees: Number(closingFees),
             sellerTierOverrides: sellerTierOverrides?.map((ids) => ({
@@ -249,7 +249,7 @@ const CreateCategoryManagment = ({
             // shippingRuleId: shippingRuleId?.id,
             metaTitle: metaTitle,
             metaDescription: metaDescription,
-            canonicalUrl: canonicalUrl,
+            canonicalUrl: canonicalUrl?.trim(),
             priorityScore: Number(priorityScore),
         };
         console.log(JSON.stringify(payload));
@@ -280,14 +280,13 @@ const CreateCategoryManagment = ({
             const payload = {
                 name: categoryName,
                 code: code,
-
                 status: statusId?.id,
                 displayOrder: Number(displayOrder),
                 isActive: isActive,
                 visibleForConsumer: visibleForConsumer,
                 //
 
-                attributeSetId: attributeSetId?.id,
+                attributeSetIds: attributeSetId?.map((ite) => ite.id),
                 variantAttributes: variantAttributes.map((ids) => {
                     const cloneData = ids;
                     delete cloneData?._id;
@@ -301,7 +300,7 @@ const CreateCategoryManagment = ({
                     complianceId: ids?.id,
                     documentName: ids?.name,
                 })),
-                hsnSetId: hsnsetId?.id,
+                hsnSetIds: hsnsetId?.map((ite) => ite.id),
                 commissionPercentage: Number(commissionPercentage),
                 closingFees: Number(closingFees),
                 sellerTierOverrides: sellerTierOverrides?.map((ids) => ({
@@ -311,7 +310,7 @@ const CreateCategoryManagment = ({
                 // shippingRuleId: shippingRuleId?.id,
                 metaTitle: metaTitle,
                 metaDescription: metaDescription,
-                canonicalUrl: canonicalUrl,
+                canonicalUrl: canonicalUrl?.trim(),
                 priorityScore: Number(priorityScore),
             };
 
@@ -357,12 +356,11 @@ const CreateCategoryManagment = ({
                 isActive: item?.isActive,
                 visibleForConsumer: item?.visibleForConsumer,
                 //
-                attributeSetId: item?.attributeSetId
-                    ? {
-                          id: item?.attributeSetId,
-                          name: item?.attributeSetName,
-                      }
-                    : null,
+                // attributeSetId: item?.attributeSets?.map((ids) => ({
+                //     id: ids?._id,
+                //     name: ids?.attributeSetName,
+                //     ...ids,
+                // })),
                 variantAttributes: item?.variantAttributes,
                 //
                 complianceDocuments: item?.complianceDocuments?.map((ids) => ({
@@ -370,12 +368,10 @@ const CreateCategoryManagment = ({
                     name: ids?.documentName,
                 })),
                 //
-                hsnsetId: item?.hsnSetId
-                    ? {
-                          id: item?.hsnSetId,
-                          name: item?.hsnSetName,
-                      }
-                    : null,
+                hsnsetId: item?.hsnSets?.map((ids) => ({
+                    id: ids?.hsnSetId,
+                    name: ids?.hsnSetName,
+                })),
                 //
                 commissionPercentage: String(item?.commissionPercentage),
                 closingFees: String(item?.closingFees),
@@ -401,12 +397,20 @@ const CreateCategoryManagment = ({
             const attra = await __getAttributeSetList(true);
             const compli = await __getAllComplianceDocumentList();
             const shipin = await __getShippingList();
+
+            console.log(code);
             updateState({
                 hsnCodeList: code,
                 attributeList: attra,
                 complianceDocumentList: compli,
                 shippingList: shipin,
                 loading: false,
+                //
+                attributeSetId: attra.filter((attr) =>
+                    item?.attributeSets?.find(
+                        (oldattr) => oldattr?.attributeSetId == attr?.id,
+                    ),
+                ),
             });
         } catch (error) {}
     };
@@ -491,8 +495,8 @@ const CreateCategoryManagment = ({
                         list={[
                             { id: "DRAFT", name: "DRAFT" },
                             { id: "SUBMIT", name: "SUBMIT" },
-                            { id: "APPROVED", name: "APPROVED" },
-                            { id: "REJECTED", name: "REJECTED" },
+                            // { id: "APPROVED", name: "APPROVED" },
+                            // { id: "REJECTED", name: "REJECTED" },
                         ]}
                         value={statusId}
                         isSearchable
@@ -560,7 +564,7 @@ const CreateCategoryManagment = ({
                 >
                     <Text style={hintText}>Attribute Set Configuration</Text>
                     <DropDownTextAreaBox
-                        type="select"
+                        type="select_multi"
                         title={"Attribute Set"}
                         placeholder={"Select Attribute Set"}
                         required
@@ -579,9 +583,12 @@ const CreateCategoryManagment = ({
                             });
                         }}
                     />
-                    {attributeSetId && (
+                    {attributeSetId.length > 0 && (
                         <VariationRuleCard
-                            attributes={attributeSetId?.attributes}
+                            attributes={attributeSetId?.flatMap(
+                                (item) => item?.attributes,
+                            )}
+                            variantAttributes={variantAttributes}
                             onSelected={(value) =>
                                 updateState({
                                     variantAttributes: value,
@@ -630,7 +637,7 @@ const CreateCategoryManagment = ({
                 >
                     <Text style={hintText}>Tax Rules</Text>
                     <DropDownTextAreaBox
-                        type="select"
+                        type="select_multi"
                         title={"HSN Set"}
                         placeholder={"Select HSN Set"}
                         required

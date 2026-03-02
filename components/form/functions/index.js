@@ -58,6 +58,7 @@ export const productValidateForm = (
         productDimension = {},
         packageDimension = {},
     },
+    variantCard = false,
 ) => {
     // if ([2].includes(tab)) return true;
     /* ---------------- TAB 1 ---------------- */
@@ -72,14 +73,22 @@ export const productValidateForm = (
     /* ---------------- TAB 2 ---------------- */
     if (tab === 2) {
         /* ---------- Basic Info ---------- */
-        if (!title?.trim())
-            return Alert.alert("Validation Error", "Product title is required");
+        if (!variantCard) {
+            if (!title?.trim())
+                return Alert.alert(
+                    "Validation Error",
+                    "Product title is required",
+                );
 
-        if (!modelName?.trim())
-            return Alert.alert("Validation Error", "Model name is required");
+            if (!modelName?.trim())
+                return Alert.alert(
+                    "Validation Error",
+                    "Model name is required",
+                );
 
-        if (!sku?.trim())
-            return Alert.alert("Validation Error", "SKU is required");
+            if (!sku?.trim())
+                return Alert.alert("Validation Error", "SKU is required");
+        }
 
         /* -------------------------------------------------
            Pricing & Inventory
@@ -147,6 +156,16 @@ export const productValidateForm = (
                     "Validation Error",
                     "Stock cannot be negative",
                 );
+            if (!metaTitle?.trim())
+                return Alert.alert(
+                    "Validation Error",
+                    "Meta Title is Required",
+                );
+            if (!metaDescription?.trim())
+                return Alert.alert(
+                    "Validation Error",
+                    "meta Description is Required",
+                );
         }
 
         /* ---------- Listing Status ---------- */
@@ -163,7 +182,7 @@ export const productValidateForm = (
     }
 
     /* ---------------- TAB 3 ---------------- */
-    if (tab === 3) {
+    if (!isVariableProduct && tab === 3) {
         for (const attr of regularAttributes) {
             if (!Array.isArray(attr.values) || attr.values.length === 0) {
                 return Alert.alert(
@@ -199,7 +218,7 @@ export const productValidateForm = (
             );
     }
     /* ---------------- TAB 4 ---------------- */
-    if (tab === 4) {
+    if (!isVariableProduct && tab === 4) {
         if (!mainImageUrl?.trim())
             return Alert.alert(
                 "Validation Error",
@@ -213,7 +232,8 @@ export const productValidateForm = (
             );
     }
     /* ---------------- TAB 5 ---------------- */
-    if (tab === 5) {
+    if (!isVariableProduct && tab === 5) {
+        if (!hsn) return Alert.alert("Validation Error", "hsn is required");
         for (const doc of complianceDocuments) {
             if (doc.isMandatory) {
                 if (!doc.url?.trim())
@@ -231,27 +251,54 @@ export const productValidateForm = (
         }
     }
     /* ---------------- TAB 6 ---------------- */
-    if (tab === 6) {
+    if (!isVariableProduct && tab === 6) {
+        // const validateDimension = (dim, label) => {
+        //     const { length, width, height, weight, lengthUnit, weightUnit } =
+        //         dim;
+
+        //     if (!length || !width || !height || !weight)
+        //         return Alert.alert(
+        //             "Validation Error",
+        //             `${label} dimensions are required`,
+        //         );
+
+        //     if (!lengthUnit || !weightUnit)
+        //         return Alert.alert(
+        //             "Validation Error",
+        //             `${label} units are required`,
+        //         );
+        // };
+
+        // validateDimension(productDimension, "Product");
+        // validateDimension(packageDimension, "Package");
+
         const validateDimension = (dim, label) => {
             const { length, width, height, weight, lengthUnit, weightUnit } =
                 dim;
 
-            if (!length || !width || !height || !weight)
-                return Alert.alert(
+            if (!length || !width || !height || !weight) {
+                Alert.alert(
                     "Validation Error",
                     `${label} dimensions are required`,
                 );
+                return false;
+            }
 
-            if (!lengthUnit || !weightUnit)
-                return Alert.alert(
-                    "Validation Error",
-                    `${label} units are required`,
-                );
+            if (!lengthUnit || !weightUnit) {
+                Alert.alert("Validation Error", `${label} units are required`);
+                return false;
+            }
+
+            return true;
         };
 
-        validateDimension(productDimension, "Product");
-        validateDimension(packageDimension, "Package");
+        const isProductValid = validateDimension(productDimension, "Product");
+        if (!isProductValid) return;
+
+        const isPackageValid = validateDimension(packageDimension, "Package");
+        if (!isPackageValid) return;
     }
+    console.log("passed");
 
     return true;
 };

@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    StyleSheet,
+    Image,
+    Linking,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { Colors } from "../../../constants/styles";
@@ -71,16 +78,31 @@ const MediaUploadComponent = ({
 
             {/* Short Video */}
             <Text style={styles.label}>Short Video</Text>
-            <TouchableOpacity style={styles.videoBtn} onPress={pickVideo}>
-                <Ionicons
-                    name="cloud-upload-outline"
-                    size={18}
-                    color={Colors.primaryColor}
-                />
-                <Text style={styles.videoBtnText}>
-                    {shortVideo ? "Change Video" : "Upload Video"}
-                </Text>
-            </TouchableOpacity>
+            <View style={{ flexDirection: "row", gap: 10 }}>
+                <TouchableOpacity style={styles.videoBtn} onPress={pickVideo}>
+                    <Ionicons
+                        name="cloud-upload-outline"
+                        size={18}
+                        color={Colors.primaryColor}
+                    />
+                    <Text style={styles.videoBtnText}>
+                        {value?.shortVideoUrl ? "Change Video" : "Upload Video"}
+                    </Text>
+                </TouchableOpacity>
+                {value?.shortVideoUrl && (
+                    <TouchableOpacity
+                        style={styles.videoBtn}
+                        onPress={() => Linking.openURL(value?.shortVideoUrl)}
+                    >
+                        <Ionicons
+                            name="cloud-upload-outline"
+                            size={18}
+                            color={Colors.primaryColor}
+                        />
+                        <Text style={styles.videoBtnText}>View</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
 
             {/* Main Image */}
             <Text style={styles.label}>

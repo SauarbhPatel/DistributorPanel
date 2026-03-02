@@ -5,6 +5,7 @@ import {
     TouchableOpacity,
     TextInput,
     ScrollView,
+    Alert,
 } from "react-native";
 import { Colors, Fonts } from "../../../constants/styles";
 import { Feather, FontAwesome } from "@expo/vector-icons";
@@ -140,6 +141,7 @@ const VariationAttributesForm = ({
             variants: variations.filter((variat) => variat[key] != val),
         });
     };
+    console.log("variations", variations);
 
     return (
         <View>
@@ -329,6 +331,15 @@ const VariationAttributesForm = ({
                             state={state}
                             index={index}
                             updateState={updateState}
+                            onDataCompleted={(data) => {
+                                const cloneData = JSON.parse(
+                                    JSON.stringify(variations),
+                                );
+
+                                cloneData[index] = data;
+                                console.log(cloneData);
+                                onChange({ variants: cloneData });
+                            }}
                         />
                     ))}
                 </>
@@ -339,11 +350,17 @@ const VariationAttributesForm = ({
 
 export default VariationAttributesForm;
 
-const VariationsCard = ({ variation, index, state, updateState }) => {
+const VariationsCard = ({
+    variation,
+    index,
+    state,
+    updateState,
+    onDataCompleted,
+}) => {
     const key = JSON.stringify(variation);
 
     const [isShowBasicInfo, setisShowBasicInfo] = useState(false);
-
+    console.log("hghj", JSON.stringify(variation));
     return (
         <View
             key={index}
@@ -352,8 +369,10 @@ const VariationsCard = ({ variation, index, state, updateState }) => {
                 borderRadius: 10,
                 padding: 16,
                 marginBottom: 12,
-                borderWidth: 1,
-                borderColor: "#e5e7eb",
+                borderWidth: variation?.variationData ? 2 : 1,
+                borderColor: variation?.variationData
+                    ? Colors.greenColor
+                    : "#e5e7eb",
             }}
         >
             <BottomPopup
@@ -361,13 +380,34 @@ const VariationsCard = ({ variation, index, state, updateState }) => {
                 title={
                     "Variant-" +
                     Object.entries(variation)
+                        .filter(([key]) => key !== "variationData")
                         .map(([k, v]) => `${k}: ${v}`)
                         .join(" · ")
                 }
                 onClose={() => setisShowBasicInfo(false)}
                 component={
                     <>
-                        <VariantCard />
+                        <VariantCard
+                            defaultSku={state.sku[key]}
+                            defaultData={variation?.variationData || null}
+                            onDone={(value) => {
+                                setisShowBasicInfo(false);
+
+                                const cloneObject = JSON.parse(
+                                    JSON.stringify(variation),
+                                );
+                                delete cloneObject?.variationData;
+                                onDataCompleted({
+                                    ...cloneObject,
+                                    variationData: {
+                                        variantHash: {
+                                            ...cloneObject,
+                                        },
+                                        ...value,
+                                    },
+                                });
+                            }}
+                        />
                     </>
                 }
                 top="10%"
@@ -379,6 +419,7 @@ const VariationsCard = ({ variation, index, state, updateState }) => {
                 }}
             >
                 {Object.entries(variation)
+                    .filter(([key]) => key !== "variationData")
                     .map(([k, v]) => `${k}: ${v}`)
                     .join(" · ")}
             </Text>
@@ -391,7 +432,9 @@ const VariationsCard = ({ variation, index, state, updateState }) => {
             >
                 <TextInput
                     placeholder="SKU (manual or generate)"
-                    value={state.sku[key] || ""}
+                    value={
+                        state.sku[key] || variation?.variationData?.sku || ""
+                    }
                     onChangeText={(text) =>
                         updateState({
                             sku: {
@@ -409,9 +452,11 @@ const VariationsCard = ({ variation, index, state, updateState }) => {
                         height: 44,
                         backgroundColor: "#f9fafb",
                     }}
+                    editable={variation?.variationData?.sku ? false : true}
                 />
 
                 <TouchableOpacity
+                    disabled={variation?.variationData?.sku ? true : false}
                     onPress={() =>
                         updateState({
                             sku: {
@@ -446,7 +491,13 @@ const VariationsCard = ({ variation, index, state, updateState }) => {
             >
                 <TouchableOpacity
                     activeOpacity={0.9}
-                    onPress={() => setisShowBasicInfo(true)}
+                    onPress={() => {
+                        if (state.sku[key] || variation?.variationData?.sku) {
+                            setisShowBasicInfo(true);
+                        } else {
+                            Alert.alert("", "please generate SKU ");
+                        }
+                    }}
                     style={{
                         backgroundColor: "#f3f4f6",
                         paddingHorizontal: 14,

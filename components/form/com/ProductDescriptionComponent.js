@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { TextAreaBox } from "../../../modules";
 import { Colors } from "../../../constants/styles";
@@ -15,6 +15,21 @@ const ProductDescriptionComponent = React.memo(
             bullet4: "",
             bullet5: "",
         });
+
+        useEffect(() => {
+            if (value?.description) {
+                const data = value?.description.split("• ");
+                console.log("****", data);
+
+                setBullets({
+                    bullet1: data[1]?.trim() || "",
+                    bullet2: data[2]?.trim() || "",
+                    bullet3: data[3]?.trim() || "",
+                    bullet4: data[4]?.trim() || "",
+                    bullet5: data[5]?.trim() || "",
+                });
+            }
+        }, []);
 
         // const updateBullet = (key, value) => {
         //     if (value.length <= MAX_CHAR) {

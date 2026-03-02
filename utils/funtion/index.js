@@ -228,8 +228,7 @@ export function createCategoryList(categories) {
                 name: currentPath,
                 slug: node.slug,
                 isActive: node.isActive,
-                attributeSetId: node.attributeSetId,
-                attributeSetName: node.attributeSetName,
+                attributeSets: node.attributeSets,
             });
 
             if (node.children && node.children.length > 0) {

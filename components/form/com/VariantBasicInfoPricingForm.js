@@ -19,7 +19,7 @@ const VariantBasicInfoPricingForm = ({ value = {}, onChange = () => {} }) => {
                 title="SKU"
                 placeholder="e.g. SAM-ELEC-S21"
                 required
-                value={value.sku}
+                value={value.defaultSku || value?.sku}
                 valuekey="sku"
                 onChangeText={updateState}
                 inputCustomStyle={inputStyle}
@@ -27,7 +27,6 @@ const VariantBasicInfoPricingForm = ({ value = {}, onChange = () => {} }) => {
                     marginHorizontal: 0,
                     marginTop: 0,
                 }}
-                editable={false}
             />
 
             <View>

@@ -213,28 +213,33 @@ const CreateGlobalProducts = ({
                 modelName: state?.modelName,
                 sku: state?.sku,
                 ...(state?.isVariableProduct
-                    ? {}
+                    ? {
+                          productType: "VARIABLE",
+                          variantAttributes: state?.variantAttributes?.map(
+                              (varian) => ({
+                                  attributeId: varian?.attributeId,
+                                  name: varian?.name,
+                                  type: varian?.type,
+                                  // "isMandatory": false,
+                                  isVariant: varian?.isVariant,
+                                  values: varian?.values,
+                              }),
+                          ),
+                          variants: state?.variants?.map(
+                              (subpro) => subpro?.variationData,
+                          ),
+                      }
                     : { productType: "SINGLE", singleProductData }),
+                isActive: true,
             };
             console.log(JSON.stringify(payload));
-        } catch (error) {
-            console.log(error);
-        }
-        return;
 
-        updateState({ loading: true });
+            updateState({ loading: true });
 
-        try {
-            const res = await __postApiData("/categories/createCategory", {
-                name: productName,
-                code,
-                parentId,
-                displayOrder: Number(displayOrder),
-                isActive,
-                enabled: isActive,
-                hsnsetId: hsnsetId?.id,
-                attributeSetId: attributeSetId?.id,
-            });
+            const res = await __postApiData(
+                "/globalProducts/createGlobalProduct",
+                payload,
+            );
 
             Alert.alert("", res?.message || "Success");
             if (res?.success) onClose();
@@ -296,29 +301,44 @@ const CreateGlobalProducts = ({
                             onSelected={async (value) => {
                                 console.log(value);
                                 updateState({ categoryId: value });
-                                const attributeData =
-                                    await __getAttributeSetById(
-                                        value?.attributeSetId,
-                                    );
 
-                                console.log(attributeData);
-                                attributeData &&
+                                if (value?.attributeSets?.length) {
+                                    updateState({ loading: true });
+                                    const responses = await Promise.all(
+                                        value.attributeSets.map((id) =>
+                                            __getAttributeSetById(
+                                                id?.attributeSetId,
+                                            ),
+                                        ),
+                                    );
+                                    // Merge all regular attributes
+                                    const regularAttributes = responses
+                                        .flatMap(
+                                            (res) =>
+                                                res?.regularAttributes || [],
+                                        )
+                                        .map((item) => ({
+                                            ...item,
+                                            values: [],
+                                        }));
+
+                                    // Merge all variant attributes
+                                    const variantAttributes = responses
+                                        .flatMap(
+                                            (res) =>
+                                                res?.variantAttributes || [],
+                                        )
+                                        .map((item) => ({
+                                            ...item,
+                                            values: [],
+                                        }));
+
                                     updateState({
-                                        regularAttributes:
-                                            attributeData?.regularAttributes?.map(
-                                                (ite) => ({
-                                                    ...ite,
-                                                    values: [],
-                                                }),
-                                            ) || [],
-                                        variantAttributes:
-                                            attributeData?.variantAttributes?.map(
-                                                (ite) => ({
-                                                    ...ite,
-                                                    values: [],
-                                                }),
-                                            ) || [],
+                                        regularAttributes,
+                                        variantAttributes,
+                                        loading: false,
                                     });
+                                }
                             }}
                             // editable={!isEdit}
                             titleCustomStyle={{

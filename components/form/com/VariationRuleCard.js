@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-const VariationRuleCard = ({ attributes = [], onSelected = () => {} }) => {
+const VariationRuleCard = ({
+    attributes = [],
+    onSelected = () => {},
+    variantAttributes = [],
+}) => {
     const [selectedVariants, setSelectedVariants] = useState({});
 
     const toggleVariant = (id) => {
@@ -20,9 +24,9 @@ const VariationRuleCard = ({ attributes = [], onSelected = () => {} }) => {
         onSelected(enabledVariants);
     }, [selectedVariants]);
 
-    useEffect(() => {
-        setSelectedVariants({});
-    }, [attributes]);
+    // useEffect(() => {
+    //     setSelectedVariants({});
+    // }, [attributes]);
 
     return (
         <View style={styles.card}>

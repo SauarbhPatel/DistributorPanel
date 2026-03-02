@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { View } from "react-native";
 import { Colors } from "../../../constants/styles";
 import VariationAttributesForm from "./VariationAttributesForm";
 

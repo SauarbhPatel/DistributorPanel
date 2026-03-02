@@ -224,12 +224,14 @@ const GlobalProducts = ({ navigation }) => {
         try {
             updateState({ loading: true });
             const res = await __getApiData(
-                `/globalProducts/getAllGlobalProducts`,
+                // `/globalProducts/getAllGlobalProducts`,
+                // `/products/grouped`,
+                `/myListings/getMyListings?page=1&limit=100&search=${ser}&sortBy=createdAt&sortOrder=desc`,
             );
             console.log(JSON.stringify(res));
             if (res?.success) {
                 updateState({
-                    list: res.data,
+                    list: res.data?.records,
                     // ...res?.data?.stats,
                 });
             }
@@ -241,7 +243,7 @@ const GlobalProducts = ({ navigation }) => {
     };
 
     useEffect(() => {
-        // __handleGetData(search);
+        __handleGetData(search);
     }, [search]);
 
     const __handleDeleteProducts = (id) => {
@@ -259,9 +261,13 @@ const GlobalProducts = ({ navigation }) => {
                     onPress: async () => {
                         try {
                             updateState({ loading: true });
+                            console.log(id);
 
                             const res = await __deleteApiData(
-                                `/productProductss/deleteProductsById/${id}`,
+                                `/products/bulkDeleteProducts`,
+                                {
+                                    ids: [id],
+                                },
                             );
                             if (res?.success) {
                                 // refresh list after delete
@@ -393,11 +399,11 @@ const GlobalProducts = ({ navigation }) => {
     function ProductsCards() {
         return (
             <View style={{ paddingHorizontal: Sizes.fixPadding }}>
-                {SAMPLE_PRODUCTS?.map((item) => (
+                {list?.map((item) => (
                     <ProductCard
-                        key={item._id}
+                        key={item?._id}
                         item={item}
-                        onDelete={() => __handleDeleteProducts(item._id)}
+                        onDelete={() => __handleDeleteProducts(item?._id)}
                     />
                 ))}
             </View>
@@ -419,49 +425,55 @@ const ProductCard = ({ item, onDelete }) => {
             >
                 {/* Left - Image */}
                 <Image
-                    source={{ uri: item.image }}
+                    source={{ uri: item?.listings[0]?.product?.mainImageUrl }}
                     style={styles.productImage}
                 />
 
                 {/* Middle - Info */}
                 <View style={{ flex: 1, marginHorizontal: 10 }}>
                     <Text style={styles.productName} numberOfLines={1}>
-                        {item.name}
+                        {item?.globalProduct?.title}
                     </Text>
 
-                    <Text style={styles.metaText}>SKU: {item.sku}</Text>
-                    <Text style={styles.metaText}>PSN: {item.psn}</Text>
-                    <Text style={styles.metaText}>LID: {item.lid}</Text>
+                    <Text style={styles.metaText}>
+                        SKU: {item?.globalProduct?.slug}
+                    </Text>
+                    <Text style={styles.metaText}>
+                        PSN: {item?.listings[0]?.product?.psn}
+                    </Text>
+                    <Text style={styles.metaText}>LID: {item?.lid}</Text>
 
                     {/* Status */}
                     <View
                         style={[
                             styles.statusBadge,
-                            !item.isActive && styles.inactiveBadge,
+                            !item?.isActive && styles.inactiveBadge,
                         ]}
                     >
                         <Text
                             style={[
                                 styles.statusText,
-                                !item.isActive && styles.inactiveText,
+                                !item?.isActive && styles.inactiveText,
                             ]}
                         >
-                            {item.isActive ? "ACTIVE" : "INACTIVE"}
+                            {item?.isActive ? "ACTIVE" : "INACTIVE"}
                         </Text>
                     </View>
 
                     {/* Stock */}
                     <Text style={styles.stockLabel}>Total Stock</Text>
                     <Text style={styles.stockValue}>
-                        {item.totalStock} units
+                        {item?.listings[0]?.stock} units
                     </Text>
 
                     {/* Price */}
-                    <Text style={styles.mrpText}>MRP: ₹{item.mrp} / piece</Text>
+                    <Text style={styles.mrpText}>
+                        MRP: ₹{item?.listings[0]?.boxMrp} / piece
+                    </Text>
 
                     <View style={styles.priceBadge}>
                         <Text style={styles.priceText}>
-                            ₹ {item.price} / piece
+                            ₹ {item?.listings[0]?.boxsellingPrice} / piece
                         </Text>
                     </View>
                 </View>
@@ -486,7 +498,13 @@ const ProductCard = ({ item, onDelete }) => {
                     </Text>
 
                     <View style={styles.inventoryGrid}>
-                        {item.inventory?.map((loc) => (
+                        {/* {item?.inventory?.map((loc) => ( */}
+                        {[
+                            { locationId: "loc1", name: "Gurgaon", stock: 40 },
+                            { locationId: "loc2", name: "Delhi", stock: 35 },
+                            { locationId: "loc3", name: "Tauru", stock: 30 },
+                            { locationId: "loc4", name: "Chennai", stock: 45 },
+                        ]?.map((loc) => (
                             <View
                                 key={loc.locationId}
                                 style={styles.inventoryCard}
@@ -514,11 +532,11 @@ const ProductCard = ({ item, onDelete }) => {
                     </View>
 
                     {/* Variants */}
-                    {item.variants?.length > 0 && (
+                    {item?.variants?.length > 0 && (
                         <>
                             <Text style={styles.sectionTitle}>Variants</Text>
 
-                            {item.variants.map((variant) => (
+                            {item?.variants.map((variant) => (
                                 <VariantCard
                                     key={variant._id}
                                     variant={variant}
