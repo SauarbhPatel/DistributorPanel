@@ -201,7 +201,7 @@ const VariantCard = ({
                 weightUnit: state?.packageDimension?.weightUnit,
             },
             //
-            productStatus: productStatus || "DRAFT",
+            productStatus: productStatus || "SUBMIT",
             isActive: true,
         });
     };

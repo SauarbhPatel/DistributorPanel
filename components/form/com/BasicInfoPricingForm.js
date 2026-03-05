@@ -58,6 +58,19 @@ const BasicInfoPricingForm = ({ value = {}, onChange = () => {} }) => {
                     marginTop: 0,
                 }}
             />
+            <TextAreaBox
+                title="Slug"
+                placeholder="e.g. SAM-ELEC-2026"
+                required
+                value={value.slug}
+                valuekey="slug"
+                onChangeText={updateState}
+                inputCustomStyle={inputStyle}
+                titleCustomStyle={{
+                    marginHorizontal: 0,
+                    marginTop: 0,
+                }}
+            />
 
             <View style={switchRow}>
                 <Text style={Fonts.blackColor14Medium}>
@@ -354,7 +367,7 @@ const BasicInfoPricingForm = ({ value = {}, onChange = () => {} }) => {
                         }}
                     />
 
-                    <DropDownTextAreaBox
+                    {/* <DropDownTextAreaBox
                         type="select"
                         title="Fulfillment Type"
                         list={[
@@ -378,34 +391,7 @@ const BasicInfoPricingForm = ({ value = {}, onChange = () => {} }) => {
                             marginTop: 10,
                         }}
                         isSearchable
-                    />
-
-                    <DropDownTextAreaBox
-                        type="select"
-                        title="Shipping Service Provider"
-                        list={[
-                            { id: "BAOFENG", name: "Baofeng" },
-                            { id: "DELHIVERY", name: "Delhivery" },
-                        ]}
-                        // value={
-                        //     state.shippingProvider
-                        //         ? {
-                        //               id: state.shippingProvider,
-                        //               name: state.shippingProvider,
-                        //           }
-                        //         : null
-                        // }
-                        onSelected={(val) =>
-                            updateState({ shippingProvider: val?.id })
-                        }
-                        inputCustomStyle={inputStyle}
-                        titleCustomStyle={{
-                            marginHorizontal: 0,
-                            marginTop: 10,
-                        }}
-                        editable={false}
-                        customStyle={{ flex: 1, opacity: 0.6 }}
-                    />
+                    /> */}
 
                     <TextAreaBox
                         title="Meta Title"

@@ -226,7 +226,8 @@ const GlobalProducts = ({ navigation }) => {
             const res = await __getApiData(
                 // `/globalProducts/getAllGlobalProducts`,
                 // `/products/grouped`,
-                `/myListings/getMyListings?page=1&limit=100&search=${ser}&sortBy=createdAt&sortOrder=desc`,
+                // `/myListings/getMyListings?page=1&limit=100&search=${ser}&sortBy=createdAt&sortOrder=desc`,
+                `/listings/getMyListings?page=1&limit=100&search=${ser}&sortBy=createdAt&sortOrder=desc`,
             );
             console.log(JSON.stringify(res));
             if (res?.success) {
@@ -425,7 +426,7 @@ const ProductCard = ({ item, onDelete }) => {
             >
                 {/* Left - Image */}
                 <Image
-                    source={{ uri: item?.listings[0]?.product?.mainImageUrl }}
+                    source={{ uri: item?.listing?.product?.mainImageUrl }}
                     style={styles.productImage}
                 />
 
@@ -463,17 +464,17 @@ const ProductCard = ({ item, onDelete }) => {
                     {/* Stock */}
                     <Text style={styles.stockLabel}>Total Stock</Text>
                     <Text style={styles.stockValue}>
-                        {item?.listings[0]?.stock} units
+                        {item?.listing?.stock} units
                     </Text>
 
                     {/* Price */}
                     <Text style={styles.mrpText}>
-                        MRP: ₹{item?.listings[0]?.boxMrp} / piece
+                        MRP: ₹{item?.listing?.boxMrp} / piece
                     </Text>
 
                     <View style={styles.priceBadge}>
                         <Text style={styles.priceText}>
-                            ₹ {item?.listings[0]?.boxsellingPrice} / piece
+                            ₹ {item?.listing?.boxsellingPrice} / piece
                         </Text>
                     </View>
                 </View>
@@ -499,22 +500,17 @@ const ProductCard = ({ item, onDelete }) => {
 
                     <View style={styles.inventoryGrid}>
                         {/* {item?.inventory?.map((loc) => ( */}
-                        {[
-                            { locationId: "loc1", name: "Gurgaon", stock: 40 },
-                            { locationId: "loc2", name: "Delhi", stock: 35 },
-                            { locationId: "loc3", name: "Tauru", stock: 30 },
-                            { locationId: "loc4", name: "Chennai", stock: 45 },
-                        ]?.map((loc) => (
+                        {item?.listing?.inventoryByPickup?.map((loc) => (
                             <View
-                                key={loc.locationId}
+                                key={loc.pickupPointId}
                                 style={styles.inventoryCard}
                             >
                                 <Text style={styles.locationName}>
-                                    {loc.name}
+                                    {loc.pickupPointName}
                                 </Text>
 
                                 <Text style={styles.locationStock}>
-                                    {loc.stock}
+                                    {loc.quantity}
                                 </Text>
 
                                 <TouchableOpacity

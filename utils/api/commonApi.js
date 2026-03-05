@@ -173,6 +173,24 @@ const __getShippingList = async () => {
             return [];
         });
 };
+const __getShippingZoneList = async () => {
+    return __getApiData(
+        `/shippingZone/getAllShippingZones?page=1&limit=100&sortBy=createAt&sortOrder=asc`,
+    )
+        .then((res) => {
+            if (res.success) {
+                return res?.data?.shippingZones?.map((item) => ({
+                    ...item,
+                    id: item?._id,
+                    name: item?.zoneName,
+                }));
+            }
+            return [];
+        })
+        .catch((error) => {
+            return [];
+        });
+};
 const __getLedgersList = async () => {
     return __getApiData(`/ledgers/getAllLedgers`)
         .then((res) => {
@@ -345,4 +363,5 @@ export {
     __getAllComplianceDocumentList,
     __getAttributeSetById,
     __getShippingList,
+    __getShippingZoneList,
 };

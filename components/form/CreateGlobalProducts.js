@@ -52,6 +52,7 @@ const initalState = {
     title: "",
     modelName: "",
     sku: "",
+    slug: "",
     // PRICING & INVENTORY (if isVariableProduct: false,)
     // ****
     ean: "",
@@ -201,7 +202,7 @@ const CreateGlobalProducts = ({
                     weightUnit: state?.packageDimension?.weightUnit,
                 },
 
-                productStatus: productStatus || "DRAFT",
+                productStatus: productStatus || "SUBMIT",
                 isActive: true,
             };
             const payload = {
@@ -212,6 +213,7 @@ const CreateGlobalProducts = ({
                 title: state?.title,
                 modelName: state?.modelName,
                 sku: state?.sku,
+                slug: state?.slug,
                 ...(state?.isVariableProduct
                     ? {
                           productType: "VARIABLE",

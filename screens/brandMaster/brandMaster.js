@@ -47,7 +47,7 @@ const BrandMaster = ({ navigation }) => {
             console.log(JSON.stringify(res));
             if (res?.success) {
                 updateState({
-                    list: res.data,
+                    // list: res.data,
                 });
             }
         } catch (error) {

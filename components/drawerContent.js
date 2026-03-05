@@ -380,6 +380,20 @@ const CustomDrawer = (props) => {
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
+                            onPress={() =>
+                                props.navigation.push("InventoryHub")
+                            }
+                        >
+                            <Text
+                                style={{
+                                    marginVertical: Sizes.fixPadding - 5.0,
+                                    ...Fonts.grayColor14SemiBold,
+                                }}
+                            >
+                                {getLocalizedString("Inventory Hub")}
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
                             onPress={() => props.navigation.push("RawMaterial")}
                         >
                             <Text

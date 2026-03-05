@@ -88,6 +88,8 @@ export const productValidateForm = (
 
             if (!sku?.trim())
                 return Alert.alert("Validation Error", "SKU is required");
+            if (!slug?.trim())
+                return Alert.alert("Validation Error", "Slug is required");
         }
 
         /* -------------------------------------------------

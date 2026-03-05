@@ -86,6 +86,8 @@ import ProductListings from "./screens/productListings/productListings";
 import TaxJurisdiction from "./screens/taxJurisdiction/taxJurisdiction";
 import CategoryTaxMapping from "./screens/categoryTaxMapping/categoryTaxMapping";
 import DocumentMaster from "./screens/documentMaster/documentMaster";
+import InventoryHub from "./screens/inventoryHub/inventoryHub";
+import MyListings from "./screens/inventoryHub/myListings";
 
 LogBox.ignoreAllLogs();
 
@@ -315,6 +317,8 @@ function App() {
                     name="DocumentMaster"
                     component={DocumentMaster}
                 />
+                <Stack.Screen name="InventoryHub" component={InventoryHub} />
+                <Stack.Screen name="MyListings" component={MyListings} />
             </Stack.Navigator>
         </NavigationContainer>
     );

@@ -9,6 +9,7 @@ import {
     __getHsnCodeList,
     __getHsnSetList,
     __getShippingList,
+    __getShippingZoneList,
 } from "../../utils/api/commonApi";
 import SingleSelectTab from "../common/SingleSelectTab";
 import VariationRuleCard from "./com/VariationRuleCard";
@@ -24,6 +25,7 @@ const CreateCategoryManagment = ({
         //
         categoryName: "",
         code: "",
+        slug: "",
         displayOrder: "1",
         statusId: null,
         isActive: true,
@@ -48,7 +50,7 @@ const CreateCategoryManagment = ({
         //
         canonicalUrl: "",
         priorityScore: "0",
-        shippingRuleId: null,
+        shippingRuleId: [],
         //
 
         metaTitle: "",
@@ -72,6 +74,7 @@ const CreateCategoryManagment = ({
         metaDescription,
         categoryName,
         code,
+        slug,
         displayOrder,
         isActive,
         statusId,
@@ -105,6 +108,10 @@ const CreateCategoryManagment = ({
         }
         if (!code?.trim()) {
             Alert.alert("Validation Error", "Code is required");
+            return false;
+        }
+        if (!slug?.trim()) {
+            Alert.alert("Validation Error", "Slug is required");
             return false;
         }
 
@@ -218,6 +225,7 @@ const CreateCategoryManagment = ({
         const payload = {
             name: categoryName,
             code: code,
+            slug: slug,
             ...(parentId && { parentId: parentId }),
             status: statusId?.id,
             displayOrder: Number(displayOrder),
@@ -246,7 +254,7 @@ const CreateCategoryManagment = ({
                 sellerTier: ids?.sellerTier,
                 commissionPercentage: Number(ids?.commissionPercentage),
             })),
-            // shippingRuleId: shippingRuleId?.id,
+            shippingZoneIds: shippingRuleId?.map((item) => item?.id),
             metaTitle: metaTitle,
             metaDescription: metaDescription,
             canonicalUrl: canonicalUrl?.trim(),
@@ -280,6 +288,7 @@ const CreateCategoryManagment = ({
             const payload = {
                 name: categoryName,
                 code: code,
+                slug: slug,
                 status: statusId?.id,
                 displayOrder: Number(displayOrder),
                 isActive: isActive,
@@ -307,7 +316,7 @@ const CreateCategoryManagment = ({
                     sellerTier: ids?.sellerTier,
                     commissionPercentage: Number(ids?.commissionPercentage),
                 })),
-                // shippingRuleId: shippingRuleId?.id,
+                shippingZoneIds: shippingRuleId?.map((item) => item?.id),
                 metaTitle: metaTitle,
                 metaDescription: metaDescription,
                 canonicalUrl: canonicalUrl?.trim(),
@@ -348,6 +357,7 @@ const CreateCategoryManagment = ({
                 //
                 categoryName: item?.name,
                 code: item?.code,
+                slug: item?.slug,
                 displayOrder: String(item?.displayOrder),
                 statusId: {
                     id: item?.status,
@@ -396,7 +406,7 @@ const CreateCategoryManagment = ({
             const code = await __getHsnSetList(true);
             const attra = await __getAttributeSetList(true);
             const compli = await __getAllComplianceDocumentList();
-            const shipin = await __getShippingList();
+            const shipin = await __getShippingZoneList();
 
             console.log(code);
             updateState({
@@ -410,6 +420,9 @@ const CreateCategoryManagment = ({
                     item?.attributeSets?.find(
                         (oldattr) => oldattr?.attributeSetId == attr?.id,
                     ),
+                ),
+                shippingRuleId: shipin.filter((attr) =>
+                    item?.shippingZoneIds?.find((ids) => ids == attr?.id),
                 ),
             });
         } catch (error) {}
@@ -463,6 +476,20 @@ const CreateCategoryManagment = ({
                             required
                             value={code}
                             valuekey="code"
+                            onChangeText={updateState}
+                            titleCustomStyle={{
+                                marginHorizontal: 0,
+                                marginTop: 10,
+                            }}
+                            inputCustomStyle={inputStyle}
+                            customStyle={{ flex: 1 }}
+                        />
+                        <TextAreaBox
+                            title="Slug"
+                            placeholder=""
+                            required
+                            value={slug}
+                            valuekey="slug"
                             onChangeText={updateState}
                             titleCustomStyle={{
                                 marginHorizontal: 0,
@@ -679,7 +706,7 @@ const CreateCategoryManagment = ({
                         }}
                     />
                 </View>
-                {/* <View
+                <View
                     style={{
                         ...inputStyle,
                         paddingHorizontal: 10,
@@ -689,9 +716,9 @@ const CreateCategoryManagment = ({
                 >
                     <Text style={hintText}>Shipping & Logistics Rules</Text>
                     <DropDownTextAreaBox
-                        type="select"
-                        title={"Shipping Template"}
-                        placeholder={"Select Shipping Template"}
+                        type="select_multi"
+                        title={"Shipping Zone"}
+                        placeholder={"Select Shipping Zone"}
                         required
                         list={shippingList}
                         value={shippingRuleId}
@@ -708,7 +735,7 @@ const CreateCategoryManagment = ({
                         }}
                         // editable={!isEdit}
                     />
-                </View> */}
+                </View>
                 <View
                     style={{
                         ...inputStyle,
