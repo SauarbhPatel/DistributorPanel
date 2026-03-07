@@ -88,6 +88,22 @@ import CategoryTaxMapping from "./screens/categoryTaxMapping/categoryTaxMapping"
 import DocumentMaster from "./screens/documentMaster/documentMaster";
 import InventoryHub from "./screens/inventoryHub/inventoryHub";
 import MyListings from "./screens/inventoryHub/myListings";
+import ComplianceHub from "./screens/complianceHub/complianceHub";
+import CategoryConditions from "./screens/categoryConditions/categoryConditions";
+import MarketplacePolicies from "./screens/marketplacePolicies/marketplacePolicies";
+import RiskMonitoring from "./screens/riskMonitoring/riskMonitoring";
+import ReportsCompliance from "./screens/reportsCompliance/reportsCompliance";
+import AuditLogsCompliance from "./screens/auditLogsCompliance/auditLogsCompliance";
+import ShippingZones from "./screens/shippingZones/shippingZones";
+import ShippingHub from "./screens/shippingHub/shippingHub";
+import ShippingMethods from "./screens/shippingHub/shippingMethods";
+import CourierPartners from "./screens/shippingHub/courierPartners";
+import Manufacturers from "./screens/manufacturers/manufacturers";
+import Directory from "./screens/manufacturers/directory";
+import Onboarding from "./screens/manufacturers/onboarding";
+import OnboardingDetails from "./screens/manufacturers/onboardingDetails";
+import AllMaster from "./screens/master/AllMaster";
+import UomMaster from "./screens/master/uomMaster";
 
 LogBox.ignoreAllLogs();
 
@@ -319,6 +335,49 @@ function App() {
                 />
                 <Stack.Screen name="InventoryHub" component={InventoryHub} />
                 <Stack.Screen name="MyListings" component={MyListings} />
+                <Stack.Screen name="ComplianceHub" component={ComplianceHub} />
+                <Stack.Screen
+                    name="CategoryConditions"
+                    component={CategoryConditions}
+                />
+                <Stack.Screen
+                    name="MarketplacePolicies"
+                    component={MarketplacePolicies}
+                />
+                <Stack.Screen
+                    name="RiskMonitoring"
+                    component={RiskMonitoring}
+                />
+                <Stack.Screen
+                    name="ReportsCompliance"
+                    component={ReportsCompliance}
+                />
+                <Stack.Screen
+                    name="AuditLogsCompliance"
+                    component={AuditLogsCompliance}
+                />
+                <Stack.Screen name="ShippingHub" component={ShippingHub} />
+                <Stack.Screen name="ShippingZones" component={ShippingZones} />
+                <Stack.Screen
+                    name="ShippingMethods"
+                    component={ShippingMethods}
+                />
+                <Stack.Screen
+                    name="CourierPartners"
+                    component={CourierPartners}
+                />
+                <Stack.Screen name="Manufacturers" component={Manufacturers} />
+                <Stack.Screen name="Directory" component={Directory} />
+                <Stack.Screen
+                    name="OnboardingManufacturers"
+                    component={Onboarding}
+                />
+                <Stack.Screen
+                    name="OnboardingDetails"
+                    component={OnboardingDetails}
+                />
+                <Stack.Screen name="AllMaster" component={AllMaster} />
+                <Stack.Screen name="UomMaster" component={UomMaster} />
             </Stack.Navigator>
         </NavigationContainer>
     );

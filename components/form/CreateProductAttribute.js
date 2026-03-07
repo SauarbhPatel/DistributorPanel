@@ -148,44 +148,6 @@ const CreateProductAttribute = ({
         if (!validateForm()) return;
         updateState({ loading: true });
 
-        console.log({
-            name: attributeName,
-            code: code,
-            abbreviation: abbreviation,
-            description: description,
-            type: attributeType,
-            status: status,
-            scope: scope,
-            ...(attributeType === "TEXT" &&
-                characterLimit != null &&
-                characterLimit != "" && {
-                    characterLimit: Number(characterLimit),
-                }),
-
-            ...(["NUMBER", "UNIT_RANGE"].includes(attributeType) &&
-                minRangeValue != null &&
-                minRangeValue != "" && {
-                    minRangeValue: Number(minRangeValue),
-                }),
-            ...(["NUMBER", "UNIT_RANGE"].includes(attributeType) &&
-                maxRangeValue != null &&
-                maxRangeValue != "" && {
-                    maxRangeValue: Number(maxRangeValue),
-                }),
-            ...(attributeType === "UNIT_RANGE" &&
-                unit != null &&
-                unit != "" && { unit: unit }),
-            //
-            isFilterable: isFilterable,
-            isVariant: isVariant,
-            isSearchable: isSearchable,
-            isSortable: isSortable,
-            isComparable: isComparable,
-            isVisibleOnFrontend: isVisibleOnFrontend,
-            isEditableAfterApproval: isEditableAfterApproval,
-            isActive: isActive,
-        });
-
         __postApiData("/productAttributes/createAttribute", {
             name: attributeName,
             code: code,
@@ -385,9 +347,9 @@ const CreateProductAttribute = ({
                             placeholder={"Select Data type"}
                             list={[
                                 "TEXT",
-                                "SELECT",
+                                // "SELECT",
                                 "NUMBER",
-                                "CHECKBOX",
+                                // "CHECKBOX",
                                 "BOOLEAN",
                                 "FILE",
                                 "DATE",
