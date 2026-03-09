@@ -104,6 +104,13 @@ import Onboarding from "./screens/manufacturers/onboarding";
 import OnboardingDetails from "./screens/manufacturers/onboardingDetails";
 import AllMaster from "./screens/master/AllMaster";
 import UomMaster from "./screens/master/uomMaster";
+import OrderHub from "./screens/orderHub/orderHub";
+import OrdersManagement from "./screens/orderHub/OrdersManagement";
+import AbandonedOrders from "./screens/orderHub/AbandonedOrders";
+import B2BOrders from "./screens/orderHub/B2BOrders";
+import CurrencyMaster from "./screens/master/CurrencyMaster";
+import PaymentMethodsMaster from "./screens/master/PaymentMethodsMaster";
+import CheckoutTemplates from "./screens/master/CheckoutTemplates";
 
 LogBox.ignoreAllLogs();
 
@@ -378,6 +385,28 @@ function App() {
                 />
                 <Stack.Screen name="AllMaster" component={AllMaster} />
                 <Stack.Screen name="UomMaster" component={UomMaster} />
+                <Stack.Screen
+                    name="CurrencyMaster"
+                    component={CurrencyMaster}
+                />
+                <Stack.Screen
+                    name="PaymentMethodsMaster"
+                    component={PaymentMethodsMaster}
+                />
+                <Stack.Screen
+                    name="CheckoutTemplates"
+                    component={CheckoutTemplates}
+                />
+                <Stack.Screen name="OrderHub" component={OrderHub} />
+                <Stack.Screen
+                    name="OrdersManagement"
+                    component={OrdersManagement}
+                />
+                <Stack.Screen
+                    name="AbandonedOrders"
+                    component={AbandonedOrders}
+                />
+                <Stack.Screen name="B2BOrders" component={B2BOrders} />
             </Stack.Navigator>
         </NavigationContainer>
     );
