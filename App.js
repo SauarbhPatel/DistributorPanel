@@ -111,6 +111,16 @@ import B2BOrders from "./screens/orderHub/B2BOrders";
 import CurrencyMaster from "./screens/master/CurrencyMaster";
 import PaymentMethodsMaster from "./screens/master/PaymentMethodsMaster";
 import CheckoutTemplates from "./screens/master/CheckoutTemplates";
+import SlaSetting from "./screens/slaSetting/slaSetting";
+import SlaPolicyBuilder from "./screens/slaSetting/slaPolicyBuilder";
+import SlaMilestoneDropdownOptions from "./screens/slaSetting/slaMilestoneDropdownOptions";
+import SlaRulesAndPriority from "./screens/slaSetting/slaRulesAndPriority";
+import SlaPolicyBuilderDetails from "./screens/slaSetting/slaPolicyBuilderDetails";
+import SlaCourierCut from "./screens/slaSetting/slaCourierCut";
+import SlaHolidayWorkingHours from "./screens/slaSetting/slaHolidayWorkingHours";
+import SlaBreachQueue from "./screens/slaSetting/slaBreachQueue";
+import SlaRewardAndPenalty from "./screens/slaSetting/slaRewardAndPenalty";
+import SlaGenerateReport from "./screens/slaSetting/slaGenerateReport";
 
 LogBox.ignoreAllLogs();
 
@@ -407,6 +417,40 @@ function App() {
                     component={AbandonedOrders}
                 />
                 <Stack.Screen name="B2BOrders" component={B2BOrders} />
+                <Stack.Screen name="SlaSetting" component={SlaSetting} />
+                <Stack.Screen
+                    name="SlaPolicyBuilder"
+                    component={SlaPolicyBuilder}
+                />
+                <Stack.Screen
+                    name="SlaPolicyBuilderDetails"
+                    component={SlaPolicyBuilderDetails}
+                />
+                <Stack.Screen
+                    name="SlaMilestoneDropdownOptions"
+                    component={SlaMilestoneDropdownOptions}
+                />
+                <Stack.Screen
+                    name="SlaRulesAndPriority"
+                    component={SlaRulesAndPriority}
+                />
+                <Stack.Screen name="SlaCourierCut" component={SlaCourierCut} />
+                <Stack.Screen
+                    name="SlaHolidayWorkingHours"
+                    component={SlaHolidayWorkingHours}
+                />
+                <Stack.Screen
+                    name="SlaBreachQueue"
+                    component={SlaBreachQueue}
+                />
+                <Stack.Screen
+                    name="SlaRewardAndPenalty"
+                    component={SlaRewardAndPenalty}
+                />
+                <Stack.Screen
+                    name="SlaGenerateReport"
+                    component={SlaGenerateReport}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );

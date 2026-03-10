@@ -180,6 +180,7 @@ const CreateHSNcode = ({ onClose = () => {}, isEdit = false, item = null }) => {
                             }}
                             inputCustomStyle={inputStyle}
                             customStyle={{ flex: 1 }}
+                            keyboardType="number-pad"
                         />
                     </View>
                     <TextAreaBox

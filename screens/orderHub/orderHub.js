@@ -27,7 +27,7 @@ const PRODUCT_MENU = [
     {
         title: "SLA Settings",
         icon: "schedule", // Clock icon
-        screen: "SLASettings",
+        screen: "SlaSetting",
     },
     {
         title: "Abandoned Orders",
