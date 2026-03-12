@@ -11,12 +11,12 @@ const SlaHeader = ({
     buttonName,
     status,
     stats = [],
+    openBreachQueueButton = false,
+    settingsButton = false,
+    colors = ["#3f51b5", "#4da3ff"],
 }) => {
     return (
-        <LinearGradient
-            colors={["#3f51b5", "#4da3ff"]}
-            style={styles.bannerCard}
-        >
+        <LinearGradient colors={colors} style={styles.bannerCard}>
             <View style={styles.bannerCircle1} />
             <View style={styles.bannerCircle2} />
 
@@ -51,6 +51,24 @@ const SlaHeader = ({
                         <Text style={styles.setupText}>{buttonName}</Text>
                     </TouchableOpacity>
                 )}
+                {openBreachQueueButton && (
+                    <TouchableOpacity
+                        style={styles.setupBtn}
+                        activeOpacity={0.8}
+                    >
+                        <Feather name="inbox" size={20} color="#3f51b5" />
+                        <Text style={styles.setupText}>Open breach queue</Text>
+                        <Feather name="arrow-right" size={20} color="#3f51b5" />
+                    </TouchableOpacity>
+                )}
+                {settingsButton && (
+                    <TouchableOpacity style={styles.status} activeOpacity={0.8}>
+                        <Feather name="settings" size={16} color="#ffffff" />
+                        <Text style={[styles.setupText, { color: "#ffffff" }]}>
+                            Settings
+                        </Text>
+                    </TouchableOpacity>
+                )}
             </View>
             {stats.length > 0 && (
                 <View style={styles.statsContainer}>
@@ -65,9 +83,11 @@ const SlaHeader = ({
                                         style={{ marginRight: 8 }}
                                     />
                                 )}
-                                <Text style={styles.statValue}>
-                                    {item.value}
-                                </Text>
+                                {item.value && (
+                                    <Text style={styles.statValue}>
+                                        {item.value}
+                                    </Text>
+                                )}
                                 <Text style={styles.statLabel}>
                                     {item.label}
                                 </Text>

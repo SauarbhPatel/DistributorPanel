@@ -8,7 +8,12 @@ import {
 } from "react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
 
-const SearchFilterBar = ({ onSearch, onStatusPress, onReset }) => {
+const SearchFilterBar = ({
+    onSearch,
+    onStatusPress,
+    onReset,
+    Severity = false,
+}) => {
     const [searchValue, setSearchValue] = useState("");
 
     return (
@@ -36,6 +41,17 @@ const SearchFilterBar = ({ onSearch, onStatusPress, onReset }) => {
                 </View>
             </View>
 
+            <View style={styles.statusContainer}>
+                <Text style={styles.label}>SEVERITY</Text>
+                <TouchableOpacity
+                    style={styles.dropdown}
+                    onPress={onStatusPress}
+                    activeOpacity={0.7}
+                >
+                    <Text style={styles.dropdownText}>All Severity</Text>
+                    <Feather name="chevron-down" size={18} color="#94a3b8" />
+                </TouchableOpacity>
+            </View>
             <View
                 style={{
                     flexDirection: "row",

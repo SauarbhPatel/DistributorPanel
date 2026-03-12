@@ -121,6 +121,10 @@ import SlaHolidayWorkingHours from "./screens/slaSetting/slaHolidayWorkingHours"
 import SlaBreachQueue from "./screens/slaSetting/slaBreachQueue";
 import SlaRewardAndPenalty from "./screens/slaSetting/slaRewardAndPenalty";
 import SlaGenerateReport from "./screens/slaSetting/slaGenerateReport";
+import SlaDashboard from "./screens/slaSetting/slaDashboard";
+import SlaMySlaDashboard from "./screens/slaSetting/slaMySlaDashboard";
+import SlaOrdersAtRisk from "./screens/slaSetting/slaOrdersAtRisk";
+import SlaBreachedOrders from "./screens/slaSetting/slaBreachedOrders";
 
 LogBox.ignoreAllLogs();
 
@@ -450,6 +454,19 @@ function App() {
                 <Stack.Screen
                     name="SlaGenerateReport"
                     component={SlaGenerateReport}
+                />
+                <Stack.Screen name="SlaDashboard" component={SlaDashboard} />
+                <Stack.Screen
+                    name="SlaMySlaDashboard"
+                    component={SlaMySlaDashboard}
+                />
+                <Stack.Screen
+                    name="SlaOrdersAtRisk"
+                    component={SlaOrdersAtRisk}
+                />
+                <Stack.Screen
+                    name="SlaBreachedOrders"
+                    component={SlaBreachedOrders}
                 />
             </Stack.Navigator>
         </NavigationContainer>

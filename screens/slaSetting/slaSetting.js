@@ -67,7 +67,7 @@ const SlaSetting = ({ navigation }) => {
                         {stats.map((item, index) => statCard(item, index))}
                     </View>
                     <SlaAdminConfigCards navigation={navigation} />
-                    <SlaSellerPanelCards />
+                    <SlaSellerPanelCards navigation={navigation} />
                     <SlaEngineInfoCard />
                 </ScrollView>
             </View>

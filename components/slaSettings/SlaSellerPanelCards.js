@@ -30,6 +30,7 @@ const cards = [
         ),
         color: "#FA5252",
         count: 3,
+        path: "SlaMySlaDashboard",
     },
     {
         title: "At-Risk Orders",
@@ -44,6 +45,7 @@ const cards = [
         ),
         color: "#059669",
         count: 2,
+        path: "SlaOrdersAtRisk",
     },
 
     {
@@ -58,10 +60,11 @@ const cards = [
         ),
         color: "#BE4BDB",
         count: 3,
+        path: "SlaBreachedOrders",
     },
 ];
 
-const SlaSellerPanelCards = () => {
+const SlaSellerPanelCards = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.heading}>
@@ -99,6 +102,9 @@ const SlaSellerPanelCards = () => {
                                     flexDirection: "row",
                                     alignItems: "center",
                                 }}
+                                onPress={() =>
+                                    item?.path && navigation.push(item?.path)
+                                }
                             >
                                 <Text
                                     style={[

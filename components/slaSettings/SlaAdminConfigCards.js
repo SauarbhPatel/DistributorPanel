@@ -100,6 +100,7 @@ const cards = [
         ),
         color: "#FA5252",
         count: 3,
+        path: "SlaDashboard",
     },
     {
         title: "SLA Breach Queue",
