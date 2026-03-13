@@ -458,6 +458,20 @@ const CustomDrawer = (props) => {
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
+                            onPress={() =>
+                                props.navigation.push("MarketinDashboard")
+                            }
+                        >
+                            <Text
+                                style={{
+                                    marginVertical: Sizes.fixPadding - 5.0,
+                                    ...Fonts.grayColor14SemiBold,
+                                }}
+                            >
+                                {getLocalizedString("Marketing Dashboard")}
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
                             onPress={() => props.navigation.push("RawMaterial")}
                         >
                             <Text

@@ -125,6 +125,8 @@ import SlaDashboard from "./screens/slaSetting/slaDashboard";
 import SlaMySlaDashboard from "./screens/slaSetting/slaMySlaDashboard";
 import SlaOrdersAtRisk from "./screens/slaSetting/slaOrdersAtRisk";
 import SlaBreachedOrders from "./screens/slaSetting/slaBreachedOrders";
+import MarketinDashboard from "./screens/marketinDashboard/marketinDashboard";
+import MarketingGoogle from "./screens/marketinDashboard/marketingGoogle";
 
 LogBox.ignoreAllLogs();
 
@@ -421,6 +423,8 @@ function App() {
                     component={AbandonedOrders}
                 />
                 <Stack.Screen name="B2BOrders" component={B2BOrders} />
+
+                {/* SLA Settings */}
                 <Stack.Screen name="SlaSetting" component={SlaSetting} />
                 <Stack.Screen
                     name="SlaPolicyBuilder"
@@ -467,6 +471,15 @@ function App() {
                 <Stack.Screen
                     name="SlaBreachedOrders"
                     component={SlaBreachedOrders}
+                />
+                {/* Marketing */}
+                <Stack.Screen
+                    name="MarketinDashboard"
+                    component={MarketinDashboard}
+                />
+                <Stack.Screen
+                    name="MarketingGoogle"
+                    component={MarketingGoogle}
                 />
             </Stack.Navigator>
         </NavigationContainer>

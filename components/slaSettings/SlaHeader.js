@@ -13,6 +13,9 @@ const SlaHeader = ({
     stats = [],
     openBreachQueueButton = false,
     settingsButton = false,
+    goToAppSetup = false,
+    isShowProgress = false,
+    progress = 0,
     colors = ["#3f51b5", "#4da3ff"],
 }) => {
     return (
@@ -100,8 +103,36 @@ const SlaHeader = ({
                     ))}
                 </View>
             )}
+
+            {goToAppSetup && (
+                <View style={styles.bannerInner}>
+                    <Text style={styles.bannerInnerText}>
+                        Create a Marketing Workspace first in App Setup to
+                        unlock connections and campaigns.
+                    </Text>
+
+                    <TouchableOpacity style={styles.setupBtn}>
+                        <Text style={styles.setupText}>Go to App Setup</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+            {progressBar()}
         </LinearGradient>
     );
+
+    function progressBar() {
+        if (!isShowProgress) return null;
+        return (
+            <View style={styles.progressContainer}>
+                <View style={styles.progressTrack}>
+                    <View
+                        style={[styles.progressFill, { width: `${progress}%` }]}
+                    />
+                </View>
+                <Text style={styles.progressText}>{progress}% Complete</Text>
+            </View>
+        );
+    }
 };
 
 const styles = StyleSheet.create({
@@ -224,6 +255,50 @@ const styles = StyleSheet.create({
         height: 25,
         backgroundColor: "rgba(255,255,255,0.3)",
         marginHorizontal: 15,
+    },
+    bannerInner: {
+        marginTop: Sizes.fixPadding * 2,
+        backgroundColor: "rgba(255,255,255,0.15)",
+        padding: Sizes.fixPadding,
+        borderRadius: 10,
+    },
+
+    bannerInnerText: {
+        ...Fonts.whiteColor12Medium,
+        marginBottom: Sizes.fixPadding,
+    },
+
+    setupBtn: {
+        alignSelf: "flex-start",
+        backgroundColor: "#fff",
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        borderRadius: 6,
+    },
+    progressContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 14,
+        gap: 10,
+    },
+    progressTrack: {
+        flex: 1,
+        height: 6,
+        backgroundColor: "rgba(255,255,255,0.3)",
+        borderRadius: 10,
+        overflow: "hidden",
+    },
+    progressFill: {
+        height: "100%",
+        backgroundColor: "#ffffff",
+        borderRadius: 10,
+    },
+    progressText: {
+        fontSize: 12,
+        fontWeight: "600",
+        color: "#ffffff",
+        minWidth: 80,
+        textAlign: "right",
     },
 });
 
