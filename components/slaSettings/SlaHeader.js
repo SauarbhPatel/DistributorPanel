@@ -15,6 +15,7 @@ const SlaHeader = ({
     settingsButton = false,
     goToAppSetup = false,
     isShowProgress = false,
+    isShowFeed = false,
     progress = 0,
     colors = ["#3f51b5", "#4da3ff"],
 }) => {
@@ -26,7 +27,47 @@ const SlaHeader = ({
             {headerIcon ? (
                 <View style={styles.headerTop}>
                     <View style={styles.iconContainer}>{headerIcon}</View>
-                    <Text style={styles.bannerTitle}>{title}</Text>
+                    <View>
+                        <Text style={styles.bannerTitle}>{title}</Text>
+                        {isShowFeed && (
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    gap: 10,
+                                    alignItems: "center",
+                                }}
+                            >
+                                <View
+                                    style={{
+                                        alignItems: "center",
+                                        backgroundColor:
+                                            "rgba(255, 255, 255, 0.2)",
+                                        paddingHorizontal: 5,
+                                        paddingVertical: 2,
+                                        borderRadius: 5,
+                                    }}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text
+                                        style={{
+                                            fontSize: 11,
+                                            color: "#ffffff",
+                                        }}
+                                    >
+                                        Feed Management
+                                    </Text>
+                                </View>
+                                <Text
+                                    style={{
+                                        fontSize: 11,
+                                        color: "rgba(255, 255, 255, 0.9)",
+                                    }}
+                                >
+                                    5 products synced
+                                </Text>
+                            </View>
+                        )}
+                    </View>
                 </View>
             ) : (
                 <Text style={styles.bannerTitle}>{title}</Text>
