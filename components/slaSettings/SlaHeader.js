@@ -2,7 +2,12 @@ import React from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Fonts, Sizes } from "../../constants/styles";
 import { LinearGradient } from "expo-linear-gradient";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+    AntDesign,
+    Feather,
+    Ionicons,
+    MaterialCommunityIcons,
+} from "@expo/vector-icons";
 
 const SlaHeader = ({
     headerIcon,
@@ -21,6 +26,11 @@ const SlaHeader = ({
     colors = ["#3f51b5", "#4da3ff"],
     property = null,
     propertyID = null,
+    linkName = null,
+    buttonsCommponend = <></>,
+    syncButton = false,
+    feedButton = false,
+    reportButton = false,
 }) => {
     return (
         <LinearGradient colors={colors} style={styles.bannerCard}>
@@ -151,9 +161,63 @@ const SlaHeader = ({
                         <Text style={styles.statusText}>{status}</Text>
                     </TouchableOpacity>
                 )}
+                {linkName && (
+                    <TouchableOpacity
+                        style={[
+                            styles.status,
+                            {
+                                backgroundColor: "#ffffff20",
+                                borderColor: "#ffffff40",
+                            },
+                        ]}
+                        activeOpacity={0.8}
+                    >
+                        <Feather name="plus-circle" size={20} color="#ffffff" />
+
+                        <Text style={styles.statusText}>{linkName}</Text>
+                    </TouchableOpacity>
+                )}
+                {syncButton && (
+                    <TouchableOpacity
+                        style={[
+                            styles.status,
+                            {
+                                backgroundColor: "#ffffff20",
+                                borderColor: "#ffffff40",
+                            },
+                        ]}
+                        activeOpacity={0.8}
+                    >
+                        <AntDesign name="sync" size={15} color="#ffffff" />
+
+                        <Text style={styles.statusText}>{"Sync Feed"}</Text>
+                    </TouchableOpacity>
+                )}
+                {feedButton && (
+                    <TouchableOpacity
+                        style={[styles.setupBtn, { marginTop: 0 }]}
+                        activeOpacity={0.8}
+                    >
+                        <Feather name="link" size={15} color="#3f51b5" />
+                        <Text style={styles.setupText}>Feed URL</Text>
+                    </TouchableOpacity>
+                )}
+                {reportButton && (
+                    <TouchableOpacity
+                        style={[styles.setupBtn, { marginTop: 0 }]}
+                        activeOpacity={0.8}
+                    >
+                        <Ionicons
+                            name="document-text-outline"
+                            size={15}
+                            color="#3f51b5"
+                        />
+                        <Text style={styles.setupText}>Validation Report</Text>
+                    </TouchableOpacity>
+                )}
                 {buttonName && (
                     <TouchableOpacity
-                        style={styles.setupBtn}
+                        style={[styles.setupBtn]}
                         activeOpacity={0.8}
                     >
                         <Feather name="plus-circle" size={20} color="#3f51b5" />
@@ -162,7 +226,7 @@ const SlaHeader = ({
                 )}
                 {openBreachQueueButton && (
                     <TouchableOpacity
-                        style={styles.setupBtn}
+                        style={[styles.setupBtn]}
                         activeOpacity={0.8}
                     >
                         <Feather name="inbox" size={20} color="#3f51b5" />
@@ -217,7 +281,7 @@ const SlaHeader = ({
                         unlock connections and campaigns.
                     </Text>
 
-                    <TouchableOpacity style={styles.setupBtn}>
+                    <TouchableOpacity style={styles.gosetupBtn}>
                         <Text style={styles.setupText}>Go to App Setup</Text>
                     </TouchableOpacity>
                 </View>
@@ -373,7 +437,7 @@ const styles = StyleSheet.create({
         marginBottom: Sizes.fixPadding,
     },
 
-    setupBtn: {
+    gosetupBtn: {
         alignSelf: "flex-start",
         backgroundColor: "#fff",
         paddingHorizontal: 14,

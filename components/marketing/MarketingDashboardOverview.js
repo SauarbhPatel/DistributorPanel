@@ -38,6 +38,7 @@ const marketingChannels = [
         icon: "instagram",
         colors: ["#F6339A", "#9810FA"],
         type: "feather",
+        path: "MarketingMeta",
     },
     {
         id: "4",

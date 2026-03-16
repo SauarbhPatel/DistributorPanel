@@ -1,9 +1,13 @@
 import React from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
-import { Feather, MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
-const ConversionSetupCard = () => {
+const ConversionSetupCard = ({
+    title = "Finish conversion measurement setup",
+    subTitle = "Complete the conversion measurement flow to enable ad creation and unlock advanced campaign analytics.",
+    isShowButton = true,
+}) => {
     return (
         <View style={styles.container}>
             {/* Warning Banner */}
@@ -11,7 +15,12 @@ const ConversionSetupCard = () => {
                 <View style={styles.orangeLeftAccent} />
 
                 <View style={styles.bannerContent}>
-                    <View style={styles.headerRow}>
+                    <View
+                        style={[
+                            styles.headerRow,
+                            !isShowButton && { marginBottom: 0 },
+                        ]}
+                    >
                         <View style={styles.warningIconBox}>
                             <Ionicons
                                 name="alert-circle-outline"
@@ -20,56 +29,56 @@ const ConversionSetupCard = () => {
                             />
                         </View>
                         <View style={styles.textContainer}>
-                            <Text style={styles.bannerTitle}>
-                                Finish conversion measurement setup
-                            </Text>
+                            <Text style={styles.bannerTitle}>{title}</Text>
                             <Text style={styles.bannerDescription}>
-                                Complete the conversion measurement flow to
-                                enable ad creation and unlock advanced campaign
-                                analytics.
+                                {subTitle}
                             </Text>
                         </View>
                     </View>
 
-                    <TouchableOpacity
-                        style={styles.setupButton}
-                        activeOpacity={0.8}
-                    >
-                        <Text style={styles.setupButtonText}>
-                            Set up conversion measurement
-                        </Text>
-                        <Feather
-                            name="external-link"
-                            size={14}
-                            color="#7c2d12"
-                        />
-                    </TouchableOpacity>
+                    {isShowButton && (
+                        <TouchableOpacity
+                            style={styles.setupButton}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={styles.setupButtonText}>
+                                Set up conversion measurement
+                            </Text>
+                            <Feather
+                                name="external-link"
+                                size={14}
+                                color="#7c2d12"
+                            />
+                        </TouchableOpacity>
+                    )}
                 </View>
             </View>
 
             {/* Action Buttons Row */}
-            <View style={styles.actionRow}>
-                <TouchableOpacity style={styles.manageButton}>
-                    <Feather name="menu" size={18} color="#1e293b" />
-                    <Text style={styles.manageButtonText}>
-                        Manage existing ads
-                    </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity activeOpacity={0.9}>
-                    <LinearGradient
-                        colors={["#2563eb", "#3b82f6"]}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.createButton}
-                    >
-                        <Feather name="plus" size={18} color="#fff" />
-                        <Text style={styles.createButtonText}>
-                            Create new ad
+            {isShowButton && (
+                <View style={styles.actionRow}>
+                    <TouchableOpacity style={styles.manageButton}>
+                        <Feather name="menu" size={18} color="#1e293b" />
+                        <Text style={styles.manageButtonText}>
+                            Manage existing ads
                         </Text>
-                    </LinearGradient>
-                </TouchableOpacity>
-            </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity activeOpacity={0.9}>
+                        <LinearGradient
+                            colors={["#2563eb", "#3b82f6"]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.createButton}
+                        >
+                            <Feather name="plus" size={18} color="#fff" />
+                            <Text style={styles.createButtonText}>
+                                Create new ad
+                            </Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </View>
+            )}
         </View>
     );
 };
@@ -80,7 +89,7 @@ const styles = StyleSheet.create({
         paddingTop: 15,
     },
     bannerContainer: {
-        backgroundColor: "#fff7ed", // Very light orange
+        backgroundColor: "#fff7ed",
         borderRadius: 12,
         borderWidth: 1,
         borderColor: "#fed7aa",

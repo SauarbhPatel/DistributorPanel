@@ -5,14 +5,13 @@ import { AntDesign, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 const GoogleHeader = ({
     title = "Google & YouTube Marketing",
     subTitle = "Overview - Marketplace Admin",
+    icon = <AntDesign name="youtube" size={26} color="white" />,
 }) => {
     return (
         <View style={styles.container}>
             {/* Top Row: Icon and Titles */}
             <View style={styles.headerRow}>
-                <View style={styles.iconContainer}>
-                    <AntDesign name="youtube" size={26} color="white" />
-                </View>
+                <View style={styles.iconContainer}>{icon}</View>
                 <View style={styles.titleContainer}>
                     <Text style={styles.mainTitle}>{title}</Text>
                     <Text style={styles.subTitle}>{subTitle}</Text>
