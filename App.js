@@ -127,6 +127,7 @@ import SlaOrdersAtRisk from "./screens/slaSetting/slaOrdersAtRisk";
 import SlaBreachedOrders from "./screens/slaSetting/slaBreachedOrders";
 import MarketinDashboard from "./screens/marketinDashboard/marketinDashboard";
 import MarketingGoogle from "./screens/marketinDashboard/marketingGoogle";
+import MarketingGoogleAnalytics from "./screens/marketinDashboard/marketingGoogleAnalytics";
 
 LogBox.ignoreAllLogs();
 
@@ -480,6 +481,10 @@ function App() {
                 <Stack.Screen
                     name="MarketingGoogle"
                     component={MarketingGoogle}
+                />
+                <Stack.Screen
+                    name="MarketingGoogleAnalytics"
+                    component={MarketingGoogleAnalytics}
                 />
             </Stack.Navigator>
         </NavigationContainer>

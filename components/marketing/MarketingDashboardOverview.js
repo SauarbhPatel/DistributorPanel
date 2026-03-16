@@ -29,6 +29,7 @@ const marketingChannels = [
         icon: "bar-chart-2",
         colors: ["#1864ab", "#1864ab"],
         type: "feather",
+        path: "MarketingGoogleAnalytics",
     },
     {
         id: "3",

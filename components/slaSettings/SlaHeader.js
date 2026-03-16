@@ -16,13 +16,43 @@ const SlaHeader = ({
     goToAppSetup = false,
     isShowProgress = false,
     isShowFeed = false,
+    isLiveShow = false,
     progress = 0,
     colors = ["#3f51b5", "#4da3ff"],
+    property = null,
+    propertyID = null,
 }) => {
     return (
         <LinearGradient colors={colors} style={styles.bannerCard}>
             <View style={styles.bannerCircle1} />
             <View style={styles.bannerCircle2} />
+            {isLiveShow && (
+                <TouchableOpacity
+                    style={[
+                        styles.status,
+                        {
+                            backgroundColor: "rgba(0, 201, 80, 0.2)",
+                            borderColor: "rgba(5, 223, 114, 0.3)",
+                            position: "absolute",
+                            top: 10,
+                            right: 10,
+                        },
+                    ]}
+                    activeOpacity={0.8}
+                >
+                    <View
+                        style={{
+                            width: 8,
+                            height: 8,
+                            backgroundColor: "#05DF72",
+                            borderRadius: 10,
+                        }}
+                    />
+                    <Text style={[styles.setupText, { color: "#ffffff" }]}>
+                        Live
+                    </Text>
+                </TouchableOpacity>
+            )}
 
             {headerIcon ? (
                 <View style={styles.headerTop}>
@@ -79,8 +109,43 @@ const SlaHeader = ({
                     flexDirection: "row",
                     alignItems: "center",
                     gap: 10,
+                    flexWrap: "wrap",
+                    marginTop: 15,
                 }}
             >
+                {property && (
+                    <TouchableOpacity style={styles.status} activeOpacity={0.8}>
+                        <View>
+                            <Text
+                                style={{
+                                    fontSize: 9,
+                                    fontWeight: "600",
+                                    color: "#ffffff90",
+                                }}
+                            >
+                                Property
+                            </Text>
+                            <Text style={styles.statusText}>{property}</Text>
+                        </View>
+                    </TouchableOpacity>
+                )}
+                {propertyID && (
+                    <TouchableOpacity style={styles.status} activeOpacity={0.8}>
+                        <View>
+                            <Text
+                                style={{
+                                    fontSize: 9,
+                                    fontWeight: "600",
+                                    color: "#ffffff90",
+                                }}
+                            >
+                                Property ID
+                            </Text>
+                            <Text style={styles.statusText}>{propertyID}</Text>
+                        </View>
+                    </TouchableOpacity>
+                )}
+
                 {status && (
                     <TouchableOpacity style={styles.status} activeOpacity={0.8}>
                         <Text style={styles.statusText}>{status}</Text>
@@ -201,7 +266,6 @@ const styles = StyleSheet.create({
         alignSelf: "flex-start",
         borderColor: "#fff",
         paddingVertical: 8,
-        marginTop: 15,
         flexDirection: "row",
         gap: 5,
         alignItems: "center",

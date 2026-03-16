@@ -44,6 +44,20 @@ import ProductList from "../../components/marketing/ProductList";
 import CampaignsTabs from "../../components/marketing/CampaignsTabs";
 import ConversionSetupCard from "../../components/marketing/ConversionSetupCard";
 import ProductSelectionGrid from "../../components/marketing/ProductSelectionGrid";
+import RBACPermissions from "../../components/marketing/RBACPermissions";
+import SpendLimitsSafeguards from "../../components/marketing/SpendLimitsSafeguards";
+import LoggingAudit from "../../components/marketing/LoggingAudit";
+import GoogleAccountCard from "../../components/marketing/GoogleAccountCard";
+import ConversionMeasurement from "../../components/marketing/ConversionMeasurement";
+import QuickStats from "../../components/marketing/QuickStats";
+import SupportCardsBox from "../../components/marketing/SupportCardsBox";
+import DemoSetupGuide from "../../components/marketing/DemoSetupGuide";
+import GettingStarted from "../../components/marketing/GettingStarted";
+import GoogleAndYoutube from "../../components/marketing/GoogleAndYoutube";
+import ProductSyncing from "../../components/marketing/ProductSyncing";
+import TroubleshootingLibrary from "../../components/marketing/TroubleshootingLibrary";
+import DiagnosticsExport from "../../components/marketing/DiagnosticsExport";
+import ContactSupport from "../../components/marketing/ContactSupport";
 
 const { width } = Dimensions.get("window");
 
@@ -197,6 +211,55 @@ const MarketingGoogle = ({ navigation }) => {
                                 />
                                 <ConversionSetupCard />
                                 <ProductSelectionGrid />
+                            </View>
+                        </>
+                    )}
+                    {activeTab == "settings" && (
+                        <>
+                            <View style={{ marginHorizontal: 10 }}>
+                                <SlaHeader
+                                    headerIcon={
+                                        <MaterialCommunityIcons
+                                            name="lock-outline"
+                                            size={24}
+                                            color="#fff"
+                                        />
+                                    }
+                                    title={"Settings"}
+                                    subTitle="RBAC and seller permissions, spend limits and safeguards, logging and audit."
+                                />
+                                <RBACPermissions />
+                                <SpendLimitsSafeguards />
+                                <LoggingAudit />
+                                <GoogleAccountCard />
+                                <ConversionMeasurement />
+                                <QuickStats />
+                            </View>
+                        </>
+                    )}
+                    {activeTab == "help" && (
+                        <>
+                            <View style={{ marginHorizontal: 10 }}>
+                                <SlaHeader
+                                    colors={["#0092B8", "#155DFC", "#4F39F6"]}
+                                    headerIcon={
+                                        <MaterialCommunityIcons
+                                            name="lightbulb-outline"
+                                            size={24}
+                                            color="#fff"
+                                        />
+                                    }
+                                    title={"Help Centre"}
+                                    subTitle="Demo/test setup guides, troubleshooting resources, and diagnostics export tools."
+                                />
+                                <SupportCardsBox />
+                                <DemoSetupGuide />
+                                <GettingStarted />
+                                <GoogleAndYoutube />
+                                <ProductSyncing />
+                                <TroubleshootingLibrary />
+                                <DiagnosticsExport />
+                                <ContactSupport />
                             </View>
                         </>
                     )}

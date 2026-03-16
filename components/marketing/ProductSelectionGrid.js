@@ -155,7 +155,7 @@ const ProductSelectionGrid = () => {
 const styles = StyleSheet.create({
     mainContainer: {
         backgroundColor: "#fff",
-        borderRadius: 16,
+        borderRadius: 12,
         borderWidth: 1,
         borderColor: "#E2E8F0",
         overflow: "hidden",

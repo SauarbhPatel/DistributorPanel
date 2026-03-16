@@ -1,9 +1,11 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { AntDesign, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Colors, Sizes, Fonts } from "../../constants/styles"; // Adjust based on your path
 
-const GoogleHeader = () => {
+const GoogleHeader = ({
+    title = "Google & YouTube Marketing",
+    subTitle = "Overview - Marketplace Admin",
+}) => {
     return (
         <View style={styles.container}>
             {/* Top Row: Icon and Titles */}
@@ -12,12 +14,8 @@ const GoogleHeader = () => {
                     <AntDesign name="youtube" size={26} color="white" />
                 </View>
                 <View style={styles.titleContainer}>
-                    <Text style={styles.mainTitle}>
-                        Google & YouTube Marketing
-                    </Text>
-                    <Text style={styles.subTitle}>
-                        Overview - Marketplace Admin
-                    </Text>
+                    <Text style={styles.mainTitle}>{title}</Text>
+                    <Text style={styles.subTitle}>{subTitle}</Text>
                 </View>
             </View>
 
