@@ -16,6 +16,8 @@ import {
     Ionicons,
     MaterialCommunityIcons,
     Entypo,
+    AntDesign,
+    FontAwesome,
 } from "@expo/vector-icons";
 import CommonHeader from "../../components/common/CommonHeader";
 import GoogleHeader from "../../components/marketing/GoogleHeader";
@@ -46,10 +48,18 @@ import CreativesLibrary from "../../components/marketing/CreativesLibrary";
 import RulesAndAutomation from "../../components/marketing/RulesAndAutomation";
 import BillingDashboard from "../../components/marketing/BillingDashboard";
 import ActivityDashboard from "../../components/marketing/ActivityDashboard";
+import MetaAnalyticsTabs from "../../components/marketing/MetaAnalyticsTabs";
+import MetaAnalyticsStats from "../../components/marketing/MetaAnalyticsStats";
+import FunnelAnalytics from "../../components/marketing/FunnelAnalytics";
+import TopProductsByROAS from "../../components/marketing/TopProductsByROAS";
+import CampaignsDashboardList from "../../components/marketing/CampaignsDashboardList";
+import ProductPerformanceList from "../../components/marketing/ProductPerformanceList";
+import ProductTitleHeader from "../../components/marketing/ProductTitleHeader";
+import InsightStatsList from "../../components/marketing/InsightStatsList";
 
 const { width } = Dimensions.get("window");
 
-const MarketingMeta = ({ navigation }) => {
+const MarketingMetaAnalytics = ({ navigation }) => {
     const [state, setState] = useState({
         activeTab: "overview",
         campaignsTab: "list",
@@ -64,11 +74,14 @@ const MarketingMeta = ({ navigation }) => {
             <StatusBar backgroundColor={Colors.primaryColor} />
 
             <View style={{ flex: 1 }}>
-                <CommonHeader title={"Meta insta"} navigation={navigation} />
+                <CommonHeader
+                    title={"Meta Analytics"}
+                    navigation={navigation}
+                />
 
                 <ScrollView contentContainerStyle={styles.container}>
                     <GoogleHeader
-                        title="Meta Marketing"
+                        title="Meta Analytics"
                         subTitle="Real-time data (demo) · Marketplace Admin"
                         icon={
                             <MaterialCommunityIcons
@@ -78,7 +91,7 @@ const MarketingMeta = ({ navigation }) => {
                             />
                         }
                     />
-                    <MetaTabs
+                    <MetaAnalyticsTabs
                         activeTab={activeTab}
                         setActiveTab={(tab) => updateState({ activeTab: tab })}
                     />
@@ -88,81 +101,68 @@ const MarketingMeta = ({ navigation }) => {
                             <View style={{ marginHorizontal: 10 }}>
                                 <SlaHeader
                                     headerIcon={
-                                        <MaterialCommunityIcons
-                                            name="domino-mask"
+                                        <FontAwesome
+                                            name="bar-chart-o"
                                             size={24}
                                             color="white"
                                         />
                                     }
-                                    title={"Baofeng Meta Workspace"}
-                                    subTitle="Ad account: act_987654321  •  INR  •  Asia/Kolkata"
-                                    linkName="Open Meta Analytics"
+                                    title={"Meta Analytics"}
+                                    subTitle={`Performance by campaign, product, funnel, and attribution (demo).\nMeta Ads + Store Outcomes`}
+                                    linkName="Open Meta Marketing"
                                 />
-                                <MetaOverview />
-                                <NextStepsComponent />
-                                <RecentActivity />
-                                <PerformanceSummary />
-                                <MetaQuickActions />
+
+                                <MetaAnalyticsStats />
+                                <FunnelAnalytics />
+                                <TopProductsByROAS />
+                                <DemoModeBanner
+                                    title="Pro Tip: Attribution Analysis"
+                                    subTitle="Track your funnel conversion rates to identify drop-off points. Focus on optimizing stages with the highest abandonment for better ROAS."
+                                    buttonName="Learn more"
+                                    icon={
+                                        <Ionicons
+                                            name="sparkles-outline"
+                                            size={24}
+                                            color="white"
+                                        />
+                                    }
+                                    isShowLearnMore={false}
+                                    colors={["#00BC7D", "#00BBA7", "#00B8DB"]}
+                                />
                             </View>
                         </>
                     )}
-                    {activeTab == "connections" && (
-                        <>
-                            <View style={{ marginHorizontal: 10 }}>
-                                <WorkspaceDetails />
-                                <DomainVerification />
-                                <MetaPixelCard />
-                                <ProductCatalog />
-                            </View>
-                        </>
-                    )}
-                    {activeTab == "sync" && (
+                    {activeTab == "performance" && (
                         <>
                             <View style={{ marginHorizontal: 10 }}>
                                 <SlaHeader
                                     headerIcon={
-                                        <Ionicons
-                                            name="settings-outline"
+                                        <FontAwesome
+                                            name="bar-chart-o"
                                             size={24}
                                             color="white"
                                         />
                                     }
-                                    title={"Baofeng Product Catalog"}
-                                    subTitle="5 products from My Listings · Last sync: Never"
-                                    syncButton={true}
-                                    feedButton={true}
-                                    reportButton={true}
+                                    title={`Performance by Campaign\n/ Ad Set / Ad`}
+                                    subTitle={`Campaign-level metrics (demo). Filter by date, placement, seller.`}
                                 />
                                 <View style={{ height: 16 }} />
-                                <ProductTableHeader
-                                    title="Feed field mapping (demo)"
-                                    subTitle="Your product model → Meta required fields. Products from My Listings."
-                                />
-                                <ProductList />
-                                <ConversionSetupCard
-                                    title="Feed generation modes"
-                                    subTitle="Demo supports: Scheduled feed URL (hosted CSV/XML), Manual upload. In production add Push updates via API."
-                                    isShowButton={false}
-                                />
+
+                                <ProductTableHeader hideTitle hideSubTitle />
+                                <CampaignsDashboardList />
                             </View>
                         </>
                     )}
-                    {activeTab == "pixel" && (
+                    {activeTab == "product_performance" && (
                         <>
                             <View style={{ marginHorizontal: 10 }}>
-                                <MetaPixelDashboard />
-                                <ConversionsAPI />
-                                <StandardEventsMapping />
-                            </View>
-                        </>
-                    )}
-                    {activeTab == "audiences" && (
-                        <>
-                            <View style={{ marginHorizontal: 10 }}>
-                                <AllAudiences />
+                                <ProductTableHeader hideTitle hideSubTitle />
+                                <ProductTitleHeader />
+                                <ProductPerformanceList />
+                                <InsightStatsList />
                                 <DemoModeBanner
-                                    title="Pro Tip: Audience Optimization"
-                                    subTitle="Create lookalike audiences from your best-performing custom audiences to expand reach while maintaining quality."
+                                    title="Pro Tip: Product Optimization"
+                                    subTitle="Focus your ad spend on products with ROAS above 15.0. Consider pausing or optimizing products with ROAS below 10.0 to maximize overall campaign performance."
                                     buttonName="Learn more"
                                     icon={
                                         <Ionicons
@@ -172,74 +172,34 @@ const MarketingMeta = ({ navigation }) => {
                                         />
                                     }
                                     isShowLearnMore={false}
+                                    // colors={["#00BC7D", "#00BBA7", "#00B8DB"]}
                                 />
                             </View>
                         </>
                     )}
-                    {activeTab == "campaigns" && (
+                    {activeTab == "funnel" && (
                         <>
-                            <View style={{ marginHorizontal: 10 }}>
-                                <SlaHeader
-                                    headerIcon={
-                                        <MaterialCommunityIcons
-                                            name="bullhorn-variant-outline"
-                                            size={24}
-                                            color="white"
-                                        />
-                                    }
-                                    title={"Campaigns"}
-                                    subTitle="Create and manage campaigns: Sales (website conversions), Catalog sales, Traffic, Leads."
-                                    buttonName="Create campaign"
-                                />
-                                <ProductSelectionBanner />
-                                <DashboardStats />
-                                <CampaignDashboard />
-                                <DemoModeBanner
-                                    title="Pro Tip: Campaign Performance"
-                                    subTitle="Monitor your ROAS closely. A ROAS above 4.0 indicates profitable campaigns. Consider pausing or optimizing campaigns with ROAS below 2.0."
-                                    buttonName="Learn more"
-                                    icon={
-                                        <Ionicons
-                                            name="sparkles-outline"
-                                            size={24}
-                                            color="white"
-                                        />
-                                    }
-                                    isShowLearnMore={false}
-                                />
-                            </View>
+                            <View style={{ marginHorizontal: 10 }}></View>
                         </>
                     )}
-                    {activeTab == "creatives" && (
+                    {activeTab == "attribution_events" && (
                         <>
-                            <View style={{ marginHorizontal: 10 }}>
-                                <CreativesLibrary />
-                            </View>
+                            <View style={{ marginHorizontal: 10 }}></View>
                         </>
                     )}
-                    {activeTab == "rules" && (
+                    {activeTab == "cohorts" && (
                         <>
-                            <View style={{ marginHorizontal: 10 }}>
-                                <RulesAndAutomation />
-                            </View>
+                            <View style={{ marginHorizontal: 10 }}></View>
                         </>
                     )}
-                    {activeTab == "billing" && (
+                    {activeTab == "reports_builder" && (
                         <>
-                            <View style={{ marginHorizontal: 10 }}>
-                                <BillingDashboard />
-                            </View>
+                            <View style={{ marginHorizontal: 10 }}></View>
                         </>
                     )}
-                    {activeTab == "logs" && (
+                    {activeTab == "exports" && (
                         <>
-                            <View style={{ marginHorizontal: 10 }}>
-                                <SlaHeader
-                                    title={"Recent activity"}
-                                    subTitle="Audit log for integrations and campaigns (demo)."
-                                />
-                                <ActivityDashboard />
-                            </View>
+                            <View style={{ marginHorizontal: 10 }}></View>
                         </>
                     )}
                 </ScrollView>
@@ -255,4 +215,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default MarketingMeta;
+export default MarketingMetaAnalytics;

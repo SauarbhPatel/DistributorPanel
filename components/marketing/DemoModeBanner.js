@@ -3,47 +3,49 @@ import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
-const DemoModeBanner = () => {
+const DemoModeBanner = ({
+    title = "Demo Mode Active",
+    subTitle = "Connect GA4 and use the Analytics Data API for live production data.",
+    icon = <MaterialCommunityIcons name="pulse" size={20} color="#FFFFFF" />,
+    isShowLearnMore = true,
+    buttonName = "Connect GA4",
+    colors = ["#2B7FFF", "#AD46FF", "#F6339A"],
+}) => {
     return (
         <LinearGradient
-            colors={["#2B7FFF", "#AD46FF", "#F6339A"]} // Deep Navy to Indigo gradient
+            colors={colors}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.container}
         >
             {/* Header Section */}
             <View style={styles.header}>
-                <View style={styles.iconContainer}>
-                    <MaterialCommunityIcons
-                        name="pulse"
-                        size={20}
-                        color="#FFFFFF"
-                    />
-                </View>
-                <Text style={styles.headerTitle}>Demo Mode Active</Text>
+                <View style={styles.iconContainer}>{icon}</View>
+                <Text style={styles.headerTitle}>{title}</Text>
             </View>
 
             {/* Description Section */}
             <View>
                 <Text style={styles.description}>
-                    Connect GA4 and use the Analytics Data API for live
-                    production data.
-                    <TouchableOpacity>
-                        <Text style={styles.learnMore}>
-                            Learn more{" "}
-                            <Feather
-                                name="external-link"
-                                size={12}
-                                color="#FFFFFF"
-                            />
-                        </Text>
-                    </TouchableOpacity>
+                    {subTitle}
+                    {isShowLearnMore ? (
+                        <TouchableOpacity>
+                            <Text style={styles.learnMore}>
+                                Learn more{" "}
+                                <Feather
+                                    name="external-link"
+                                    size={12}
+                                    color="#FFFFFF"
+                                />
+                            </Text>
+                        </TouchableOpacity>
+                    ) : null}
                 </Text>
             </View>
 
             {/* Action Button */}
             <TouchableOpacity style={styles.downloadButton} activeOpacity={0.8}>
-                <Text style={styles.buttonText}>Connect GA4</Text>
+                <Text style={styles.buttonText}>{buttonName}</Text>
             </TouchableOpacity>
         </LinearGradient>
     );

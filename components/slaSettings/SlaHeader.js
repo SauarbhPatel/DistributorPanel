@@ -172,7 +172,11 @@ const SlaHeader = ({
                         ]}
                         activeOpacity={0.8}
                     >
-                        <Feather name="plus-circle" size={20} color="#ffffff" />
+                        <Feather
+                            name="external-link"
+                            size={18}
+                            color="#ffffff"
+                        />
 
                         <Text style={styles.statusText}>{linkName}</Text>
                     </TouchableOpacity>

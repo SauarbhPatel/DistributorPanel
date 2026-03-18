@@ -47,6 +47,7 @@ const marketingChannels = [
         icon: "facebook",
         colors: ["#155DFC", "#4F39F6"],
         type: "feather",
+        path: "MarketingMetaAnalytics",
     },
     {
         id: "5",

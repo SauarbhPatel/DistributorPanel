@@ -11,12 +11,16 @@ import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 const ProductTableHeader = ({
     title = "Product table",
     subTitle = "From My Listings (Inventory HUB). Columns: Image, id (SKU), title, price, availability, link / image_link, Status.",
+    hideTitle = false,
+    hideSubTitle = false,
 }) => {
     return (
         <View style={styles.cardContainer}>
-            <Text style={styles.titleText}>{title}</Text>
+            {!hideTitle && <Text style={styles.titleText}>{title}</Text>}
 
-            <Text style={styles.descriptionText}>{subTitle}</Text>
+            {!hideSubTitle && (
+                <Text style={styles.descriptionText}>{subTitle}</Text>
+            )}
 
             <View style={styles.searchContainer}>
                 <TextInput

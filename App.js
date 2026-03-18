@@ -129,6 +129,7 @@ import MarketinDashboard from "./screens/marketinDashboard/marketinDashboard";
 import MarketingGoogle from "./screens/marketinDashboard/marketingGoogle";
 import MarketingGoogleAnalytics from "./screens/marketinDashboard/marketingGoogleAnalytics";
 import MarketingMeta from "./screens/marketinDashboard/marketingMeta";
+import MarketingMetaAnalytics from "./screens/marketinDashboard/marketingMetaAnalytics";
 
 LogBox.ignoreAllLogs();
 
@@ -488,6 +489,10 @@ function App() {
                     component={MarketingGoogleAnalytics}
                 />
                 <Stack.Screen name="MarketingMeta" component={MarketingMeta} />
+                <Stack.Screen
+                    name="MarketingMetaAnalytics"
+                    component={MarketingMetaAnalytics}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );
