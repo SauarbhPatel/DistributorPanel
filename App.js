@@ -94,7 +94,7 @@ import MarketplacePolicies from "./screens/marketplacePolicies/marketplacePolici
 import RiskMonitoring from "./screens/riskMonitoring/riskMonitoring";
 import ReportsCompliance from "./screens/reportsCompliance/reportsCompliance";
 import AuditLogsCompliance from "./screens/auditLogsCompliance/auditLogsCompliance";
-import ShippingZones from "./screens/shippingZones/shippingZones";
+import ShippingZones from "./screens/shippingHub/shippingZones";
 import ShippingHub from "./screens/shippingHub/shippingHub";
 import ShippingMethods from "./screens/shippingHub/shippingMethods";
 import CourierPartners from "./screens/shippingHub/courierPartners";

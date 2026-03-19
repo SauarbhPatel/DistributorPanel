@@ -7,31 +7,16 @@ import {
     Dimensions,
 } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { __generateRandomString } from "../../utils/funtion";
 import { TouchableOpacity } from "react-native";
 import { __makeGetBlogGetRequest } from "../../utils/api";
 import { ScrollView } from "react-native";
+import SlaHeader from "../../components/slaSettings/SlaHeader";
+import ShippingDashboard from "../../components/shippingHub/ShippingStatCard";
+import RecommendedWorkflow from "../../components/shippingHub/RecommendedWorkflow";
+import CheckoutEligibility from "../../components/shippingHub/CheckoutEligibility";
 const { width } = Dimensions.get("window");
-const PRODUCT_MENU = [
-    {
-        title: "Shipping Zones",
-        icon: "location-on",
-        screen: "ShippingZones",
-    },
-
-    {
-        title: "Shipping Methods",
-        icon: "layers",
-        screen: "ShippingMethods",
-    },
-
-    {
-        title: "Courier Partners",
-        icon: "assignment",
-        screen: "CourierPartners",
-    },
-];
 
 const ShippingHub = ({ navigation }) => {
     // const [state, setState] = useState({
@@ -48,25 +33,20 @@ const ShippingHub = ({ navigation }) => {
             <View style={{ flex: 1 }}>
                 {header()}
                 <ScrollView contentContainerStyle={styles.container}>
-                    <View style={styles.grid}>
-                        {PRODUCT_MENU.map((item) => (
-                            <TouchableOpacity
-                                key={__generateRandomString(8)}
-                                activeOpacity={0.8}
-                                style={styles.card}
-                                onPress={() => navigation.navigate(item.screen)}
-                            >
-                                <MaterialIcons
-                                    name={item.icon}
-                                    size={28}
-                                    color={Colors.primaryColor}
-                                />
-                                <Text style={styles.cardText}>
-                                    {item.title}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
+                    <SlaHeader
+                        title="Shipping HUB"
+                        subTitle="Manage shipping zones, methods, and courier partners. Configure weight and category rules, charges, and API integrations so the right shipping options appear at checkout by zone and cart."
+                        headerIcon={
+                            <MaterialIcons
+                                name="local-shipping"
+                                size={24}
+                                color="#fff"
+                            />
+                        }
+                    />
+                    <ShippingDashboard />
+                    <RecommendedWorkflow navigation={navigation} />
+                    <CheckoutEligibility />
                 </ScrollView>
             </View>
         </SafeAreaView>

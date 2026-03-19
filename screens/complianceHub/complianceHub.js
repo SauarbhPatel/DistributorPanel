@@ -13,6 +13,9 @@ import { TouchableOpacity } from "react-native";
 import { __makeGetBlogGetRequest } from "../../utils/api";
 import { useState } from "react";
 import { ScrollView } from "react-native";
+import SetupBanner from "../../components/complianceHub/SetupBanner";
+import DashboardGrid from "../../components/complianceHub/DashboardGrid";
+import ConfigurationWorkflow from "../../components/complianceHub/ConfigurationWorkflow";
 const { width } = Dimensions.get("window");
 const PRODUCT_MENU = [
     {
@@ -87,7 +90,10 @@ const ComplianceHub = ({ navigation }) => {
             <View style={{ flex: 1 }}>
                 {header()}
                 <ScrollView contentContainerStyle={styles.container}>
-                    <View style={styles.grid}>
+                    <SetupBanner />
+                    <DashboardGrid />
+                    <ConfigurationWorkflow navigation={navigation} />
+                    {/* <View style={styles.grid}>
                         {PRODUCT_MENU.map((item) => (
                             <TouchableOpacity
                                 key={__generateRandomString(8)}
@@ -105,7 +111,7 @@ const ComplianceHub = ({ navigation }) => {
                                 </Text>
                             </TouchableOpacity>
                         ))}
-                    </View>
+                    </View> */}
                 </ScrollView>
             </View>
         </SafeAreaView>

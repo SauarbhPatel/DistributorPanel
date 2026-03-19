@@ -23,31 +23,8 @@ import CommonHeader from "../../components/common/CommonHeader";
 import GoogleHeader from "../../components/marketing/GoogleHeader";
 import { useState } from "react";
 import SlaHeader from "../../components/slaSettings/SlaHeader";
-import MetaTabs from "../../components/marketing/MetaTabs";
-import MetaOverview from "../../components/marketing/MetaOverview";
-import NextStepsComponent from "../../components/marketing/NextStepsComponent";
-import RecentActivity from "../../components/marketing/RecentActivity";
-import PerformanceSummary from "../../components/marketing/PerformanceSummary";
-import MetaQuickActions from "../../components/marketing/MetaQuickActions";
-import WorkspaceDetails from "../../components/marketing/WorkspaceDetails";
-import DomainVerification from "../../components/marketing/DomainVerification";
-import MetaPixelCard from "../../components/marketing/MetaPixelCard";
-import ProductCatalog from "../../components/marketing/ProductCatalog";
 import ProductTableHeader from "../../components/marketing/ProductTableHeader";
-import ProductList from "../../components/marketing/ProductList";
-import ConversionSetupCard from "../../components/marketing/ConversionSetupCard";
-import MetaPixelDashboard from "../../components/marketing/MetaPixelDashboard";
-import ConversionsAPI from "../../components/marketing/ConversionsAPI";
-import StandardEventsMapping from "../../components/marketing/StandardEventsMapping";
-import AllAudiences from "../../components/marketing/AllAudiences";
 import DemoModeBanner from "../../components/marketing/DemoModeBanner";
-import ProductSelectionBanner from "../../components/marketing/ProductSelectionBanner";
-import DashboardStats from "../../components/marketing/CampaignsDashboardStats";
-import CampaignDashboard from "../../components/marketing/CampaignDashboard";
-import CreativesLibrary from "../../components/marketing/CreativesLibrary";
-import RulesAndAutomation from "../../components/marketing/RulesAndAutomation";
-import BillingDashboard from "../../components/marketing/BillingDashboard";
-import ActivityDashboard from "../../components/marketing/ActivityDashboard";
 import MetaAnalyticsTabs from "../../components/marketing/MetaAnalyticsTabs";
 import MetaAnalyticsStats from "../../components/marketing/MetaAnalyticsStats";
 import FunnelAnalytics from "../../components/marketing/FunnelAnalytics";
@@ -56,6 +33,17 @@ import CampaignsDashboardList from "../../components/marketing/CampaignsDashboar
 import ProductPerformanceList from "../../components/marketing/ProductPerformanceList";
 import ProductTitleHeader from "../../components/marketing/ProductTitleHeader";
 import InsightStatsList from "../../components/marketing/InsightStatsList";
+import FunnelDashboardStats from "../../components/marketing/FunnelDashboardStats";
+import ConversionFunnel from "../../components/marketing/ConversionFunnel";
+import DeviceBreakdown from "../../components/marketing/DeviceBreakdown";
+import UserTypeBreakdown from "../../components/marketing/UserTypeBreakdown";
+import VerticalActionButtons from "../../components/marketing/FunnelActionButtons";
+import PixelStatus from "../../components/marketing/PixelStatus";
+import CapiDeduplication from "../../components/marketing/CapiDeduplication";
+import AttributionConfiguration from "../../components/marketing/AttributionConfiguration";
+import CustomReports from "../../components/marketing/CustomReports";
+import ExportOptions from "../../components/marketing/ExportOptions";
+import ScheduledExports from "../../components/marketing/ScheduledExports";
 
 const { width } = Dimensions.get("window");
 
@@ -172,34 +160,135 @@ const MarketingMetaAnalytics = ({ navigation }) => {
                                         />
                                     }
                                     isShowLearnMore={false}
-                                    // colors={["#00BC7D", "#00BBA7", "#00B8DB"]}
                                 />
                             </View>
                         </>
                     )}
                     {activeTab == "funnel" && (
                         <>
-                            <View style={{ marginHorizontal: 10 }}></View>
+                            <View style={{ marginHorizontal: 10 }}>
+                                <SlaHeader
+                                    headerIcon={
+                                        <FontAwesome
+                                            name="bar-chart-o"
+                                            size={24}
+                                            color="white"
+                                        />
+                                    }
+                                    title={`Funnel Analytics`}
+                                    subTitle={`ViewContent → AddToCart → InitiateCheckout → Purchase. Breakdowns: device, zone, category, new vs returning.`}
+                                />
+                                <FunnelDashboardStats />
+                                <ConversionFunnel />
+                                <DeviceBreakdown />
+                                <UserTypeBreakdown />
+                                <VerticalActionButtons />
+                                <DemoModeBanner
+                                    title="Pro Tip: Optimize Your Funnel"
+                                    subTitle="The biggest drop-off is from ViewContent to AddToCart (83.1%). Focus on improving product pages, pricing clarity, and trust signals to increase add-to-cart rates."
+                                    buttonName="Learn more"
+                                    icon={
+                                        <Ionicons
+                                            name="sparkles-outline"
+                                            size={24}
+                                            color="white"
+                                        />
+                                    }
+                                    isShowLearnMore={false}
+                                    colors={["#FF6900", "#FB2C36", "#F6339A"]}
+                                />
+                            </View>
                         </>
                     )}
                     {activeTab == "attribution_events" && (
                         <>
-                            <View style={{ marginHorizontal: 10 }}></View>
+                            <View style={{ marginHorizontal: 10 }}>
+                                <SlaHeader
+                                    headerIcon={
+                                        <Ionicons
+                                            name="pulse"
+                                            size={24}
+                                            color="white"
+                                        />
+                                    }
+                                    title={`Attribution & Events Quality`}
+                                    subTitle={`Attribution windows, event health, and CAPI web parameters.`}
+                                />
+                                <PixelStatus />
+                                <CapiDeduplication />
+                                <AttributionConfiguration />
+                            </View>
                         </>
                     )}
                     {activeTab == "cohorts" && (
                         <>
-                            <View style={{ marginHorizontal: 10 }}></View>
+                            <View style={{ marginHorizontal: 10 }}>
+                                <SlaHeader
+                                    headerIcon={
+                                        <Ionicons
+                                            name="pulse"
+                                            size={24}
+                                            color="white"
+                                        />
+                                    }
+                                    title={`Cohorts`}
+                                    subTitle={`New vs returning buyers (demo).`}
+                                />
+                                <PixelStatus />
+                                <CapiDeduplication />
+                                <AttributionConfiguration />
+                            </View>
                         </>
                     )}
                     {activeTab == "reports_builder" && (
                         <>
-                            <View style={{ marginHorizontal: 10 }}></View>
+                            <View style={{ marginHorizontal: 10 }}>
+                                <SlaHeader
+                                    headerIcon={
+                                        <Ionicons
+                                            name="pulse"
+                                            size={24}
+                                            color="white"
+                                        />
+                                    }
+                                    title={`Reports Builder`}
+                                    subTitle={`Select dimensions (campaign, adset, ad, SKU, category, brand), metrics (spend, purchases, ROAS), filters and grouping.`}
+                                />
+                                <CustomReports />
+                            </View>
                         </>
                     )}
                     {activeTab == "exports" && (
                         <>
-                            <View style={{ marginHorizontal: 10 }}></View>
+                            <View style={{ marginHorizontal: 10 }}>
+                                <SlaHeader
+                                    headerIcon={
+                                        <Ionicons
+                                            name="pulse"
+                                            size={24}
+                                            color="white"
+                                        />
+                                    }
+                                    title={`Reports Builder`}
+                                    subTitle={`Select dimensions (campaign, adset, ad, SKU, category, brand), metrics (spend, purchases, ROAS), filters and grouping.`}
+                                />
+                                <ExportOptions />
+                                <ScheduledExports />
+                                <DemoModeBanner
+                                    title="Pro Tip: Automate Your Reporting"
+                                    subTitle="Set up scheduled exports to receive automated reports in your inbox. With template versioning, you can track changes over time and ensure consistent reporting across your team."
+                                    buttonName="Learn more"
+                                    icon={
+                                        <Ionicons
+                                            name="sparkles-outline"
+                                            size={24}
+                                            color="white"
+                                        />
+                                    }
+                                    isShowLearnMore={false}
+                                    colors={["#2B7FFF", "#00B8DB", "#00BBA7"]}
+                                />
+                            </View>
                         </>
                     )}
                 </ScrollView>

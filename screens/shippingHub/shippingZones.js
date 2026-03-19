@@ -1,29 +1,17 @@
-import {
-    SafeAreaView,
-    View,
-    Text,
-    StyleSheet,
-    ScrollView,
-    TouchableOpacity,
-    TextInput,
-    FlatList,
-    Alert,
-} from "react-native";
-import { Colors, Fonts, Sizes } from "../../constants/styles";
-import { Feather, MaterialIcons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView, ScrollView, Alert } from "react-native";
+import { Colors } from "../../constants/styles";
 import { useEffect, useState } from "react";
 import CommonHeader from "../../components/common/CommonHeader";
 import { __deleteApiData, __getApiData, __postApiData } from "../../utils/api";
 import BottomPopup from "../../components/common/BottomPopup";
 import { __formatDate } from "../../utils/funtion";
 import { Loader } from "../../modules";
-import CreateShippingMethods from "../../components/form/CreateShippingMethods";
-import ShippingMethodsHeader from "../../components/shippingHub/ShippingMethodsHeader";
-import MethodList from "../../components/shippingHub/MethodList";
-import ShippingMethodModal from "../../components/shippingHub/ShippingMethodModal";
+import CreateShippingZones from "../../components/form/CreateShippingZones";
+import ShippingZonesHeader from "../../components/shippingHub/ShippingZonesHeader";
+import ZoneList from "../../components/shippingHub/ZoneList";
+import ShippingZoneModal from "../../components/shippingHub/ShippingZoneModal";
 
-const ShippingMethods = ({ navigation }) => {
+const ShippingZones = ({ navigation }) => {
     const [state, setState] = useState({
         loading: false,
         list: [],
@@ -109,24 +97,23 @@ const ShippingMethods = ({ navigation }) => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
-            <CommonHeader title={"Shipping Methods"} navigation={navigation} />
+            <CommonHeader title={"Shipping Zones"} navigation={navigation} />
             <Loader isShow={loading} />
-            <ScrollView
-                contentContainerStyle={{ paddingBottom: 20, paddingTop: 10 }}
-            >
-                <ShippingMethodsHeader search={search} onChange={updateState} />
-                <MethodList onChange={updateState} />
+            <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+                <ShippingZonesHeader search={search} onChange={updateState} />
+                <ZoneList onChange={updateState} />
             </ScrollView>
-            <ShippingMethodModal
+
+            <ShippingZoneModal
                 visible={isShowCreate}
                 onClose={() => updateState({ isShowCreate: false })}
             />
             {/* <BottomPopup
                 isShow={isShowCreate}
-                title="Add Shipping Methods"
+                title="Add Zone"
                 onClose={() => updateState({ isShowCreate: false })}
                 component={
-                    <CreateShippingMethods
+                    <CreateShippingZones    
                         onClose={() => {
                             updateState({ isShowCreate: false });
                             __handleGetData(search);
@@ -138,4 +125,4 @@ const ShippingMethods = ({ navigation }) => {
     );
 };
 
-export default ShippingMethods;
+export default ShippingZones;
