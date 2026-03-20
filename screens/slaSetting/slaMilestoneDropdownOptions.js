@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     SafeAreaView,
     View,
@@ -12,6 +12,8 @@ import { Colors, Fonts, Sizes } from "../../constants/styles";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
 import SlaHeader from "../../components/slaSettings/SlaHeader";
 import CommonHeader from "../../components/common/CommonHeader";
+import SLARuleModal from "../../components/slaSettings/SLARuleModal";
+import OptionModal from "../../components/slaSettings/OptionModal";
 
 const options = [
     {
@@ -38,6 +40,12 @@ const options = [
 ];
 
 const SlaMilestoneDropdownOptions = ({ navigation }) => {
+    const [state, setState] = useState({
+        loading: false,
+        isShowCreate: false,
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+    const { loading, isShowCreate } = state;
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
             <StatusBar backgroundColor={Colors.primaryColor} />
@@ -53,6 +61,9 @@ const SlaMilestoneDropdownOptions = ({ navigation }) => {
                         title="Milestone dropdown options"
                         subTitle="Create and manage options for Start trigger, End trigger, Duration type, and Severity used in Add Milestone."
                         buttonName="Add option"
+                        onPressButton={() => {
+                            updateState({ isShowCreate: true });
+                        }}
                     />
 
                     {optionTypeDropdown()}
@@ -61,6 +72,11 @@ const SlaMilestoneDropdownOptions = ({ navigation }) => {
                         <OptionCard item={item} key={index} />
                     ))}
                 </ScrollView>
+
+                <OptionModal
+                    visible={isShowCreate}
+                    onClose={() => updateState({ isShowCreate: false })}
+                />
             </View>
         </SafeAreaView>
     );
@@ -85,15 +101,32 @@ const SlaMilestoneDropdownOptions = ({ navigation }) => {
 export default SlaMilestoneDropdownOptions;
 
 const OptionCard = ({ item }) => {
+    const [state, setState] = useState({
+        loading: false,
+        isShowCreate: false,
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+    const { loading, isShowCreate } = state;
     return (
         <View style={styles.card}>
-            {/* TOP ROW */}
+            <OptionModal
+                edit
+                visible={isShowCreate}
+                onClose={() => updateState({ isShowCreate: false })}
+            />
             <View style={styles.rowTop}>
                 <Text style={styles.code}>{item.code}</Text>
 
                 <View style={styles.actions}>
                     <TouchableOpacity style={styles.iconBtn}>
-                        <Feather name="edit-2" size={16} color="#495057" />
+                        <Feather
+                            name="edit-2"
+                            size={16}
+                            color="#495057"
+                            onPress={() => {
+                                updateState({ isShowCreate: true });
+                            }}
+                        />
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.iconBtn}>
@@ -102,12 +135,10 @@ const OptionCard = ({ item }) => {
                 </View>
             </View>
 
-            {/* LABEL */}
             <View style={styles.labelBadge}>
                 <Text style={styles.labelText}>{item.label}</Text>
             </View>
 
-            {/* ORDER */}
             <View style={styles.metaRow}>
                 <Text style={styles.metaTitle}>Order</Text>
                 <Text style={styles.metaValue}>{item.order}</Text>

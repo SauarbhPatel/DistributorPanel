@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     SafeAreaView,
     View,
@@ -12,6 +12,8 @@ import { Colors, Fonts, Sizes } from "../../constants/styles";
 import { Feather } from "@expo/vector-icons";
 import SlaHeader from "../../components/slaSettings/SlaHeader";
 import CommonHeader from "../../components/common/CommonHeader";
+import SLAPolicyModal from "../../components/slaSettings/SLAPolicyModal";
+import ShippingZoneModal from "../../components/shippingHub/ShippingZoneModal";
 
 const policies = [
     {
@@ -50,6 +52,13 @@ const policies = [
 ];
 
 const SlaPolicyBuilder = ({ navigation }) => {
+    const [state, setState] = useState({
+        loading: false,
+        isShowCreate: false,
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+    const { loading, isShowCreate } = state;
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
             <StatusBar backgroundColor={Colors.primaryColor} />
@@ -65,14 +74,26 @@ const SlaPolicyBuilder = ({ navigation }) => {
                         title="SLA Policy Builder"
                         subTitle="Create and manage SLA policies. Define milestones, triggers, duration, and severity."
                         buttonName="New policy"
+                        onPressButton={() => {
+                            updateState({ isShowCreate: true });
+                        }}
                     />
 
                     <Text style={styles.sectionTitle}>Policies</Text>
 
                     {policies.map((item) => (
-                        <PolicyCard key={item.id} item={item} navigation={navigation} />
+                        <PolicyCard
+                            key={item.id}
+                            item={item}
+                            navigation={navigation}
+                        />
                     ))}
                 </ScrollView>
+
+                <SLAPolicyModal
+                    visible={isShowCreate}
+                    onClose={() => updateState({ isShowCreate: false })}
+                />
             </View>
         </SafeAreaView>
     );
@@ -80,9 +101,21 @@ const SlaPolicyBuilder = ({ navigation }) => {
 
 export default SlaPolicyBuilder;
 
-const PolicyCard = ({ item ,navigation}) => {
+const PolicyCard = ({ item, navigation }) => {
+    const [state, setState] = useState({
+        loading: false,
+        isShowCreate: false,
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+    const { loading, isShowCreate } = state;
+
     return (
         <View style={[styles.card, { borderColor: item.color }]}>
+            <SLAPolicyModal
+                edit
+                visible={isShowCreate}
+                onClose={() => updateState({ isShowCreate: false })}
+            />
             <View style={[styles.iconWrap, { backgroundColor: item.bg }]}>
                 <Feather name="file-text" size={20} color={item.color} />
             </View>
@@ -135,11 +168,19 @@ const PolicyCard = ({ item ,navigation}) => {
                             styles.editBtn,
                             { backgroundColor: item.color },
                         ]}
+                        onPress={() => {
+                            updateState({ isShowCreate: true });
+                        }}
                     >
                         <Text style={styles.btnText}>Edit</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.viewBtn} onPress={()=>navigation.push("SlaPolicyBuilderDetails",item)}>
+                    <TouchableOpacity
+                        style={styles.viewBtn}
+                        onPress={() =>
+                            navigation.push("SlaPolicyBuilderDetails", item)
+                        }
+                    >
                         <Text style={styles.viewText}>View</Text>
                     </TouchableOpacity>
                 </View>

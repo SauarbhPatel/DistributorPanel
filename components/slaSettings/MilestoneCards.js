@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
@@ -12,6 +12,7 @@ import {
     MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
+import MilestoneModal from "./MilestoneModal";
 
 const { width } = Dimensions.get("window");
 
@@ -91,131 +92,157 @@ const milestones = [
 ];
 
 const MilestoneCards = () => {
+    const [state, setState] = useState({
+        loading: false,
+        isShowCreate: false,
+        isShowEdit: false,
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+    const { loading, isShowCreate, isShowEdit } = state;
     return (
-        <View style={styles.container}>
-            <View style={styles.headerRow}>
-                <View>
-                    <Text style={styles.heading}>Milestones</Text>
-                    <Text style={styles.subHeading}>
-                        Start/end triggers, duration, and severity.
-                    </Text>
+        <>
+            <MilestoneModal
+                visible={isShowCreate}
+                onClose={() => updateState({ isShowCreate: false })}
+            />
+            <MilestoneModal
+                edit
+                visible={isShowEdit}
+                onClose={() => updateState({ isShowEdit: false })}
+            />
+            <View style={styles.container}>
+                <View style={styles.headerRow}>
+                    <View>
+                        <Text style={styles.heading}>Milestones</Text>
+                        <Text style={styles.subHeading}>
+                            Start/end triggers, duration, and severity.
+                        </Text>
+                    </View>
+                    <TouchableOpacity
+                        style={styles.addBtn}
+                        onPress={() => updateState({ isShowCreate: true })}
+                    >
+                        <MaterialIcons name="add" size={18} color="#fff" />
+                        <Text style={styles.addBtnText}>Add</Text>
+                    </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.addBtn}>
-                    <MaterialIcons name="add" size={18} color="#fff" />
-                    <Text style={styles.addBtnText}>Add</Text>
-                </TouchableOpacity>
-            </View>
 
-            {milestones.map((item, index) => (
-                <View
-                    key={index}
-                    style={[styles.card, { borderLeftColor: item.color }]}
-                >
-                    {/* Top Row: ID, Icon, Title, Actions */}
-                    <View style={styles.topRow}>
-                        <View style={styles.titleSection}>
-                            <View
-                                style={[
-                                    styles.iconBox,
-                                    { backgroundColor: item.color },
-                                ]}
-                            >
-                                {item.icon}
-                            </View>
-                            <Text style={styles.title}>{item.title}</Text>
-                        </View>
-                        <View style={styles.actionSection}>
-                            <TouchableOpacity>
-                                <MaterialIcons
-                                    name="edit"
-                                    size={18}
-                                    color="#94A3B8"
-                                />
-                            </TouchableOpacity>
-                            <TouchableOpacity style={{ marginLeft: 10 }}>
-                                <MaterialIcons
-                                    name="delete"
-                                    size={18}
-                                    color="#FA5252"
-                                />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-
-                    {/* Triggers Section */}
-                    <View style={styles.triggerRow}>
-                        <View style={styles.triggerBadgeStart}>
-                            <View style={styles.dotStart} />
-                            <Text style={styles.triggerTextStart}>
-                                {item.start}
-                            </Text>
-                        </View>
-                        <MaterialIcons
-                            name="arrow-forward"
-                            size={14}
-                            color="#CBD5E1"
-                        />
-                        <View style={styles.triggerBadgeEnd}>
-                            <View style={styles.dotEnd} />
-                            <Text style={styles.triggerTextEnd}>
-                                {item.end}
-                            </Text>
-                        </View>
-                    </View>
-
-                    {/* Meta Info: Duration, Grace, Severity */}
-                    <View style={styles.metaRow}>
-                        <View style={styles.metaItem}>
-                            <MaterialCommunityIcons
-                                name="clock-outline"
-                                size={14}
-                                color="#64748B"
-                            />
-                            <Text style={styles.metaValue}>
-                                {item.duration}
-                            </Text>
-                            <Text style={styles.metaLabel}>
-                                {item.durationTitle}
-                            </Text>
-                        </View>
-
-                        <View style={styles.metaItem}>
-                            <MaterialCommunityIcons
-                                name="lightning-bolt-outline"
-                                size={14}
-                                color="#F59E0B"
-                            />
-                            <Text style={styles.metaValue}>{item.grace}</Text>
-                            <View
-                                style={[
-                                    styles.severityBadge,
-                                    {
-                                        backgroundColor:
-                                            item.severity === "HIGH"
-                                                ? "#FFF1F2"
-                                                : "#FEF3C7",
-                                    },
-                                ]}
-                            >
-                                <Text
+                {milestones.map((item, index) => (
+                    <View
+                        key={index}
+                        style={[styles.card, { borderLeftColor: item.color }]}
+                    >
+                        <View style={styles.topRow}>
+                            <View style={styles.titleSection}>
+                                <View
                                     style={[
-                                        styles.severityText,
-                                        {
-                                            color:
-                                                item.severity === "HIGH"
-                                                    ? "#E11D48"
-                                                    : "#D97706",
-                                        },
+                                        styles.iconBox,
+                                        { backgroundColor: item.color },
                                     ]}
                                 >
-                                    {item.severity}
+                                    {item.icon}
+                                </View>
+                                <Text style={styles.title}>{item.title}</Text>
+                            </View>
+                            <View style={styles.actionSection}>
+                                <TouchableOpacity
+                                    onPress={() =>
+                                        updateState({ isShowEdit: true })
+                                    }
+                                >
+                                    <MaterialIcons
+                                        name="edit"
+                                        size={18}
+                                        color="#94A3B8"
+                                    />
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{ marginLeft: 10 }}>
+                                    <MaterialIcons
+                                        name="delete"
+                                        size={18}
+                                        color="#FA5252"
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                        {/* Triggers Section */}
+                        <View style={styles.triggerRow}>
+                            <View style={styles.triggerBadgeStart}>
+                                <View style={styles.dotStart} />
+                                <Text style={styles.triggerTextStart}>
+                                    {item.start}
+                                </Text>
+                            </View>
+                            <MaterialIcons
+                                name="arrow-forward"
+                                size={14}
+                                color="#CBD5E1"
+                            />
+                            <View style={styles.triggerBadgeEnd}>
+                                <View style={styles.dotEnd} />
+                                <Text style={styles.triggerTextEnd}>
+                                    {item.end}
                                 </Text>
                             </View>
                         </View>
+
+                        {/* Meta Info: Duration, Grace, Severity */}
+                        <View style={styles.metaRow}>
+                            <View style={styles.metaItem}>
+                                <MaterialCommunityIcons
+                                    name="clock-outline"
+                                    size={14}
+                                    color="#64748B"
+                                />
+                                <Text style={styles.metaValue}>
+                                    {item.duration}
+                                </Text>
+                                <Text style={styles.metaLabel}>
+                                    {item.durationTitle}
+                                </Text>
+                            </View>
+
+                            <View style={styles.metaItem}>
+                                <MaterialCommunityIcons
+                                    name="lightning-bolt-outline"
+                                    size={14}
+                                    color="#F59E0B"
+                                />
+                                <Text style={styles.metaValue}>
+                                    {item.grace}
+                                </Text>
+                                <View
+                                    style={[
+                                        styles.severityBadge,
+                                        {
+                                            backgroundColor:
+                                                item.severity === "HIGH"
+                                                    ? "#FFF1F2"
+                                                    : "#FEF3C7",
+                                        },
+                                    ]}
+                                >
+                                    <Text
+                                        style={[
+                                            styles.severityText,
+                                            {
+                                                color:
+                                                    item.severity === "HIGH"
+                                                        ? "#E11D48"
+                                                        : "#D97706",
+                                            },
+                                        ]}
+                                    >
+                                        {item.severity}
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
                     </View>
-                </View>
-            ))}
-        </View>
+                ))}
+            </View>
+        </>
     );
 };
 

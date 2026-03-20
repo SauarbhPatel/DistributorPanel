@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import SlaHeader from "./SlaHeader";
+import SLARuleModal from "./SLARuleModal";
 
 const rulesData = [
     {
@@ -24,6 +25,13 @@ const rulesData = [
 ];
 
 const SlaRules = ({ navigation }) => {
+    const [state, setState] = useState({
+        loading: false,
+        isShowCreate: false,
+        isShowEdit: false,
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+    const { loading, isShowCreate, isShowEdit } = state;
     return (
         <View
             style={{
@@ -32,10 +40,22 @@ const SlaRules = ({ navigation }) => {
                 marginBottom: 20,
             }}
         >
+            <SLARuleModal
+                visible={isShowCreate}
+                onClose={() => updateState({ isShowCreate: false })}
+            />
+            <SLARuleModal
+                edit
+                visible={isShowEdit}
+                onClose={() => updateState({ isShowEdit: false })}
+            />
             <SlaHeader
                 title={"SLA Rules"}
                 subTitle="Conditions and priority for this policy. Most specific rule wins."
                 buttonName="Add rule"
+                onPressButton={() => {
+                    updateState({ isShowCreate: true });
+                }}
             />
 
             <View style={styles.container}>
@@ -47,7 +67,6 @@ const SlaRules = ({ navigation }) => {
                             { borderColor: item.color + "40" },
                         ]}
                     >
-                        {/* Priority Badge Section */}
                         <View style={styles.prioritySection}>
                             <View
                                 style={[
@@ -73,7 +92,6 @@ const SlaRules = ({ navigation }) => {
                             )}
                         </View>
 
-                        {/* Rule Content Section */}
                         <View style={styles.contentSection}>
                             <View style={styles.titleRow}>
                                 <View
@@ -93,7 +111,6 @@ const SlaRules = ({ navigation }) => {
                                 </Text>
                             </View>
 
-                            {/* Conditions Row */}
                             <View style={styles.conditionsRow}>
                                 <ConditionTag
                                     icon="storefront-outline"
@@ -116,7 +133,6 @@ const SlaRules = ({ navigation }) => {
                     </View>
                 ))}
 
-                {/* Footer Summary */}
                 <View style={styles.footerRow}>
                     <View style={styles.summaryItem}>
                         <View

@@ -10,7 +10,7 @@ import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import NoDataCard from "../common/NoDataCard";
 
-const MethodCard = ({
+const PartnerCard = ({
     name,
     courier,
     mode,
@@ -19,21 +19,24 @@ const MethodCard = ({
     categories,
     status,
 }) => {
-    const accentColor = mode === "Air" ? "#A855F7" : "#0071BC";
+    // Visual logic: Air = Purple, Surface = Blue
+    const themeColor = mode === "Air" ? "#A855F7" : "#0071BC";
 
     return (
         <View style={styles.card}>
+            {/* Left Accent Border */}
             <View
-                style={[styles.accentBorder, { backgroundColor: accentColor }]}
+                style={[styles.accentBorder, { backgroundColor: themeColor }]}
             />
 
             <View style={styles.cardContent}>
+                {/* Header Section */}
                 <View style={styles.header}>
-                    <View style={styles.titleWrapper}>
-                        <Text style={styles.methodName}>{name}</Text>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.partnerName}>{name}</Text>
                         <View
                             style={[
-                                styles.modeTag,
+                                styles.modeBadge,
                                 {
                                     backgroundColor:
                                         mode === "Air" ? "#F5F3FF" : "#EFF6FF",
@@ -42,43 +45,42 @@ const MethodCard = ({
                         >
                             <Text
                                 style={[
-                                    styles.modeTagText,
-                                    { color: accentColor },
+                                    styles.modeBadgeText,
+                                    { color: themeColor },
                                 ]}
                             >
                                 {mode.toUpperCase()}
                             </Text>
                         </View>
                     </View>
-                    <TouchableOpacity
-                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                    >
+                    <TouchableOpacity style={styles.deleteBtn}>
                         <Feather name="trash-2" size={18} color="#FF5252" />
                     </TouchableOpacity>
                 </View>
 
-                <View style={styles.infoContainer}>
-                    <View style={styles.infoRow}>
-                        <View style={styles.infoItem}>
+                {/* Info Grid (Matches ZoneList Structure) */}
+                <View style={styles.grid}>
+                    <View style={styles.gridRow}>
+                        <View style={styles.gridItem}>
                             <Text style={styles.label}>COURIER</Text>
-                            <View style={styles.courierBadge}>
+                            <View style={styles.courierTag}>
                                 <Text style={styles.courierText}>
                                     {courier}
                                 </Text>
                             </View>
                         </View>
-                        <View style={styles.infoItem}>
-                            <Text style={styles.label}>WEIGHT (KG)</Text>
+                        <View style={styles.gridItem}>
+                            <Text style={styles.label}>WEIGHT LIMIT</Text>
                             <Text style={styles.valueText}>{weightKg} kg</Text>
                         </View>
                     </View>
 
-                    <View style={styles.infoRow}>
-                        <View style={styles.infoItem}>
+                    <View style={styles.gridRow}>
+                        <View style={styles.gridItem}>
                             <Text style={styles.label}>CHARGE MODEL</Text>
                             <Text style={styles.valueText}>{chargeModel}</Text>
                         </View>
-                        <View style={styles.infoItem}>
+                        <View style={styles.gridItem}>
                             <Text style={styles.label}>CATEGORIES</Text>
                             <Text style={styles.valueText} numberOfLines={1}>
                                 {categories.join(", ")}
@@ -87,18 +89,28 @@ const MethodCard = ({
                     </View>
                 </View>
 
+                {/* Footer Actions */}
                 <View style={styles.footer}>
-                    <View style={styles.statusRow}>
-                        <View style={styles.statusDot} />
+                    <View style={styles.statusWrapper}>
+                        <View
+                            style={[
+                                styles.statusDot,
+                                {
+                                    backgroundColor:
+                                        status === "Active"
+                                            ? "#10B981"
+                                            : "#94A3B8",
+                                },
+                            ]}
+                        />
                         <Text style={styles.statusText}>
                             {status.toUpperCase()}
                         </Text>
                     </View>
 
-                    <TouchableOpacity>
+                    <TouchableOpacity activeOpacity={0.8}>
                         <LinearGradient
-                            // colors={["#0071BC", "#005A96"]}
-                            colors={[accentColor, accentColor + "CC"]}
+                            colors={[themeColor, themeColor + "CC"]}
                             style={styles.editButton}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 0 }}
@@ -113,8 +125,8 @@ const MethodCard = ({
     );
 };
 
-const MethodList = ({ onChange }) => {
-    const methodsData = [
+const PartnersList = ({ onChange = () => {} }) => {
+    const partnersData = [
         {
             name: "Standard Ground",
             courier: "FedEx",
@@ -155,19 +167,19 @@ const MethodList = ({ onChange }) => {
 
     return (
         <View style={styles.container}>
-            {methodsData.length > 0 ? (
-                methodsData.map((method, index) => (
-                    <MethodCard key={index} {...method} />
+            {partnersData.length > 0 ? (
+                partnersData.map((item, index) => (
+                    <PartnerCard key={index} {...item} />
                 ))
             ) : (
                 <NoDataCard
                     onCreatePress={() => onChange({ isShowCreate: true })}
-                    title="No Shipping Methods Found"
-                    subTitle="You haven't configured any delivery options yet. Create a method to define couriers, weight limits, and shipping rates."
-                    buttonName="Create Your First Method"
+                    title="No Courier Partners Linked"
+                    subTitle="Connect your preferred shipping carriers to automate label generation and real-time tracking for your orders."
+                    buttonName="Link a Courier Partner"
                     icon={
                         <MaterialCommunityIcons
-                            name={"truck-delivery-outline"}
+                            name="truck-fast-outline"
                             size={32}
                             color="#94A3B8"
                         />
@@ -194,36 +206,35 @@ const styles = StyleSheet.create({
         overflow: "hidden",
         borderWidth: 1,
         borderColor: "#E2E8F0",
+        elevation: 3,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
     },
     accentBorder: { width: 6, height: "100%" },
     cardContent: { flex: 1, padding: 16 },
     header: {
         flexDirection: "row",
         justifyContent: "space-between",
-        alignItems: "flex-start",
         marginBottom: 16,
     },
-    titleWrapper: { flex: 1 },
-    methodName: {
+    partnerName: {
         fontSize: 16,
         fontWeight: "700",
         color: "#1E293B",
         marginBottom: 4,
     },
-    modeTag: {
+    modeBadge: {
         alignSelf: "flex-start",
         paddingHorizontal: 8,
         paddingVertical: 2,
         borderRadius: 6,
     },
-    modeTagText: { fontSize: 10, fontWeight: "800" },
-    infoContainer: { marginBottom: 16 },
-    infoRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginBottom: 12,
-    },
-    infoItem: { flex: 1 },
+    modeBadgeText: { fontSize: 10, fontWeight: "800" },
+    grid: { gap: 12, marginBottom: 16 },
+    gridRow: { flexDirection: "row", justifyContent: "space-between" },
+    gridItem: { flex: 1 },
     label: {
         fontSize: 10,
         fontWeight: "800",
@@ -232,14 +243,12 @@ const styles = StyleSheet.create({
         letterSpacing: 0.5,
     },
     valueText: { fontSize: 13, color: "#475569", fontWeight: "600" },
-    courierBadge: {
-        backgroundColor: "#F8FAFB",
+    courierTag: {
+        backgroundColor: "#F1F5F9",
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
         alignSelf: "flex-start",
-        borderWidth: 1,
-        borderColor: "#F1F5F9",
     },
     courierText: { fontSize: 12, color: "#1E293B", fontWeight: "700" },
     footer: {
@@ -250,19 +259,13 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderTopColor: "#F1F5F9",
     },
-    statusRow: { flexDirection: "row", alignItems: "center" },
-    statusDot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-        backgroundColor: "#10B981",
-        marginRight: 6,
-    },
+    statusWrapper: { flexDirection: "row", alignItems: "center" },
+    statusDot: { width: 8, height: 8, borderRadius: 4, marginRight: 6 },
     statusText: { fontSize: 12, fontWeight: "700", color: "#64748B" },
     editButton: {
         flexDirection: "row",
         alignItems: "center",
-        paddingHorizontal: 14,
+        paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 10,
     },
@@ -274,4 +277,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default MethodList;
+export default PartnersList;

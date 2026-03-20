@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     SafeAreaView,
     View,
@@ -12,6 +12,7 @@ import { Colors, Fonts, Sizes } from "../../constants/styles";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
 import SlaHeader from "../../components/slaSettings/SlaHeader";
 import CommonHeader from "../../components/common/CommonHeader";
+import CourierCutoffModal from "../../components/slaSettings/CourierCutoffModal";
 
 const options = [
     {
@@ -44,6 +45,12 @@ const options = [
 ];
 
 const SlaCourierCut = ({ navigation }) => {
+    const [state, setState] = useState({
+        loading: false,
+        isShowCreate: false,
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+    const { loading, isShowCreate } = state;
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
             <StatusBar backgroundColor={Colors.primaryColor} />
@@ -59,12 +66,20 @@ const SlaCourierCut = ({ navigation }) => {
                         title="Courier cut-off for pickup"
                         subTitle="Define cut-off times for courier pickup. Orders must be ready (hours  before cut-off) for same-day pickup. Used in Add Milestone to set SLA  deadline = cut-off time minus X hours."
                         buttonName="Add cut-off"
+                        onPressButton={() =>
+                            updateState({ isShowCreate: true })
+                        }
                     />
                     <View style={{ marginTop: 10 }} />
                     {options.map((item, index) => (
                         <OptionCard item={item} key={index} />
                     ))}
                 </ScrollView>
+
+                <CourierCutoffModal
+                    visible={isShowCreate}
+                    onClose={() => updateState({ isShowCreate: false })}
+                />
             </View>
         </SafeAreaView>
     );
@@ -73,14 +88,27 @@ const SlaCourierCut = ({ navigation }) => {
 export default SlaCourierCut;
 
 const OptionCard = ({ item }) => {
+    const [state, setState] = useState({
+        loading: false,
+        isShowCreate: false,
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+    const { loading, isShowCreate } = state;
     return (
         <View style={[styles.card, { borderLeftColor: item.statusColor }]}>
-            {/* NAME & ACTIONS ROW */}
+            <CourierCutoffModal
+                edit
+                visible={isShowCreate}
+                onClose={() => updateState({ isShowCreate: false })}
+            />
             <View style={styles.rowTop}>
                 <Text style={styles.code}>{item.name}</Text>
 
                 <View style={styles.actions}>
-                    <TouchableOpacity style={styles.iconBtn}>
+                    <TouchableOpacity
+                        style={styles.iconBtn}
+                        onPress={() => updateState({ isShowCreate: true })}
+                    >
                         <Feather name="edit-2" size={16} color="#495057" />
                     </TouchableOpacity>
 
@@ -90,18 +118,15 @@ const OptionCard = ({ item }) => {
                 </View>
             </View>
 
-            {/* CUT-OFF TIME BADGE */}
             <View style={styles.labelBadge}>
                 <Text style={styles.labelText}>{item.cutOffTime}</Text>
             </View>
 
-            {/* TIMEZONE & REGION */}
             <View style={styles.metaRow}>
                 <Text style={styles.metaTitle}>{item.timezone}</Text>
                 <Text style={styles.metaValue}>{item.region}</Text>
             </View>
 
-            {/* DAYS */}
             <View style={styles.metaRow}>
                 <Text style={styles.metaTitle}>Days</Text>
                 <Text style={styles.metaValue}>{item.days}</Text>

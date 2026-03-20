@@ -31,6 +31,7 @@ const SlaHeader = ({
     syncButton = false,
     feedButton = false,
     reportButton = false,
+    onPressButton = () => {},
 }) => {
     return (
         <LinearGradient colors={colors} style={styles.bannerCard}>
@@ -223,6 +224,7 @@ const SlaHeader = ({
                     <TouchableOpacity
                         style={[styles.setupBtn]}
                         activeOpacity={0.8}
+                        onPress={() => onPressButton("1")}
                     >
                         <Feather name="plus-circle" size={20} color="#3f51b5" />
                         <Text style={styles.setupText}>{buttonName}</Text>
