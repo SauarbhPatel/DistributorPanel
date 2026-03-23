@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import {
     MaterialCommunityIcons,
@@ -7,6 +7,7 @@ import {
     MaterialIcons,
     FontAwesome,
 } from "@expo/vector-icons";
+import OrderAtRiskModal from "./OrderAtRiskModal";
 
 const SummaryCard = ({
     count,
@@ -98,61 +99,84 @@ const SummaryCard = ({
     </View>
 );
 
-const DetailSection = ({ title, total, icon, color, data }) => (
-    <View style={styles.detailSection}>
-        <View style={[styles.detailHeader, { backgroundColor: color }]}>
-            <View style={styles.headerLeft}>
-                <MaterialCommunityIcons name={icon} size={20} color="#fff" />
-                <Text style={styles.headerTitle}>{title}</Text>
+const DetailSection = ({ title, total, icon, color, data }) => {
+    const [isShowModel, setIsShowModel] = useState(false);
+    return (
+        <View style={styles.detailSection}>
+            <OrderAtRiskModal
+                title="Order details"
+                visible={isShowModel}
+                onClose={() => setIsShowModel(false)}
+                hideReminder
+                hideNote
+                hideOpenManagment
+            />
+            <View style={[styles.detailHeader, { backgroundColor: color }]}>
+                <View style={styles.headerLeft}>
+                    <MaterialCommunityIcons
+                        name={icon}
+                        size={20}
+                        color="#fff"
+                    />
+                    <Text style={styles.headerTitle}>{title}</Text>
+                </View>
+                <View style={styles.totalBadge}>
+                    <Text style={styles.totalBadgeText}>{total} total</Text>
+                </View>
             </View>
-            <View style={styles.totalBadge}>
-                <Text style={styles.totalBadgeText}>{total} total</Text>
-            </View>
-        </View>
-        <View style={styles.detailBody}>
-            {data.map((item, idx) => (
-                <View key={idx} style={styles.detailRow}>
-                    <View style={styles.rowTop}>
-                        <View style={styles.rowLabelGroup}>
+            <View style={styles.detailBody}>
+                {data.map((item, idx) => (
+                    <View key={idx} style={styles.detailRow}>
+                        <View style={styles.rowTop}>
+                            <View style={styles.rowLabelGroup}>
+                                <View
+                                    style={[
+                                        styles.indicator,
+                                        {
+                                            backgroundColor:
+                                                item.indicatorColor,
+                                        },
+                                    ]}
+                                />
+                                <Text style={styles.rowLabel}>
+                                    {item.label}
+                                </Text>
+                            </View>
                             <View
                                 style={[
-                                    styles.indicator,
+                                    styles.rowBadge,
                                     { backgroundColor: item.indicatorColor },
                                 ]}
-                            />
-                            <Text style={styles.rowLabel}>{item.label}</Text>
-                        </View>
-                        <View
-                            style={[
-                                styles.rowBadge,
-                                { backgroundColor: item.indicatorColor },
-                            ]}
-                        >
-                            <Text style={styles.rowBadgeText}>
-                                {item.count}
-                            </Text>
-                        </View>
-                    </View>
-                    <View style={styles.orderLinks}>
-                        {item.orders.map((ord, oIdx) => (
-                            <TouchableOpacity
-                                key={oIdx}
-                                style={styles.orderButton}
                             >
-                                <Text style={styles.orderLinkText}>{ord}</Text>
-                                <MaterialIcons
-                                    name="open-in-new"
-                                    size={12}
-                                    color="#3b82f6"
-                                />
-                            </TouchableOpacity>
-                        ))}
+                                <Text style={styles.rowBadgeText}>
+                                    {item.count}
+                                </Text>
+                            </View>
+                        </View>
+                        <View style={styles.orderLinks}>
+                            {item.orders.map((ord, oIdx) => (
+                                <TouchableOpacity
+                                    key={oIdx}
+                                    style={styles.orderButton}
+                                    onPress={() => setIsShowModel(true)}
+                                >
+                                    <Text style={styles.orderLinkText}>
+                                        {ord}
+                                    </Text>
+                                    <MaterialIcons
+                                        name="open-in-new"
+                                        size={12}
+                                        color="#3b82f6"
+                                    />
+                                </TouchableOpacity>
+                            ))}
+                        </View>
                     </View>
-                </View>
-            ))}
+                ))}
+            </View>
         </View>
-    </View>
-);
+    );
+};
 
 const SlaDashboardOverview = () => {
     return (

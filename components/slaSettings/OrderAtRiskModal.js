@@ -13,7 +13,15 @@ import {
 import { Feather, MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
-const OrderAtRiskModal = ({ visible, onClose, orderData }) => {
+const OrderAtRiskModal = ({
+    visible,
+    onClose,
+    orderData,
+    title,
+    hideOpenManagment = false,
+    hideReminder = false,
+    hideNote = false,
+}) => {
     return (
         <Modal visible={visible} animationType="fade" transparent={true}>
             <SafeAreaView style={styles.modalContainer}>
@@ -27,7 +35,9 @@ const OrderAtRiskModal = ({ visible, onClose, orderData }) => {
                                 color="#fff"
                             />
                         </View>
-                        <Text style={styles.headerTitle}>Order at risk</Text>
+                        <Text style={styles.headerTitle}>
+                            {title || "Order at risk"}
+                        </Text>
                     </View>
                     <Text style={styles.headerOrderId}>
                         {orderData?.orderId || "ORD-2024-002505"}
@@ -150,14 +160,18 @@ const OrderAtRiskModal = ({ visible, onClose, orderData }) => {
                         </View>
 
                         {/* Section 3: Inputs */}
-                        <Text style={styles.inputLabel}>
-                            Send reminder to seller
-                        </Text>
-                        <TextInput
-                            style={styles.textArea}
-                            placeholder="Optional note to include with reminder..."
-                            multiline
-                        />
+                        {!hideReminder && (
+                            <>
+                                <Text style={styles.inputLabel}>
+                                    Send reminder to seller
+                                </Text>
+                                <TextInput
+                                    style={styles.textArea}
+                                    placeholder="Optional note to include with reminder..."
+                                    multiline
+                                />
+                            </>
+                        )}
 
                         {/* Section 4: Actions Grid */}
                         <SectionHeader
@@ -192,23 +206,37 @@ const OrderAtRiskModal = ({ visible, onClose, orderData }) => {
                                 color="#fd7e14"
                             />
                         </View>
-
-                        <Text style={[styles.inputLabel, { marginTop: 20 }]}>
-                            Internal note
-                        </Text>
-                        <TextInput
-                            style={styles.textArea}
-                            placeholder="Add a note for internal use..."
-                            multiline
-                        />
+                        {!hideNote && (
+                            <>
+                                <Text
+                                    style={[
+                                        styles.inputLabel,
+                                        { marginTop: 20 },
+                                    ]}
+                                >
+                                    Internal note
+                                </Text>
+                                <TextInput
+                                    style={styles.textArea}
+                                    placeholder="Add a note for internal use..."
+                                    multiline
+                                />
+                            </>
+                        )}
                     </View>
 
-                    <TouchableOpacity style={styles.externalLinkBtn}>
-                        <Text style={styles.externalLinkText}>
-                            Open in Order Management
-                        </Text>
-                        <Feather name="chevron-right" size={20} color="#fff" />
-                    </TouchableOpacity>
+                    {!hideOpenManagment && (
+                        <TouchableOpacity style={styles.externalLinkBtn}>
+                            <Text style={styles.externalLinkText}>
+                                Open in Order Management
+                            </Text>
+                            <Feather
+                                name="chevron-right"
+                                size={20}
+                                color="#fff"
+                            />
+                        </TouchableOpacity>
+                    )}
                 </ScrollView>
 
                 {/* Footer Actions */}

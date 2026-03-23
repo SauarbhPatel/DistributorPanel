@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     SafeAreaView,
     View,
@@ -14,6 +14,8 @@ import SlaHeader from "../../components/slaSettings/SlaHeader";
 import CommonHeader from "../../components/common/CommonHeader";
 import WorkingHoursCard from "../../components/slaSettings/WorkingHoursCard";
 import WorkingHoursHeader from "../../components/slaSettings/WorkingHoursHeader";
+import WorkingHoursModel from "../../components/slaSettings/WorkingHoursModel";
+import HolidayModel from "../../components/slaSettings/HolidayModel";
 
 const options = [
     {
@@ -43,6 +45,13 @@ const options = [
 ];
 
 const SlaHolidayWorkingHours = ({ navigation }) => {
+    const [state, setState] = useState({
+        loading: false,
+        isShowCreate: false,
+        isShowCreate2: false,
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+    const { loading, isShowCreate, isShowCreate2 } = state;
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
             <StatusBar backgroundColor={Colors.primaryColor} />
@@ -62,7 +71,7 @@ const SlaHolidayWorkingHours = ({ navigation }) => {
                         title="Working hours by region"
                         buttonName={"Add"}
                         count={2}
-                        onAdd={() => {}}
+                        onAdd={() => updateState({ isShowCreate: true })}
                     />
                     {[
                         {
@@ -94,12 +103,21 @@ const SlaHolidayWorkingHours = ({ navigation }) => {
                         title="Holidays"
                         buttonName={"Add"}
                         count={2}
-                        onAdd={() => {}}
+                        onAdd={() => updateState({ isShowCreate2: true })}
                     />
                     {options.map((item, index) => (
                         <OptionCard item={item} key={index} />
                     ))}
                 </ScrollView>
+
+                <WorkingHoursModel
+                    visible={isShowCreate}
+                    onClose={() => updateState({ isShowCreate: false })}
+                />
+                <HolidayModel
+                    visible={isShowCreate2}
+                    onClose={() => updateState({ isShowCreate2: false })}
+                />
             </View>
         </SafeAreaView>
     );
@@ -108,15 +126,31 @@ const SlaHolidayWorkingHours = ({ navigation }) => {
 export default SlaHolidayWorkingHours;
 
 const OptionCard = ({ item }) => {
+    const [state, setState] = useState({
+        loading: false,
+        isShowCreate: false,
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+    const { loading, isShowCreate } = state;
     return (
         <View style={[styles.card, { borderLeftColor: item.statusColor }]}>
+            <HolidayModel
+                edit
+                visible={isShowCreate}
+                onClose={() => updateState({ isShowCreate: false })}
+            />
             {/* DATE & ACTIONS ROW */}
             <View style={styles.rowTop}>
                 <Text style={styles.code}>{item.date}</Text>
 
                 <View style={styles.actions}>
                     <TouchableOpacity style={styles.iconBtn}>
-                        <Feather name="edit-2" size={16} color="#495057" />
+                        <Feather
+                            name="edit-2"
+                            onPress={() => updateState({ isShowCreate: true })}
+                            size={16}
+                            color="#495057"
+                        />
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.iconBtn}>

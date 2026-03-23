@@ -287,10 +287,9 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         borderWidth: 1,
-        borderColor: "#E2E8F0",
+        borderColor: "#dee2e6",
         borderRadius: 8,
         padding: 12,
-        height: 48,
     },
     dropdownText: { fontSize: 14, color: "#64748b" },
     stepperContainer: {

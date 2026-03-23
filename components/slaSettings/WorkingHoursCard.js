@@ -1,8 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import WorkingHoursModel from "./WorkingHoursModel";
 
 const WorkingHoursCard = ({ item }) => {
+    const [state, setState] = useState({
+        loading: false,
+        isShowCreate: false,
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+    const { loading, isShowCreate } = state;
     return (
         <View
             style={[
@@ -13,6 +20,11 @@ const WorkingHoursCard = ({ item }) => {
                 },
             ]}
         >
+            <WorkingHoursModel
+                visible={isShowCreate}
+                onClose={() => updateState({ isShowCreate: false })}
+                edit
+            />
             <View style={styles.content}>
                 {/* ROW 1: REGION & BADGES */}
                 <View style={styles.headerRow}>
@@ -70,7 +82,14 @@ const WorkingHoursCard = ({ item }) => {
                     {/* ACTIONS */}
                     <View style={styles.actions}>
                         <TouchableOpacity style={styles.actionCircle}>
-                            <Feather name="edit-2" size={14} color="#666" />
+                            <Feather
+                                onPress={() =>
+                                    updateState({ isShowCreate: true })
+                                }
+                                name="edit-2"
+                                size={14}
+                                color="#666"
+                            />
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.actionCircle}>
                             <Feather name="trash-2" size={14} color="#fa5252" />
