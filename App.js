@@ -130,6 +130,8 @@ import MarketingGoogle from "./screens/marketinDashboard/marketingGoogle";
 import MarketingGoogleAnalytics from "./screens/marketinDashboard/marketingGoogleAnalytics";
 import MarketingMeta from "./screens/marketinDashboard/marketingMeta";
 import MarketingMetaAnalytics from "./screens/marketinDashboard/marketingMetaAnalytics";
+import B2BSettings from "./screens/orderHub/B2BSettings";
+import B2BSettingManageSecondary from "./screens/orderHub/B2BSettingManageSecondary";
 
 LogBox.ignoreAllLogs();
 
@@ -426,6 +428,11 @@ function App() {
                     component={AbandonedOrders}
                 />
                 <Stack.Screen name="B2BOrders" component={B2BOrders} />
+                <Stack.Screen name="B2BSettings" component={B2BSettings} />
+                <Stack.Screen
+                    name="B2BSettingManageSecondary"
+                    component={B2BSettingManageSecondary}
+                />
 
                 {/* SLA Settings */}
                 <Stack.Screen name="SlaSetting" component={SlaSetting} />
