@@ -20,9 +20,10 @@ import { __deleteApiData, __getApiData, __patchApiData } from "../../utils/api";
 import BottomPopup from "../../components/common/BottomPopup";
 import { Loader } from "../../modules";
 import CreateTaxJurisdiction from "../../components/form/CreateTaxJurisdiction";
+import JurisdictionsHeader from "../../components/masters/JurisdictionsHeader";
 
 const TaxJurisdiction = ({ navigation }) => {
-    const [search, setSearch] = useState("");
+    // const [search, setSearch] = useState("");
     const [state, setState] = useState({
         loading: false,
         loading1: false,
@@ -31,11 +32,13 @@ const TaxJurisdiction = ({ navigation }) => {
         filterableAttributes: 0,
         variantAttributes: 0,
         isShowCreate: false,
+        search: "",
     });
 
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
     const {
+        search,
         isShowCreate,
         loading,
         loading1,
@@ -110,8 +113,7 @@ const TaxJurisdiction = ({ navigation }) => {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
             <CommonHeader
-                title={"Tax Jurisdictions"}
-                subTitle={"Configure countries, states, and regions."}
+                title={"Regulatory jurisdiction"}
                 navigation={navigation}
             />
             <Loader isShow={loading} />
@@ -119,15 +121,8 @@ const TaxJurisdiction = ({ navigation }) => {
             <ScrollView
                 contentContainerStyle={{ paddingBottom: 20, paddingTop: 10 }}
             >
-                {searchAndAdd()}
-                <View style={{ position: "relative" }}>
-                    {/* {loading1 && (
-                        <ActivityIndicator
-                            style={{
-                                margin: 10,
-                            }}
-                        />
-                    )} */}
+                <JurisdictionsHeader search={search} onChange={updateState} />
+                <View style={{ position: "relative", marginTop: 10 }}>
                     {attributeCards()}
                 </View>
             </ScrollView>
@@ -146,63 +141,6 @@ const TaxJurisdiction = ({ navigation }) => {
             />
         </SafeAreaView>
     );
-
-    function statsCards() {
-        return (
-            <FlatList
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                ListHeaderComponent={
-                    <>
-                        <View style={styles.statsRow}>
-                            <StatCard
-                                title="Total Categories"
-                                value={totalAttributes}
-                                colors={["#3B82F6", "#2563EB"]}
-                                icon="tag"
-                            />
-                            <StatCard
-                                title="Active"
-                                value={filterableAttributes}
-                                colors={["#10B981", "#059669"]}
-                                icon="filter"
-                            />
-                            <StatCard
-                                title="Root Levels"
-                                value={variantAttributes}
-                                colors={["#8B5CF6", "#7C3AED"]}
-                                icon="layers"
-                            />
-                        </View>
-                    </>
-                }
-            />
-        );
-    }
-
-    function searchAndAdd() {
-        return (
-            <View style={styles.searchRow}>
-                <View style={styles.searchBox}>
-                    <Feather name="search" size={18} color={Colors.grayColor} />
-                    <TextInput
-                        placeholder="Search categories..."
-                        style={styles.searchInput}
-                        value={search}
-                        onChangeText={setSearch}
-                    />
-                </View>
-
-                <TouchableOpacity
-                    style={styles.addBtn}
-                    onPress={() => updateState({ isShowCreate: true })}
-                >
-                    <Feather name="plus" size={18} color={Colors.whiteColor} />
-                    <Text style={styles.addText}>Add</Text>
-                </TouchableOpacity>
-            </View>
-        );
-    }
 
     function attributeCards() {
         return (

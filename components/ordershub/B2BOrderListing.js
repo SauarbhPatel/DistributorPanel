@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
@@ -9,6 +9,9 @@ import {
     ScrollView,
 } from "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import OrderDetailsModal from "./OrderDetailsModal";
+import BuyerProfileModal from "./BuyerProfileModal";
+import UpdateOrderModal from "./UpdateOrderModal";
 
 const ORDER_DATA = [
     {
@@ -97,6 +100,14 @@ const OrderItem = ({ item }) => {
         }
     };
 
+    const [state, setState] = useState({
+        isShowDetails: false,
+        isShowUpdate: false,
+        isShowBuyer: false,
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+    const { isShowDetails, isShowUpdate, isShowBuyer } = state;
+
     return (
         <View style={styles.card}>
             <View
@@ -104,6 +115,24 @@ const OrderItem = ({ item }) => {
             >
                 <Text style={styles.ribbonText}>{item.statusType}</Text>
             </View>
+            <OrderDetailsModal
+                visible={isShowDetails}
+                onClose={() => {
+                    updateState({ isShowDetails: false });
+                }}
+            />
+            <BuyerProfileModal
+                visible={isShowBuyer}
+                onClose={() => {
+                    updateState({ isShowBuyer: false });
+                }}
+            />
+            <UpdateOrderModal
+                visible={isShowUpdate}
+                onClose={() => {
+                    updateState({ isShowUpdate: false });
+                }}
+            />
 
             <View style={styles.cardContent}>
                 <View style={styles.row}>
@@ -146,7 +175,14 @@ const OrderItem = ({ item }) => {
                             justifyContent: "space-between",
                         }}
                     >
-                        <Text style={styles.orderId}>{item.id}</Text>
+                        <Text
+                            style={styles.orderId}
+                            onPress={() => {
+                                updateState({ isShowDetails: true });
+                            }}
+                        >
+                            {item.id}
+                        </Text>
                         <View
                             style={[
                                 styles.slaBadge,
@@ -231,7 +267,14 @@ const OrderItem = ({ item }) => {
                 <View style={styles.divider} />
 
                 <View style={styles.buyerInfo}>
-                    <Text style={styles.buyerName}>{item.buyer}</Text>
+                    <Text
+                        style={styles.buyerName}
+                        onPress={() => {
+                            updateState({ isShowBuyer: true });
+                        }}
+                    >
+                        {item.buyer}
+                    </Text>
                     <Text style={styles.buyerAddress}>{item.address}</Text>
                     <Text style={styles.buyerPhone}>{item.phone}</Text>
                 </View>
@@ -247,6 +290,9 @@ const OrderItem = ({ item }) => {
                         label="Update Details"
                         color="#EFF6FF"
                         textColor="#2563EB"
+                        onPress={() => {
+                            updateState({ isShowUpdate: true });
+                        }}
                     />
                     <ActionButton
                         label="Mark Unverified"
@@ -264,8 +310,11 @@ const OrderItem = ({ item }) => {
     );
 };
 
-const ActionButton = ({ label, color, textColor }) => (
-    <TouchableOpacity style={[styles.actionBtn, { backgroundColor: color }]}>
+const ActionButton = ({ label, color, textColor, onPress = () => {} }) => (
+    <TouchableOpacity
+        onPress={onPress}
+        style={[styles.actionBtn, { backgroundColor: color }]}
+    >
         <Text style={[styles.actionBtnText, { color: textColor }]}>
             {label}
         </Text>
@@ -339,7 +388,12 @@ const styles = StyleSheet.create({
     sellerText: { fontSize: 11, color: "#2563EB", fontWeight: "600" },
     dateText: { fontSize: 11, color: "#94A3B8", marginTop: 4 },
     divider: { height: 1, backgroundColor: "#F1F5F9", marginVertical: 12 },
-    orderId: { fontSize: 13, fontWeight: "700", color: "#1E40AF" },
+    orderId: {
+        fontSize: 13,
+        fontWeight: "700",
+        color: "#1E40AF",
+        textDecorationLine: "underline",
+    },
     slaBadge: {
         flexDirection: "row",
         alignItems: "center",
@@ -379,6 +433,7 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         color: "#2563EB",
         marginBottom: 2,
+        textDecorationLine: "underline",
     },
     buyerAddress: { fontSize: 12, color: "#64748B", lineHeight: 18 },
     buyerPhone: {

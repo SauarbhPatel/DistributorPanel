@@ -33,10 +33,10 @@ const B2BSettingManageSecondary = ({ navigation }) => {
                 />
                 <B2BSettingMSListing />
             </ScrollView>
-            {/* <B2BSettingEditPrimaryModal
+            <B2BSettingEditPrimaryModal
                 visible={isShowCreate}
                 onClose={() => updateState({ isShowCreate: false })}
-            /> */}
+            />
         </SafeAreaView>
     );
 };

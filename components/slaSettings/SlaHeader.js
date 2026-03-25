@@ -32,6 +32,9 @@ const SlaHeader = ({
     feedButton = false,
     reportButton = false,
     onPressButton = () => {},
+    totalCategory = null,
+    active = null,
+    leaf = null,
 }) => {
     return (
         <LinearGradient colors={colors} style={styles.bannerCard}>
@@ -153,6 +156,60 @@ const SlaHeader = ({
                                 Property ID
                             </Text>
                             <Text style={styles.statusText}>{propertyID}</Text>
+                        </View>
+                    </TouchableOpacity>
+                )}
+                {(totalCategory || totalCategory >= 0) &&
+                    totalCategory != null && (
+                        <TouchableOpacity
+                            style={styles.status}
+                            activeOpacity={0.8}
+                        >
+                            <View>
+                                <Text
+                                    style={{
+                                        fontSize: 9,
+                                        fontWeight: "600",
+                                        color: "#ffffff90",
+                                    }}
+                                >
+                                    Total Category
+                                </Text>
+                                <Text style={styles.statusText}>
+                                    {totalCategory}
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
+                    )}
+                {(active || active >= 0) && active != null && (
+                    <TouchableOpacity style={styles.status} activeOpacity={0.8}>
+                        <View>
+                            <Text
+                                style={{
+                                    fontSize: 9,
+                                    fontWeight: "600",
+                                    color: "#ffffff90",
+                                }}
+                            >
+                                Active
+                            </Text>
+                            <Text style={styles.statusText}>{active}</Text>
+                        </View>
+                    </TouchableOpacity>
+                )}
+                {(leaf || leaf >= 0) && leaf != null && (
+                    <TouchableOpacity style={styles.status} activeOpacity={0.8}>
+                        <View>
+                            <Text
+                                style={{
+                                    fontSize: 9,
+                                    fontWeight: "600",
+                                    color: "#ffffff90",
+                                }}
+                            >
+                                Leaf — Product-enabled
+                            </Text>
+                            <Text style={styles.statusText}>{leaf}</Text>
                         </View>
                     </TouchableOpacity>
                 )}

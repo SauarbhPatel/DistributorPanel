@@ -13,27 +13,18 @@ import B2BSettingTransitionRules from "../../components/ordershub/B2BSettingTran
 import B2BSettingRolePermissions from "../../components/ordershub/B2BSettingRolePermissions";
 import ComingSoon from "../../components/ordershub/ComingSoon";
 const tabsData = {
-    "B2B Transactions": {
-        title: "B2B Transactions by Leaf Category",
-        des: "Map leaf categories to enable B2B transactions. When enabled, the B2B  order button appears on the front for products in that category. GSTIN is mandatory for all B2B transactions.",
-        buttonName: "Create & map category",
-    },
-    "Demo Data": {
-        title: "B2B Demo Orders",
-        des: "Seed the B2B Orders page with demo data. This data is separate from  Order Management and will not affect it. After seeding, go to o see the table.",
-        buttonName: "Create B2B demo orders",
-    },
     "Order Status Manager": {
         title: "",
-        des: "These primary and secondary statuses are the same ones used in the B2B  Orders status header. Any change you make here is reflected on the B2B  Orders page when you go back.",
+        des: "",
         buttonName: "Create New Status",
         isShowFilter: true,
     },
     "Transition Rules": {
         title: "",
-        des: "These primary and secondary statuses are the same ones used in the B2B  Orders status header. Any change you make here is reflected on the B2B  Orders page when you go back.",
+        des: "",
         isShowFilter: true,
-        hideAllButton: true,
+        buttonName: "Create New Status",
+        // hideAllButton: true,
     },
     "Role Permissions": {
         title: "Role Permissions",
@@ -46,7 +37,7 @@ const tabsData = {
         hideAllButton: true,
     },
 };
-const B2BSettings = ({ navigation }) => {
+const OrderSetting = ({ navigation }) => {
     const [state, setState] = useState({
         loading: false,
     });
@@ -54,20 +45,30 @@ const B2BSettings = ({ navigation }) => {
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
     const { loading } = state;
-    const [activeTab, setActiveTab] = useState("B2B Transactions");
+    const [activeTab, setActiveTab] = useState("Order Status Manager");
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
-            <CommonHeader title={"B2B Settings"} navigation={navigation} />
+            <CommonHeader title={"Order Settings"} navigation={navigation} />
             <Loader isShow={loading} />
             <ScrollView
                 contentContainerStyle={{ paddingBottom: 20, paddingTop: 1 }}
             >
-                <B2BSettingsHeader tabsData={tabsData[activeTab]} />
+                <B2BSettingsHeader
+                    title="Order Settings"
+                    subTitle="Dynamic order statuses (Level 1 + Level 2), transition rules, role  permissions, and audit. Manage lifecycle without code changes."
+                    tabsData={tabsData[activeTab]}
+                />
                 <B2BTransactionsCom
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
                     tabsData={tabsData}
+                    tabs={[
+                        "Order Status Manager",
+                        "Transition Rules",
+                        "Role Permissions",
+                        "Audit Logs",
+                    ]}
                 />
 
                 {activeTab == "B2B Transactions" ? (
@@ -107,4 +108,4 @@ const B2BSettings = ({ navigation }) => {
     );
 };
 
-export default B2BSettings;
+export default OrderSetting;

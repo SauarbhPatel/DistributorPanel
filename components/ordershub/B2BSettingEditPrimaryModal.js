@@ -12,130 +12,159 @@ import {
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
-const B2BSettingEditPrimaryModal = ({ visible, onClose }) => {
-    const [form, setForm] = useState({
-        statusType: "Open",
-        visibleTo: { Admin: true, Seller: true, Buyer: false },
-        assignmentMode: "Manual Only",
-    });
-
-    const toggleRole = (role) => {
-        setForm({
-            ...form,
-            visibleTo: { ...form.visibleTo, [role]: !form.visibleTo[role] },
-        });
-    };
-
+const B2BSettingEditPrimaryModal = ({ visible, onClose, initialData }) => {
     return (
         <Modal visible={visible} animationType="slide" transparent={true}>
             <SafeAreaView style={styles.container}>
                 {/* Header Section */}
                 <View style={styles.header}>
-                    <View style={styles.headerTitleRow}>
-                        <View style={styles.blueIconCircle}>
-                            <Feather name="edit-2" size={18} color="#fff" />
-                        </View>
-                        <Text style={styles.headerTitle}>
-                            Edit primary status
-                        </Text>
-                    </View>
+                    <Text style={styles.headerTitle}>Edit primary status</Text>
+                    <Text style={styles.headerSub}>
+                        Status code is unique and immutable once used. Use
+                        Deactivate instead of deleting if the status has
+                        historical orders.
+                    </Text>
                 </View>
 
                 <ScrollView
                     style={styles.content}
                     showsVerticalScrollIndicator={false}
                 >
-                    {/* Top Alert/Info Box */}
-                    <View style={styles.infoBox}>
-                        <Text style={styles.infoBoxTitle}>
-                            Status Configuration
-                        </Text>
-                        <Text style={styles.infoBoxText}>
-                            Primary statuses represent major stages in the order
-                            lifecycle. Changes here will affect all mapped
-                            secondary statuses and transition rules.
-                        </Text>
-                    </View>
-
                     <View style={styles.mainCard}>
-                        {/* Name Input */}
+                        {/* 1. Status Name */}
                         <View style={styles.inputGroup}>
                             <Text style={styles.label}>
-                                Primary status name *
+                                Status name{" "}
+                                <Text style={styles.required}>*</Text>
                             </Text>
                             <TextInput
                                 style={styles.input}
-                                defaultValue="New Order"
+                                placeholder="Order name"
                                 placeholderTextColor="#adb5bd"
                             />
                         </View>
 
-                        {/* Code and Sort Row */}
-                        <View style={styles.row}>
-                            <View style={styles.fieldFlex}>
-                                <Text style={styles.label}>
-                                    Code * (unique)
-                                </Text>
-                                <TextInput
-                                    style={[styles.input, styles.disabledInput]}
-                                    value="NEW_ORDER"
-                                    editable={false}
-                                />
-                            </View>
-                            <StepperField label="Sort order" value="10" />
+                        {/* 2. Status Code (Immutable Note) */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>
+                                Status code * (unique, immutable)
+                            </Text>
+                            <TextInput
+                                style={[styles.input, styles.disabledInput]}
+                                value="NEW_ORDER2"
+                                editable={false}
+                            />
+                            <Text style={styles.helperText}>
+                                Code cannot be changed after creation.
+                            </Text>
                         </View>
 
-                        {/* Description */}
+                        {/* 3. Internal Description */}
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Description</Text>
+                            <Text style={styles.label}>
+                                Description (internal)
+                            </Text>
                             <TextInput
-                                style={[styles.input, styles.textArea]}
-                                defaultValue="Order just placed; pending verification and assignment"
+                                style={[
+                                    styles.input,
+                                    { height: 80, textAlignVertical: "top" },
+                                ]}
+                                placeholder="Optional"
                                 multiline={true}
                             />
+                            <Text style={styles.helperText}>
+                                Internal code decided after discussion. Must be
+                                unique.
+                            </Text>
                         </View>
 
-                        {/* Dropdown for Status Type */}
-                        <View style={styles.row}>
-                            <DropdownField
-                                label="Status type"
-                                value={form.statusType}
-                            />
-                            <DropdownField
-                                label="Default assignment"
-                                value={form.assignmentMode}
-                            />
+                        {/* 4. Status Type Dropdown */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Status type</Text>
+                            <TouchableOpacity style={styles.dropdown}>
+                                <Text style={styles.dropdownText}>Open</Text>
+                                <Feather
+                                    name="chevron-down"
+                                    size={18}
+                                    color="#495057"
+                                />
+                            </TouchableOpacity>
+                            <Text style={styles.helperText}>
+                                Open / In Progress / Closed — for grouping in
+                                UI.
+                            </Text>
                         </View>
 
-                        {/* Role Visibility Selection */}
-                        <Text style={styles.label}>Visible to</Text>
-                        <View style={styles.checkboxContainer}>
-                            {Object.keys(form.visibleTo).map((role) => (
-                                <TouchableOpacity
-                                    key={role}
-                                    style={styles.checkboxItem}
-                                    onPress={() => toggleRole(role)}
-                                >
-                                    <View
-                                        style={[
-                                            styles.checkbox,
-                                            form.visibleTo[role] &&
-                                                styles.checkboxActive,
-                                        ]}
-                                    >
-                                        {form.visibleTo[role] && (
-                                            <Feather
-                                                name="check"
-                                                size={12}
-                                                color="#fff"
-                                            />
-                                        )}
-                                    </View>
-                                    <Text style={styles.checkboxLabel}>
-                                        {role}
+                        {/* 5. Terminal Flag Section */}
+                        <View style={styles.flagCard}>
+                            <View style={styles.checkboxRow}>
+                                <MaterialCommunityIcons
+                                    name="checkbox-marked"
+                                    size={20}
+                                    color="#0071BC"
+                                />
+                                <Text style={styles.flagText}>
+                                    Is terminal (cannot move forward except
+                                    exceptions)
+                                </Text>
+                            </View>
+                        </View>
+
+                        {/* 6. Visibility Roles */}
+                        <View style={[styles.flagCard, { marginTop: 15 }]}>
+                            <Text style={[styles.label, { marginBottom: 12 }]}>
+                                Visibility (internal)
+                            </Text>
+                            <View style={styles.rolesRow}>
+                                <RoleToggle label="Admin" active={true} />
+                                <RoleToggle label="Seller" active={true} />
+                                <RoleToggle label="Buyer" active={true} />
+                            </View>
+                        </View>
+
+                        {/* 7. Sort Order & Active Status */}
+                        <View style={[styles.row, { marginTop: 15 }]}>
+                            <View
+                                style={[
+                                    styles.inputGroup,
+                                    { flex: 1, marginRight: 10 },
+                                ]}
+                            >
+                                <Text style={styles.label}>
+                                    Sort order / priority
+                                </Text>
+                                <TextInput
+                                    style={styles.input}
+                                    keyboardType="numeric"
+                                    defaultValue="0"
+                                />
+                            </View>
+                            <View style={[styles.inputGroup, { flex: 1 }]}>
+                                <Text style={styles.label}>Active</Text>
+                                <TouchableOpacity style={styles.dropdown}>
+                                    <Text style={styles.dropdownText}>
+                                        Active
                                     </Text>
+                                    <Feather
+                                        name="chevron-down"
+                                        size={18}
+                                        color="#495057"
+                                    />
                                 </TouchableOpacity>
-                            ))}
+                            </View>
+                        </View>
+
+                        {/* Bottom Tip */}
+                        <View style={styles.tipContainer}>
+                            <Feather
+                                name="message-square"
+                                size={16}
+                                color="#adb5bd"
+                            />
+                            <Text style={styles.tipText}>
+                                This name will be visible to users in the order
+                                workflow.
+                            </Text>
                         </View>
                     </View>
                 </ScrollView>
@@ -151,22 +180,20 @@ const B2BSettingEditPrimaryModal = ({ visible, onClose }) => {
                             size={20}
                             color="#868e96"
                         />
-                        <Text style={styles.cancelText}>Discard</Text>
+                        <Text style={styles.cancelText}>Cancel</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity activeOpacity={0.8} onPress={onClose}>
+                    <TouchableOpacity activeOpacity={0.8}>
                         <LinearGradient
                             colors={["#0070ba", "#005a96"]}
                             style={styles.saveBtn}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 0 }}
                         >
-                            <Text style={styles.saveBtnText}>
-                                Update Status
-                            </Text>
+                            <Text style={styles.saveBtnText}>Save</Text>
                             <Feather
-                                name="check-circle"
-                                size={18}
+                                name="chevron-right"
+                                size={20}
                                 color="#fff"
                             />
                         </LinearGradient>
@@ -177,69 +204,23 @@ const B2BSettingEditPrimaryModal = ({ visible, onClose }) => {
     );
 };
 
-// --- Reusable Sub-Components ---
-
-const DropdownField = ({ label, value }) => (
-    <View style={styles.fieldFlex}>
-        <Text style={styles.label}>{label}</Text>
-        <TouchableOpacity style={styles.dropdown}>
-            <Text style={styles.dropdownText}>{value}</Text>
-            <Feather name="chevron-down" size={18} color="#1a1b1e" />
-        </TouchableOpacity>
-    </View>
-);
-
-const StepperField = ({ label, value }) => (
-    <View style={styles.fieldFlex}>
-        <Text style={styles.label}>{label}</Text>
-        <View style={styles.stepperContainer}>
-            <TextInput
-                style={styles.stepperInput}
-                value={value}
-                keyboardType="numeric"
-            />
-            <View style={styles.stepperControls}>
-                <TouchableOpacity style={styles.stepperBtn}>
-                    <Feather name="chevron-up" size={12} />
-                </TouchableOpacity>
-                <View style={styles.stepperDivider} />
-                <TouchableOpacity style={styles.stepperBtn}>
-                    <Feather name="chevron-down" size={12} />
-                </TouchableOpacity>
-            </View>
-        </View>
+const RoleToggle = ({ label, active }) => (
+    <View style={styles.roleItem}>
+        <MaterialCommunityIcons
+            name={active ? "checkbox-marked" : "checkbox-blank-outline"}
+            size={20}
+            color={active ? "#10B981" : "#adb5bd"}
+        />
+        <Text style={styles.roleLabel}>{label}</Text>
     </View>
 );
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: "#F0F4F8" },
+    container: { flex: 1, backgroundColor: "#f3f4f6" },
     header: { padding: 20 },
-    headerTitleRow: { flexDirection: "row", alignItems: "center", gap: 12 },
-    blueIconCircle: {
-        width: 34,
-        height: 34,
-        borderRadius: 10,
-        backgroundColor: "#0070ba",
-        justifyContent: "center",
-        alignItems: "center",
-    },
+    headerSub: { color: "#6b7280", fontSize: 12, marginTop: 4, lineHeight: 18 },
     headerTitle: { fontSize: 18, fontWeight: "800", color: "#1a1b1e" },
     content: { flex: 1, paddingHorizontal: 16 },
-    infoBox: {
-        backgroundColor: "#fff",
-        borderRadius: 12,
-        padding: 16,
-        marginBottom: 16,
-        borderWidth: 1,
-        borderColor: "#E2E8F0",
-    },
-    infoBoxTitle: {
-        fontSize: 16,
-        fontWeight: "700",
-        color: "#1e293b",
-        marginBottom: 8,
-    },
-    infoBoxText: { fontSize: 12, color: "#64748b", lineHeight: 18 },
     mainCard: {
         backgroundColor: "#fff",
         borderRadius: 12,
@@ -249,14 +230,13 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     inputGroup: { marginBottom: 15 },
-    row: { flexDirection: "row", marginBottom: 15, gap: 12 },
-    fieldFlex: { flex: 1 },
     label: {
         fontSize: 13,
         fontWeight: "700",
         color: "#495057",
         marginBottom: 8,
     },
+    required: { color: "#ef4444" },
     input: {
         borderWidth: 1,
         borderColor: "#dee2e6",
@@ -264,60 +244,39 @@ const styles = StyleSheet.create({
         padding: 12,
         fontSize: 14,
         color: "#1a1b1e",
+        backgroundColor: "#fff",
     },
-    disabledInput: { backgroundColor: "#f8fafc", color: "#94a3b8" },
-    textArea: { height: 60, textAlignVertical: "top" },
+    disabledInput: { backgroundColor: "#f9fafb", color: "#9ca3af" },
+    helperText: { fontSize: 11, color: "#9ca3af", marginTop: 4 },
+    row: { flexDirection: "row" },
     dropdown: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
         borderWidth: 1,
         borderColor: "#dee2e6",
-        borderRadius: 10,
+        borderRadius: 8,
         padding: 12,
     },
-    dropdownText: { fontSize: 14, color: "#475569" },
-    stepperContainer: {
+    dropdownText: { fontSize: 14, color: "#1f2937" },
+    flagCard: { backgroundColor: "#f9fafb", padding: 12, borderRadius: 8 },
+    checkboxRow: { flexDirection: "row", alignItems: "center" },
+    flagText: {
+        marginLeft: 10,
+        fontSize: 13,
+        color: "#374151",
+        fontWeight: "500",
+    },
+    rolesRow: { flexDirection: "row", gap: 20 },
+    roleItem: { flexDirection: "row", alignItems: "center" },
+    roleLabel: { marginLeft: 6, fontSize: 13, color: "#4b5563" },
+    tipContainer: {
         flexDirection: "row",
-        borderWidth: 1,
-        borderColor: "#dee2e6",
-        borderRadius: 10,
-        height: 48,
-        overflow: "hidden",
-    },
-    stepperInput: {
-        flex: 1,
-        paddingHorizontal: 12,
-        fontSize: 14,
-        color: "#1e293b",
-    },
-    stepperControls: {
-        width: 30,
-        borderLeftWidth: 1,
-        borderLeftColor: "#E2E8F0",
-    },
-    stepperBtn: { flex: 1, justifyContent: "center", alignItems: "center" },
-    stepperDivider: { height: 1, backgroundColor: "#E2E8F0" },
-    checkboxContainer: {
-        flexDirection: "row",
-        gap: 20,
-        marginTop: 10,
-        backgroundColor: "#F8FAFC",
-        padding: 12,
-        borderRadius: 10,
-    },
-    checkboxItem: { flexDirection: "row", alignItems: "center", gap: 8 },
-    checkbox: {
-        width: 20,
-        height: 20,
-        borderRadius: 6,
-        borderWidth: 2,
-        borderColor: "#0070ba",
-        justifyContent: "center",
         alignItems: "center",
+        marginTop: 20,
+        paddingHorizontal: 5,
     },
-    checkboxActive: { backgroundColor: "#0070ba" },
-    checkboxLabel: { fontSize: 14, color: "#475569", fontWeight: "600" },
+    tipText: { marginLeft: 10, fontSize: 12, color: "#9ca3af" },
     footer: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -333,7 +292,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         paddingHorizontal: 25,
         paddingVertical: 12,
-        borderRadius: 12,
+        borderRadius: 10,
         gap: 8,
     },
     saveBtnText: { color: "#fff", fontWeight: "700", fontSize: 15 },

@@ -19,9 +19,9 @@ import BottomPopup from "../../components/common/BottomPopup";
 import CreateDocument from "../../components/form/CreateDocument";
 import { __formatDate } from "../../utils/funtion";
 import { Loader } from "../../modules";
+import DocumentHeader from "../../components/masters/DocumentHeader";
 
 const DocumentMaster = ({ navigation }) => {
-    const [search, setSearch] = useState("");
     const [state, setState] = useState({
         loading: false,
         list: [],
@@ -29,11 +29,13 @@ const DocumentMaster = ({ navigation }) => {
         filterableAttributes: 0,
         variantAttributes: 0,
         isShowCreate: false,
+        search: "",
     });
 
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
     const {
+        search,
         isShowCreate,
         loading,
         list,
@@ -105,17 +107,12 @@ const DocumentMaster = ({ navigation }) => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
-            <CommonHeader
-                title={"Document master"}
-                subTitle={"Compliance document master"}
-                navigation={navigation}
-            />
+            <CommonHeader title={"Document master"} navigation={navigation} />
             <Loader isShow={loading} />
             <ScrollView
                 contentContainerStyle={{ paddingBottom: 20, paddingTop: 10 }}
             >
-                {/* {statsCards()} */}
-                {searchAndAdd()}
+                <DocumentHeader search={search} onChange={updateState} />
                 {attributeCards()}
             </ScrollView>
             <BottomPopup
@@ -134,74 +131,11 @@ const DocumentMaster = ({ navigation }) => {
         </SafeAreaView>
     );
 
-    function statsCards() {
-        return (
-            <FlatList
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                ListHeaderComponent={
-                    <>
-                        <View style={styles.statsRow}>
-                            <StatCard
-                                title="Total Tax Rates"
-                                value={6}
-                                colors={["#3B82F6", "#2563EB"]}
-                                icon="percent"
-                            />
-
-                            <StatCard
-                                title="GST Rates (India)"
-                                value={4}
-                                colors={["#8B5CF6", "#7C3AED"]}
-                                icon="percent"
-                            />
-                            <StatCard
-                                title="VAT Rates"
-                                value={2}
-                                colors={["#10B981", "#059669"]}
-                                icon="percent"
-                            />
-
-                            <StatCard
-                                title="Countries Covered"
-                                value={3}
-                                colors={["#F97316", "#EA580C"]}
-                                icon="globe"
-                            />
-                        </View>
-                    </>
-                }
-            />
-        );
-    }
-
-    function searchAndAdd() {
-        return (
-            <View style={styles.searchRow}>
-                <View style={styles.searchBox}>
-                    <Feather name="search" size={18} color={Colors.grayColor} />
-                    <TextInput
-                        placeholder="Search Documents..."
-                        style={styles.searchInput}
-                        value={search}
-                        onChangeText={setSearch}
-                    />
-                </View>
-
-                <TouchableOpacity
-                    style={styles.addBtn}
-                    onPress={() => updateState({ isShowCreate: true })}
-                >
-                    <Feather name="plus" size={18} color={Colors.whiteColor} />
-                    <Text style={styles.addText}>Add Document</Text>
-                </TouchableOpacity>
-            </View>
-        );
-    }
-
     function attributeCards() {
         return (
-            <View style={{ paddingHorizontal: Sizes.fixPadding }}>
+            <View
+                style={{ paddingHorizontal: Sizes.fixPadding, marginTop: 10 }}
+            >
                 {list?.map((item) => (
                     <ListCard
                         item={item}

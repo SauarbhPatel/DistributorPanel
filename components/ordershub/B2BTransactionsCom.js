@@ -8,16 +8,19 @@ import {
 } from "react-native";
 import B2BSettingFilterSearchBar from "./B2BSettingFilterSearchBar";
 
-const B2BTransactionsCom = ({ activeTab, setActiveTab, tabsData }) => {
-    const tabs = [
+const B2BTransactionsCom = ({
+    tabs = [
         "B2B Transactions",
         "Demo Data",
         "Order Status Manager",
         "Transition Rules",
         "Role Permissions",
-        "Inactive",
-    ];
-
+        "Audit Logs",
+    ],
+    activeTab,
+    setActiveTab,
+    tabsData,
+}) => {
     return (
         <View style={styles.outerContainer}>
             <View style={styles.tabWrapper}>

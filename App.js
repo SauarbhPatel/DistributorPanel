@@ -132,6 +132,7 @@ import MarketingMeta from "./screens/marketinDashboard/marketingMeta";
 import MarketingMetaAnalytics from "./screens/marketinDashboard/marketingMetaAnalytics";
 import B2BSettings from "./screens/orderHub/B2BSettings";
 import B2BSettingManageSecondary from "./screens/orderHub/B2BSettingManageSecondary";
+import OrderSetting from "./screens/orderHub/OrderSetting";
 
 LogBox.ignoreAllLogs();
 
@@ -433,6 +434,7 @@ function App() {
                     name="B2BSettingManageSecondary"
                     component={B2BSettingManageSecondary}
                 />
+                <Stack.Screen name="OrderSetting" component={OrderSetting} />
 
                 {/* SLA Settings */}
                 <Stack.Screen name="SlaSetting" component={SlaSetting} />

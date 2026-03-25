@@ -8,15 +8,16 @@ import {
 } from "react-native";
 import { Feather, MaterialCommunityIcons, AntDesign } from "@expo/vector-icons";
 
-const B2BSettingsHeader = ({ tabsData }) => {
+const B2BSettingsHeader = ({
+    title = "B2B Settings",
+    subTitle = "Order Status Manager, Transition Rules, Role Permissions, and Audit Log for B2B orders.",
+    tabsData,
+}) => {
     return (
         <View style={styles.headerContainer}>
             <View style={styles.textWrapper}>
-                <Text style={styles.mainTitle}>B2B Settings</Text>
-                <Text style={styles.subTitle}>
-                    Order Status Manager, Transition Rules, Role Permissions,
-                    and Audit Log for B2B orders.
-                </Text>
+                <Text style={styles.mainTitle}>{title}</Text>
+                <Text style={styles.subTitle}>{subTitle}</Text>
             </View>
 
             {!tabsData?.hideAllButton ? (

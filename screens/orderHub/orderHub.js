@@ -16,32 +16,32 @@ const { width } = Dimensions.get("window");
 const PRODUCT_MENU = [
     {
         title: "Orders Management",
-        icon: "assignment", // Clipboard icon
+        icon: "assignment",
         screen: "OrdersManagement",
     },
     {
         title: "Order Settings",
-        icon: "settings", // Gear icon
-        screen: "OrderSettings",
+        icon: "settings",
+        screen: "OrderSetting",
     },
     {
         title: "SLA Settings",
-        icon: "schedule", // Clock icon
+        icon: "schedule",
         screen: "SlaSetting",
     },
     {
         title: "Abandoned Orders",
-        icon: "shopping-bag", // Shopping bag icon
+        icon: "shopping-bag",
         screen: "AbandonedOrders",
     },
     {
         title: "B2B Orders",
-        icon: "business", // Building/Office icon
+        icon: "business",
         screen: "B2BOrders",
     },
     {
         title: "B2B Settings",
-        icon: "settings", // Gear icon
+        icon: "settings",
         screen: "B2BSettings",
     },
 ];

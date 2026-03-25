@@ -20,6 +20,8 @@ import { __deleteApiData, __getApiData, __patchApiData } from "../../utils/api";
 import CreateCategoryManagment from "../../components/form/CreateCategoryManagment";
 import BottomPopup from "../../components/common/BottomPopup";
 import { Loader } from "../../modules";
+import CategorySearch from "../../components/masters/CategorySearch";
+import SlaHeader from "../../components/slaSettings/SlaHeader";
 
 const CategoryManagment = ({ navigation }) => {
     const [search, setSearch] = useState("");
@@ -111,7 +113,6 @@ const CategoryManagment = ({ navigation }) => {
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
             <CommonHeader
                 title={"Category Management"}
-                subTitle={"Manage hierarchical product categories"}
                 navigation={navigation}
             />
             <Loader isShow={loading} />
@@ -119,8 +120,21 @@ const CategoryManagment = ({ navigation }) => {
             <ScrollView
                 contentContainerStyle={{ paddingBottom: 20, paddingTop: 10 }}
             >
-                {statsCards()}
-                {searchAndAdd()}
+                <View style={{ paddingHorizontal: 10 }}>
+                    <SlaHeader
+                        title={"Category Management"}
+                        subTitle="Manage your complete category tree structure here.  Create, organize, and control all categories in one place."
+                        buttonName="Create Category"
+                        onPressButton={() => {
+                            updateState({ isShowCreate: true });
+                        }}
+                        totalCategory="10"
+                        active="9"
+                        leaf="0"
+                    />
+                </View>
+
+                <CategorySearch />
                 <View style={{ position: "relative" }}>
                     {/* {loading1 && (
                         <ActivityIndicator
