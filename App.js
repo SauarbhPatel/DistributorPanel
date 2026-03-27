@@ -133,6 +133,7 @@ import MarketingMetaAnalytics from "./screens/marketinDashboard/marketingMetaAna
 import B2BSettings from "./screens/orderHub/B2BSettings";
 import B2BSettingManageSecondary from "./screens/orderHub/B2BSettingManageSecondary";
 import OrderSetting from "./screens/orderHub/OrderSetting";
+import TaxManagment from "./screens/taxManagment/taxManagment";
 
 LogBox.ignoreAllLogs();
 
@@ -484,6 +485,8 @@ function App() {
                     name="SlaBreachedOrders"
                     component={SlaBreachedOrders}
                 />
+                {/* TaxManagment */}
+                <Stack.Screen name="TaxManagment" component={TaxManagment} />
                 {/* Marketing */}
                 <Stack.Screen
                     name="MarketinDashboard"

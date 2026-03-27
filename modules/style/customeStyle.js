@@ -18,12 +18,7 @@ export const inputTitleDynamicStyle = {
     fontFamily: "Roboto_Medium",
 };
 
-export const inputBoxDynamicStyle = {
-    backgroundColor: dynamicColors.whiteColor,
-    elevation: 1,
-    borderWidth: 0,
-    fontSize: 12,
-};
+export const inputBoxDynamicStyle = {};
 
 export const selectFormTitleDynamicStyle = {
     color: "#000000",

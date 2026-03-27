@@ -109,19 +109,6 @@ const CourierPartners = ({ navigation }) => {
                 visible={isShowCreate}
                 onClose={() => updateState({ isShowCreate: false })}
             />
-            {/* <BottomPopup
-                isShow={isShowCreate}
-                title="Add Courier Partners"
-                onClose={() => updateState({ isShowCreate: false })}
-                component={
-                    <CreateCourierPartners
-                        onClose={() => {
-                            updateState({ isShowCreate: false });
-                            __handleGetData(search);
-                        }}
-                    />
-                }
-            /> */}
         </SafeAreaView>
     );
 };

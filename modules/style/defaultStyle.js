@@ -37,16 +37,15 @@ export const inputTitleDefaultStyle = {
     fontFamily: "Roboto_Medium",
 };
 export const inputBoxDefaultStyle = {
-    marginHorizontal: Sizes.fixPadding * 2.0,
-    paddingVertical: Sizes.fixPadding,
+    paddingVertical: 3,
     paddingHorizontal: Sizes.fixPadding,
     flexDirection: "row",
     backgroundColor: Colors.whiteColor,
-    borderColor: Colors.grayColor,
-    borderWidth: 0.4,
+    borderWidth: 1,
+    borderColor: "#dee2e6",
     borderRadius: Sizes.fixPadding,
-    fontSize: Sizes.fixPadding * 1.6,
-    color: Colors.blackColor,
+    fontSize: 14,
+    color: "#1a1b1e",
 };
 
 export const selectFormTitleDefaultStyle = {

@@ -122,7 +122,13 @@ const DropDownTextAreaBox = React.memo(
                             </View>
                             {rightIcon || (
                                 <AntDesign
-                                    name="down"
+                                    name={
+                                        type == "date"
+                                            ? "calendar"
+                                            : type == "time"
+                                              ? "field-time"
+                                              : "down"
+                                    }
                                     size={16}
                                     color={Colors.grayColor}
                                 />
