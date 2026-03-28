@@ -261,9 +261,10 @@ const TaxSlabModal = ({ visible, onClose, isEdit = false, item = null }) => {
             <Loader isShow={state.isLoading} />
             <SafeAreaView style={styles.container}>
                 <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Create shipping zone</Text>
+                    <Text style={styles.headerTitle}>Add Tax Type</Text>
                     <Text style={styles.headerSub}>
-                        Define zone by country, state, city, and pincode ranges.
+                        Set up the tax rate and conditions for this slab before
+                        saving.
                     </Text>
                 </View>
 
@@ -286,7 +287,7 @@ const TaxSlabModal = ({ visible, onClose, isEdit = false, item = null }) => {
                         >
                             <View style={styles.cardHeader}>
                                 <Text style={styles.cardTitle}>
-                                    Shipping Zone Setup
+                                    Slab Details
                                 </Text>
                                 <Feather
                                     name="info"
@@ -295,8 +296,8 @@ const TaxSlabModal = ({ visible, onClose, isEdit = false, item = null }) => {
                                 />
                             </View>
                             <Text style={styles.cardSub}>
-                                Define a shipping zone by location or pincode
-                                range to control delivery options.
+                                Enter and manage configuration details for this
+                                tax slab.
                             </Text>
                         </View>
                         <View style={styles.inputGroup}>

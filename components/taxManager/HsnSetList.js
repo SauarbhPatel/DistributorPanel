@@ -1,19 +1,13 @@
 import React from "react";
-import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    ScrollView,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Colors, Sizes } from "../../constants/styles";
 import NoDataCard from "../common/NoDataCard";
 
-const TaxKindCard = ({
+const HsnSetCard = ({
     name,
     subtitle,
-    code,
+    hsnSetCode,
+    hsnCodes,
     description,
     status,
     isActive,
@@ -23,6 +17,7 @@ const TaxKindCard = ({
 
     return (
         <View style={[styles.card, isActive && styles.activeCard]}>
+            {/* Header section with Icon and Name */}
             <View style={styles.cardHeader}>
                 <View style={styles.headerLeft}>
                     <View style={styles.iconContainer}>
@@ -32,24 +27,30 @@ const TaxKindCard = ({
                             color={activeBlue}
                         />
                     </View>
-                    <View>
-                        <Text style={styles.taxNameText}>{name}</Text>
-                        <Text style={styles.taxSubtitleText}>{subtitle}</Text>
+                    <View style={styles.titleWrapper}>
+                        <Text style={styles.nameText}>{name}</Text>
+                        <Text style={styles.subtitleText}>{subtitle}</Text>
                     </View>
                 </View>
-                <TouchableOpacity style={styles.deleteButton}>
-                    <Feather name="trash-2" size={18} color="#FF5252" />
-                </TouchableOpacity>
+                <View style={styles.headerRight}>
+                    <TouchableOpacity style={styles.deleteButton}>
+                        <Feather name="trash-2" size={18} color="#FF5252" />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
-                    <Text style={styles.label}>TAX CODE</Text>
+                    <Text style={styles.label}>HSN SET CODE</Text>
                     <View style={styles.codeBadge}>
-                        <Text style={styles.codeBadgeText}>{code}</Text>
+                        <Text style={styles.codeBadgeText}>{hsnSetCode}</Text>
                     </View>
                 </View>
-                <View style={styles.infoItem}>
+                <View style={[styles.infoItem, { alignItems: "center" }]}>
+                    <Text style={styles.label}>HSN CODES</Text>
+                    <Text style={styles.valueText}>{hsnCodes}</Text>
+                </View>
+                <View style={[styles.infoItem, { alignItems: "flex-end" }]}>
                     <Text style={styles.label}>STATUS</Text>
                     <View style={styles.statusWrapper}>
                         <View
@@ -67,14 +68,12 @@ const TaxKindCard = ({
                 <Text style={styles.label}>DESCRIPTION</Text>
                 <Text style={styles.descriptionText}>{description}</Text>
             </View>
-
             <View style={styles.actionRow}>
                 <TouchableOpacity style={styles.editButton} activeOpacity={0.8}>
                     <Feather name="edit-3" size={14} color="#FFF" />
                     <Text style={styles.editButtonText}>Edit Details</Text>
                 </TouchableOpacity>
             </View>
-
             <View
                 style={[
                     styles.accentBorder,
@@ -85,41 +84,45 @@ const TaxKindCard = ({
     );
 };
 
-const TaxKindList = ({ onChange = () => {} }) => {
-    const taxData = [
+const HsnSetList = ({ onChange = () => {} }) => {
+    // Data updated to reflect HSN Set structure
+    const hsnData = [
         {
-            name: "GST",
+            name: "HSN Set Name",
             subtitle: "National consumption tax",
-            code: "GST",
+            hsnSetCode: "ELEC-HSN",
+            hsnCodes: "8517, 8516",
             description:
-                "Goods and Services Tax (GST) is an indirect tax used in India on the supply of goods and services.",
+                "HSN codes for electronic and telecommunication products",
             status: "ACTIVE",
+            isActive: true,
         },
         {
             name: "VAT",
             subtitle: "Value added tax",
-            code: "VAT",
-            description:
-                "Value Added Tax is a consumption tax placed on a product whenever value is added at each stage of the supply chain.",
+            hsnSetCode: "APP-COS",
+            hsnCodes: "6109, 3304",
+            description: "Apparel and cosmetics HSN codes",
             status: "ACTIVE",
+            isActive: false,
         },
     ];
 
     return (
         <View style={styles.container}>
-            {taxData.length > 0 ? (
-                taxData.map((item, index) => (
-                    <TaxKindCard key={index} {...item} />
+            {hsnData.length > 0 ? (
+                hsnData.map((item, index) => (
+                    <HsnSetCard key={index} {...item} />
                 ))
             ) : (
                 <NoDataCard
                     onCreatePress={() => onChange({ isShowCreate: true })}
-                    title="No Tax Kinds Defined"
-                    subTitle="Categorize your items by defining tax kinds (e.g., Electronics, Services). This helps in mapping specific tax rules and validation settings across your inventory."
-                    buttonName="Add Tax Kind"
+                    title="No HSN Sets Defined"
+                    subTitle="Organize your product HSN codes into sets for easier tax management and reporting."
+                    buttonName="Add HSN Set"
                     icon={
                         <MaterialCommunityIcons
-                            name="shape-outline"
+                            name="layers-outline"
                             size={42}
                             color="#94A3B8"
                         />
@@ -135,18 +138,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#F8FAFC",
         padding: 15,
-        paddingBottom: 30,
-    },
-    scrollPadding: {
-        padding: 15,
-        paddingBottom: 30,
-    },
-    screenTitle: {
-        fontSize: 18,
-        fontWeight: "800",
-        color: "#1E293B",
-        marginBottom: 15,
-        marginLeft: 5,
     },
     card: {
         backgroundColor: "#FFF",
@@ -157,7 +148,6 @@ const styles = StyleSheet.create({
         padding: 16,
         position: "relative",
         overflow: "hidden",
-        // Shadow for Mobile depth
         elevation: 3,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
@@ -179,87 +169,38 @@ const styles = StyleSheet.create({
     cardHeader: {
         flexDirection: "row",
         justifyContent: "space-between",
-        alignItems: "flex-start",
+        alignItems: "center",
         marginBottom: 15,
     },
     headerLeft: {
         flexDirection: "row",
         alignItems: "center",
+        flex: 1,
     },
     iconContainer: {
-        width: 40,
-        height: 40,
+        width: 36,
+        height: 36,
         backgroundColor: "#F0F7FF",
         borderRadius: 10,
         justifyContent: "center",
         alignItems: "center",
-        marginRight: 12,
+        marginRight: 10,
     },
-    taxNameText: {
-        fontSize: 16,
+    titleWrapper: {
+        flex: 1,
+    },
+    nameText: {
+        fontSize: 15,
         fontWeight: "700",
         color: "#1E293B",
     },
-    taxSubtitleText: {
-        fontSize: 12,
+    subtitleText: {
+        fontSize: 11,
         color: "#64748B",
     },
-    infoRow: {
-        flexDirection: "row",
-        marginBottom: 15,
-        borderTopWidth: 1,
-        borderTopColor: "#F1F5F9",
-        paddingTop: 15,
-    },
-    infoItem: {
-        flex: 1,
-    },
-    label: {
-        fontSize: 10,
-        fontWeight: "800",
-        color: "#94A3B8",
-        marginBottom: 6,
-        letterSpacing: 0.5,
-    },
-    codeBadge: {
-        backgroundColor: "#F1F5F9",
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 6,
-        alignSelf: "flex-start",
-    },
-    codeBadgeText: {
-        fontSize: 11,
-        fontWeight: "700",
-        color: "#475569",
-    },
-    statusWrapper: {
+    headerRight: {
         flexDirection: "row",
         alignItems: "center",
-    },
-    statusDot: {
-        width: 7,
-        height: 7,
-        borderRadius: 4,
-        marginRight: 6,
-    },
-    statusText: {
-        fontSize: 12,
-        fontWeight: "700",
-        color: "#475569",
-    },
-    descriptionContainer: {
-        marginBottom: 15,
-    },
-    descriptionText: {
-        fontSize: 13,
-        color: "#64748B",
-        lineHeight: 18,
-    },
-    actionRow: {
-        borderTopWidth: 1,
-        borderTopColor: "#F1F5F9",
-        paddingTop: 12,
     },
     editButton: {
         backgroundColor: "#0071BC",
@@ -278,6 +219,72 @@ const styles = StyleSheet.create({
     deleteButton: {
         padding: 4,
     },
+    infoRow: {
+        flexDirection: "row",
+        marginBottom: 12,
+        paddingTop: 12,
+        borderTopWidth: 1,
+        borderTopColor: "#F1F5F9",
+    },
+    detailsRow: {
+        flexDirection: "row",
+        alignItems: "flex-start",
+    },
+    infoItem: {
+        flex: 1,
+    },
+    label: {
+        fontSize: 10,
+        fontWeight: "800",
+        color: "#94A3B8",
+        marginBottom: 4,
+        letterSpacing: 0.5,
+    },
+    codeBadge: {
+        backgroundColor: "#F1F5F9",
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 6,
+        alignSelf: "flex-start",
+    },
+    codeBadgeText: {
+        fontSize: 10,
+        fontWeight: "700",
+        color: "#475569",
+    },
+    valueText: {
+        fontSize: 12,
+        color: "#475569",
+        fontWeight: "500",
+    },
+    descriptionText: {
+        fontSize: 12,
+        color: "#64748B",
+        lineHeight: 16,
+    },
+    statusWrapper: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    statusDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        marginRight: 6,
+    },
+    statusText: {
+        fontSize: 11,
+        fontWeight: "700",
+        color: "#475569",
+    },
+    descriptionContainer: {
+        marginBottom: 15,
+    },
+    descriptionText: {
+        fontSize: 13,
+        color: "#64748B",
+        lineHeight: 18,
+    },
 });
 
-export default TaxKindList;
+export default HsnSetList;

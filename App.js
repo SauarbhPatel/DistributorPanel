@@ -134,6 +134,7 @@ import B2BSettings from "./screens/orderHub/B2BSettings";
 import B2BSettingManageSecondary from "./screens/orderHub/B2BSettingManageSecondary";
 import OrderSetting from "./screens/orderHub/OrderSetting";
 import TaxManagment from "./screens/taxManagment/taxManagment";
+import TaxKindMaster from "./screens/taxManagment/taxKindMaster";
 
 LogBox.ignoreAllLogs();
 
@@ -487,6 +488,7 @@ function App() {
                 />
                 {/* TaxManagment */}
                 <Stack.Screen name="TaxManagment" component={TaxManagment} />
+                <Stack.Screen name="TaxKindMaster" component={TaxKindMaster} />
                 {/* Marketing */}
                 <Stack.Screen
                     name="MarketinDashboard"

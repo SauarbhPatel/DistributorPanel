@@ -18,28 +18,22 @@ import { __deleteApiData, __getApiData, __postApiData } from "../../utils/api";
 import BottomPopup from "../../components/common/BottomPopup";
 import CreateTaxType from "../../components/form/CreateTaxType";
 import { Loader } from "../../modules";
+import HeaderWithSearchAndFilter from "../../components/common/HeaderWithSearchAndFilter";
+import TaxTypeList from "../../components/taxManager/TaxTypeList";
+import TaxTypeModel from "../../components/taxManager/TaxTypeModel";
 
 const TaxTypes = ({ navigation }) => {
-    const [search, setSearch] = useState("");
+    // const [search, setSearch] = useState("");
     const [state, setState] = useState({
         loading: false,
         list: [],
-        totalAttributes: 0,
-        filterableAttributes: 0,
-        variantAttributes: 0,
+        search: "",
         isShowCreate: false,
     });
 
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
-    const {
-        isShowCreate,
-        loading,
-        list,
-        totalAttributes,
-        filterableAttributes,
-        variantAttributes,
-    } = state;
+    const { isShowCreate, loading, list, search } = state;
 
     const __handleGetData = async (ser) => {
         try {
@@ -100,20 +94,30 @@ const TaxTypes = ({ navigation }) => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
-            <CommonHeader
-                title={"Tax Types"}
-                subTitle={"Manage Tax Types."}
-                navigation={navigation}
-            />
-            <Loader isShow={loading} />
+            <CommonHeader title={"Tax Types"} navigation={navigation} />
             <ScrollView
-                contentContainerStyle={{ paddingBottom: 20, paddingTop: 10 }}
+                contentContainerStyle={{ paddingBottom: 20, paddingTop: 1 }}
             >
-                {/* {statsCards()} */}
-                {searchAndAdd()}
-                {attributeCards()}
+                <HeaderWithSearchAndFilter
+                    search={search}
+                    onChange={updateState}
+                    dec="Manage tax type configurations"
+                    buttonName="Add Tax Type"
+                    dropDownCount={2}
+                    dropDown1Name="Sort by"
+                    dropDown2Name="Sort By action"
+                    searchPlaceHolder="Search name, code, description..."
+                    isLoading={loading}
+                />
+                <TaxTypeList list={list} onChange={updateState} />
+
+                {/* {attributeCards()} */}
             </ScrollView>
-            <BottomPopup
+            <TaxTypeModel
+                visible={isShowCreate}
+                onClose={() => updateState({ isShowCreate: false })}
+            />
+            {/* <BottomPopup
                 isShow={isShowCreate}
                 title="Add Tax Type"
                 // top="55%"
@@ -126,66 +130,9 @@ const TaxTypes = ({ navigation }) => {
                         }}
                     />
                 }
-            />
+            /> */}
         </SafeAreaView>
     );
-
-    function statsCards() {
-        return (
-            <FlatList
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                ListHeaderComponent={
-                    <>
-                        <View style={styles.statsRow}>
-                            <StatCard
-                                title="Total Tax Types"
-                                value={totalAttributes}
-                                colors={["#3B82F6", "#2563EB"]}
-                                icon="tag"
-                            />
-                            <StatCard
-                                title="With Tax Linked"
-                                value={filterableAttributes}
-                                colors={["#10B981", "#059669"]}
-                                icon="filter"
-                            />
-                            <StatCard
-                                title="Pending Tax"
-                                value={variantAttributes}
-                                colors={["#8B5CF6", "#7C3AED"]}
-                                icon="layers"
-                            />
-                        </View>
-                    </>
-                }
-            />
-        );
-    }
-
-    function searchAndAdd() {
-        return (
-            <View style={styles.searchRow}>
-                <View style={styles.searchBox}>
-                    <Feather name="search" size={18} color={Colors.grayColor} />
-                    <TextInput
-                        placeholder="Search Tax Types..."
-                        style={styles.searchInput}
-                        value={search}
-                        onChangeText={setSearch}
-                    />
-                </View>
-
-                <TouchableOpacity
-                    style={styles.addBtn}
-                    onPress={() => updateState({ isShowCreate: true })}
-                >
-                    <Feather name="plus" size={18} color={Colors.whiteColor} />
-                    <Text style={styles.addText}>Add Type</Text>
-                </TouchableOpacity>
-            </View>
-        );
-    }
 
     function attributeCards() {
         return (

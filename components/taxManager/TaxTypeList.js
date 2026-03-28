@@ -1,28 +1,33 @@
 import React from "react";
-import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    ScrollView,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Colors, Sizes } from "../../constants/styles";
+import { LinearGradient } from "expo-linear-gradient";
 import NoDataCard from "../common/NoDataCard";
 
-const TaxKindCard = ({
+const TaxTypeCard = ({
     name,
-    subtitle,
     code,
     description,
     status,
     isActive,
+    onEdit,
+    onDelete,
 }) => {
     const activeBlue = "#0071BC";
     const statusGreen = "#10B981";
 
     return (
-        <View style={[styles.card, isActive && styles.activeCard]}>
+        <View style={[styles.card]}>
+            <View
+                style={[
+                    styles.accentBorder,
+                    {
+                        backgroundColor:
+                            status === "Active" ? statusGreen : "#94A3B8",
+                    },
+                ]}
+            />
+
             <View style={styles.cardHeader}>
                 <View style={styles.headerLeft}>
                     <View style={styles.iconContainer}>
@@ -34,10 +39,15 @@ const TaxKindCard = ({
                     </View>
                     <View>
                         <Text style={styles.taxNameText}>{name}</Text>
-                        <Text style={styles.taxSubtitleText}>{subtitle}</Text>
+                        <Text style={styles.taxSubtitleText}>
+                            Tax Type Configuration
+                        </Text>
                     </View>
                 </View>
-                <TouchableOpacity style={styles.deleteButton}>
+                <TouchableOpacity
+                    onPress={onDelete}
+                    style={styles.deleteButton}
+                >
                     <Feather name="trash-2" size={18} color="#FF5252" />
                 </TouchableOpacity>
             </View>
@@ -46,7 +56,9 @@ const TaxKindCard = ({
                 <View style={styles.infoItem}>
                     <Text style={styles.label}>TAX CODE</Text>
                     <View style={styles.codeBadge}>
-                        <Text style={styles.codeBadgeText}>{code}</Text>
+                        <Text style={styles.codeBadgeText}>
+                            {code?.toUpperCase()}
+                        </Text>
                     </View>
                 </View>
                 <View style={styles.infoItem}>
@@ -55,71 +67,109 @@ const TaxKindCard = ({
                         <View
                             style={[
                                 styles.statusDot,
-                                { backgroundColor: statusGreen },
+                                {
+                                    backgroundColor:
+                                        status === "Active"
+                                            ? statusGreen
+                                            : "#EF4444",
+                                },
                             ]}
                         />
-                        <Text style={styles.statusText}>{status}</Text>
+                        <Text style={styles.statusText}>
+                            {status?.toUpperCase()}
+                        </Text>
                     </View>
                 </View>
             </View>
 
             <View style={styles.descriptionContainer}>
                 <Text style={styles.label}>DESCRIPTION</Text>
-                <Text style={styles.descriptionText}>{description}</Text>
+                <Text style={styles.descriptionText} numberOfLines={2}>
+                    {description ||
+                        "No description provided for this tax type."}
+                </Text>
             </View>
 
             <View style={styles.actionRow}>
-                <TouchableOpacity style={styles.editButton} activeOpacity={0.8}>
-                    <Feather name="edit-3" size={14} color="#FFF" />
-                    <Text style={styles.editButtonText}>Edit Details</Text>
+                <TouchableOpacity
+                    style={styles.editButton}
+                    activeOpacity={0.8}
+                    onPress={onEdit}
+                >
+                    <LinearGradient
+                        colors={["#0071BC", "#005a96"]}
+                        style={styles.buttonGradient}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                    >
+                        <Feather name="edit-3" size={14} color="#FFF" />
+                        <Text style={styles.editButtonText}>Edit Tax Type</Text>
+                    </LinearGradient>
                 </TouchableOpacity>
             </View>
-
-            <View
-                style={[
-                    styles.accentBorder,
-                    { backgroundColor: isActive ? activeBlue : statusGreen },
-                ]}
-            />
         </View>
     );
 };
 
-const TaxKindList = ({ onChange = () => {} }) => {
-    const taxData = [
+const TaxTypeList = ({
+    data = [
         {
-            name: "GST",
-            subtitle: "National consumption tax",
-            code: "GST",
+            taxTypeName: "GST",
+            taxCode: "GST",
+            status: "Active",
             description:
-                "Goods and Services Tax (GST) is an indirect tax used in India on the supply of goods and services.",
-            status: "ACTIVE",
+                "Goods and Services Tax applicable on all intra-state and inter-state supplies in India.",
         },
         {
-            name: "VAT",
-            subtitle: "Value added tax",
-            code: "VAT",
+            taxTypeName: "VAT",
+            taxCode: "VAT_INT",
+            status: "Active",
             description:
-                "Value Added Tax is a consumption tax placed on a product whenever value is added at each stage of the supply chain.",
-            status: "ACTIVE",
+                "Value Added Tax for international exports and specific high-value items.",
         },
-    ];
-
+        {
+            taxTypeName: "Cess",
+            taxCode: "CESS_01",
+            status: "Inactive",
+            description:
+                "Additional cess applicable on luxury items and tobacco products.",
+        },
+        {
+            taxTypeName: "Service Tax",
+            taxCode: "SRV_TAX",
+            status: "Active",
+            description:
+                "Legacy service tax components for specific maintenance contracts.",
+        },
+    ],
+    onChange = () => {},
+    onEdit,
+    onDelete,
+}) => {
     return (
         <View style={styles.container}>
-            {taxData.length > 0 ? (
-                taxData.map((item, index) => (
-                    <TaxKindCard key={index} {...item} />
+            {data.length > 0 ? (
+                data.map((item, index) => (
+                    <TaxTypeCard
+                        key={index}
+                        name={item.taxTypeName}
+                        code={item.taxCode}
+                        description={item.description}
+                        status={item.status}
+                        isActive={index === 0}
+                        onEdit={() => onEdit && onEdit(item)}
+                        onDelete={() => onDelete && onDelete(item)}
+                    />
                 ))
             ) : (
                 <NoDataCard
                     onCreatePress={() => onChange({ isShowCreate: true })}
-                    title="No Tax Kinds Defined"
-                    subTitle="Categorize your items by defining tax kinds (e.g., Electronics, Services). This helps in mapping specific tax rules and validation settings across your inventory."
-                    buttonName="Add Tax Kind"
+                    title="No Tax Types Found"
+                    subTitle="Define the types of taxes applicable to your business (e.g., GST, VAT, Service Tax) to ensure accurate calculations and compliance."
+                    buttonName="Add Tax Type"
                     icon={
                         <MaterialCommunityIcons
-                            name="shape-outline"
+                            name="calculator-variant-outline"
                             size={42}
                             color="#94A3B8"
                         />
@@ -135,18 +185,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#F8FAFC",
         padding: 15,
-        paddingBottom: 30,
-    },
-    scrollPadding: {
-        padding: 15,
-        paddingBottom: 30,
-    },
-    screenTitle: {
-        fontSize: 18,
-        fontWeight: "800",
-        color: "#1E293B",
-        marginBottom: 15,
-        marginLeft: 5,
     },
     card: {
         backgroundColor: "#FFF",
@@ -157,7 +195,6 @@ const styles = StyleSheet.create({
         padding: 16,
         position: "relative",
         overflow: "hidden",
-        // Shadow for Mobile depth
         elevation: 3,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
@@ -167,14 +204,13 @@ const styles = StyleSheet.create({
     activeCard: {
         borderColor: "#0071BC",
         borderWidth: 1.5,
-        backgroundColor: "#F0F9FF",
     },
     accentBorder: {
         position: "absolute",
         left: 0,
         top: 0,
         bottom: 0,
-        width: 5,
+        width: 4,
     },
     cardHeader: {
         flexDirection: "row",
@@ -194,6 +230,11 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         marginRight: 12,
+    },
+    iconGradient: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
     },
     taxNameText: {
         fontSize: 16,
@@ -262,22 +303,24 @@ const styles = StyleSheet.create({
         paddingTop: 12,
     },
     editButton: {
-        backgroundColor: "#0071BC",
+        borderRadius: 10,
+        overflow: "hidden",
+    },
+    buttonGradient: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
         paddingVertical: 10,
-        borderRadius: 10,
+        gap: 8,
     },
     editButtonText: {
         color: "#FFF",
         fontSize: 14,
         fontWeight: "700",
-        marginLeft: 8,
     },
     deleteButton: {
         padding: 4,
     },
 });
 
-export default TaxKindList;
+export default TaxTypeList;

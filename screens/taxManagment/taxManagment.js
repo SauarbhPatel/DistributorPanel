@@ -124,6 +124,7 @@ const TaxManagment = ({ navigation }) => {
                         "Step 0",
                         "#B45309",
                         "#FEF3C7",
+                        "TaxKindMaster",
                     )}
                     {renderStepItem(
                         "layers-outline",
@@ -132,6 +133,7 @@ const TaxManagment = ({ navigation }) => {
                         "Step 0.5",
                         "#B45309",
                         "#FEF3C7",
+                        "HsnSet",
                     )}
                     {renderStepItem(
                         "earth",
@@ -140,6 +142,7 @@ const TaxManagment = ({ navigation }) => {
                         "Step 1",
                         "#B45309",
                         "#FEF3C7",
+                        "TaxJurisdiction",
                     )}
 
                     {renderSectionHeader("Configuration")}
@@ -150,6 +153,7 @@ const TaxManagment = ({ navigation }) => {
                         "Step 2",
                         "#1D4ED8",
                         "#DBEAFE",
+                        "TaxTypes",
                     )}
                     {renderStepItem(
                         "chart-bar",
