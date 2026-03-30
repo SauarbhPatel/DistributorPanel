@@ -171,6 +171,7 @@ const TaxManagment = ({ navigation }) => {
                         "Step 4",
                         "#1D4ED8",
                         "#DBEAFE",
+                        "HsnCodes",
                     )}
                     {renderSectionHeader("Mapping Rules")}
                     {renderStepItem(
@@ -199,6 +200,7 @@ const TaxManagment = ({ navigation }) => {
                             "Step 11",
                             "#7B1FA2",
                             "#F3E5F5",
+                            "InvoiceTemplate",
                         )}
                     </View>
 

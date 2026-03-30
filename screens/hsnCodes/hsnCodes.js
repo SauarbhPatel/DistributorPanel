@@ -15,15 +15,18 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import CommonHeader from "../../components/common/CommonHeader";
 import { __deleteApiData, __getApiData } from "../../utils/api";
-import CreateProductAttribute from "../../components/form/CreateProductAttribute";
 import BottomPopup from "../../components/common/BottomPopup";
 import CreateHSNcode from "../../components/form/CreateHSNcode";
 import { Loader } from "../../modules";
+import HeaderWithSearchAndFilter from "../../components/common/HeaderWithSearchAndFilter";
+import HsnCodeList from "../../components/taxManager/HsnCodeList";
+import HsnSetModel from "../../components/taxManager/HsnSetModel";
+import HsnCodeModel from "../../components/taxManager/HsnCodeModel";
 
 const HsnCodes = ({ navigation }) => {
-    const [search, setSearch] = useState("");
     const [state, setState] = useState({
         loading: false,
+        search: "",
         list: [],
         totalAttributes: 0,
         filterableAttributes: 0,
@@ -34,6 +37,7 @@ const HsnCodes = ({ navigation }) => {
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
     const {
+        search,
         isShowCreate,
         loading,
         list,
@@ -103,20 +107,30 @@ const HsnCodes = ({ navigation }) => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
-            <CommonHeader
-                title={"HSN Codes"}
-                subTitle={"Manage HSN codes."}
-                navigation={navigation}
-            />
-            <Loader isShow={loading} />
+            <CommonHeader title={"HSN / SAC Master"} navigation={navigation} />
+            {/* <Loader isShow={loading} /> */}
             <ScrollView
-                contentContainerStyle={{ paddingBottom: 20, paddingTop: 10 }}
+                contentContainerStyle={{ paddingBottom: 20, paddingTop: 1 }}
             >
-                {/* {statsCards()} */}
-                {searchAndAdd()}
-                {attributeCards()}
+                <HeaderWithSearchAndFilter
+                    search={search}
+                    onChange={updateState}
+                    dec="Harmonized System codes, description, default tax slab, product type."
+                    buttonName="Add HSN"
+                    dropDownCount={2}
+                    dropDown1Name="Sort by"
+                    dropDown2Name="Sort By action"
+                    searchPlaceHolder="Search name, code, description..."
+                    isLoading={loading}
+                />
+                {/* {attributeCards()} */}
+                <HsnCodeList list={list} onChange={updateState} />
             </ScrollView>
-            <BottomPopup
+            <HsnCodeModel
+                visible={isShowCreate}
+                onClose={() => updateState({ isShowCreate: false })}
+            />
+            {/* <BottomPopup
                 isShow={isShowCreate}
                 title="Add HSN Code"
                 // top="45%"
@@ -129,66 +143,9 @@ const HsnCodes = ({ navigation }) => {
                         }}
                     />
                 }
-            />
+            /> */}
         </SafeAreaView>
     );
-
-    function statsCards() {
-        return (
-            <FlatList
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                ListHeaderComponent={
-                    <>
-                        <View style={styles.statsRow}>
-                            <StatCard
-                                title="Total HSN Codes"
-                                value={totalAttributes}
-                                colors={["#3B82F6", "#2563EB"]}
-                                icon="tag"
-                            />
-                            <StatCard
-                                title="With Tax Linked"
-                                value={filterableAttributes}
-                                colors={["#10B981", "#059669"]}
-                                icon="filter"
-                            />
-                            <StatCard
-                                title="Pending Tax"
-                                value={variantAttributes}
-                                colors={["#8B5CF6", "#7C3AED"]}
-                                icon="layers"
-                            />
-                        </View>
-                    </>
-                }
-            />
-        );
-    }
-
-    function searchAndAdd() {
-        return (
-            <View style={styles.searchRow}>
-                <View style={styles.searchBox}>
-                    <Feather name="search" size={18} color={Colors.grayColor} />
-                    <TextInput
-                        placeholder="Search HSN codes..."
-                        style={styles.searchInput}
-                        value={search}
-                        onChangeText={setSearch}
-                    />
-                </View>
-
-                <TouchableOpacity
-                    style={styles.addBtn}
-                    onPress={() => updateState({ isShowCreate: true })}
-                >
-                    <Feather name="plus" size={18} color={Colors.whiteColor} />
-                    <Text style={styles.addText}>Add Code</Text>
-                </TouchableOpacity>
-            </View>
-        );
-    }
 
     function attributeCards() {
         return (
