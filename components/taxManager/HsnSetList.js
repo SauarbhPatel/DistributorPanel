@@ -1,23 +1,24 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import NoDataCard from "../common/NoDataCard";
+import { __deleteApiData } from "../../utils/api";
+import DeleteAlert from "../common/DeleteAlert";
 
 const HsnSetCard = ({
     name,
-    subtitle,
-    hsnSetCode,
-    hsnCodes,
+    hsnCodesDetails,
     description,
     status,
     isActive,
+    onDelete = () => {},
+    onEdit = () => {},
 }) => {
     const activeBlue = "#0071BC";
     const statusGreen = "#10B981";
 
     return (
         <View style={[styles.card, isActive && styles.activeCard]}>
-            {/* Header section with Icon and Name */}
             <View style={styles.cardHeader}>
                 <View style={styles.headerLeft}>
                     <View style={styles.iconContainer}>
@@ -29,11 +30,14 @@ const HsnSetCard = ({
                     </View>
                     <View style={styles.titleWrapper}>
                         <Text style={styles.nameText}>{name}</Text>
-                        <Text style={styles.subtitleText}>{subtitle}</Text>
+                        {/* <Text style={styles.subtitleText}>{subtitle}</Text> */}
                     </View>
                 </View>
                 <View style={styles.headerRight}>
-                    <TouchableOpacity style={styles.deleteButton}>
+                    <TouchableOpacity
+                        onPress={() => onDelete()}
+                        style={styles.deleteButton}
+                    >
                         <Feather name="trash-2" size={18} color="#FF5252" />
                     </TouchableOpacity>
                 </View>
@@ -43,14 +47,13 @@ const HsnSetCard = ({
                 <View style={styles.infoItem}>
                     <Text style={styles.label}>HSN SET CODE</Text>
                     <View style={styles.codeBadge}>
-                        <Text style={styles.codeBadgeText}>{hsnSetCode}</Text>
+                        <Text style={styles.codeBadgeText}>
+                            {hsnCodesDetails?.map((co) => co?.code)?.join(", ")}
+                        </Text>
                     </View>
                 </View>
-                <View style={[styles.infoItem, { alignItems: "center" }]}>
-                    <Text style={styles.label}>HSN CODES</Text>
-                    <Text style={styles.valueText}>{hsnCodes}</Text>
-                </View>
-                <View style={[styles.infoItem, { alignItems: "flex-end" }]}>
+
+                <View style={[styles.infoItem]}>
                     <Text style={styles.label}>STATUS</Text>
                     <View style={styles.statusWrapper}>
                         <View
@@ -59,7 +62,9 @@ const HsnSetCard = ({
                                 { backgroundColor: statusGreen },
                             ]}
                         />
-                        <Text style={styles.statusText}>{status}</Text>
+                        <Text style={styles.statusText}>
+                            {isActive ? "Active" : "In-Active"}
+                        </Text>
                     </View>
                 </View>
             </View>
@@ -69,7 +74,11 @@ const HsnSetCard = ({
                 <Text style={styles.descriptionText}>{description}</Text>
             </View>
             <View style={styles.actionRow}>
-                <TouchableOpacity style={styles.editButton} activeOpacity={0.8}>
+                <TouchableOpacity
+                    style={styles.editButton}
+                    onPress={onEdit}
+                    activeOpacity={0.8}
+                >
                     <Feather name="edit-3" size={14} color="#FFF" />
                     <Text style={styles.editButtonText}>Edit Details</Text>
                 </TouchableOpacity>
@@ -84,35 +93,75 @@ const HsnSetCard = ({
     );
 };
 
-const HsnSetList = ({ onChange = () => {} }) => {
-    // Data updated to reflect HSN Set structure
-    const hsnData = [
-        {
-            name: "HSN Set Name",
-            subtitle: "National consumption tax",
-            hsnSetCode: "ELEC-HSN",
-            hsnCodes: "8517, 8516",
-            description:
-                "HSN codes for electronic and telecommunication products",
-            status: "ACTIVE",
-            isActive: true,
-        },
-        {
-            name: "VAT",
-            subtitle: "Value added tax",
-            hsnSetCode: "APP-COS",
-            hsnCodes: "6109, 3304",
-            description: "Apparel and cosmetics HSN codes",
-            status: "ACTIVE",
-            isActive: false,
-        },
-    ];
+const HsnSetList = ({ onChange = () => {}, list = [], onDone = () => {} }) => {
+    const [state, setState] = useState({
+        loading: false,
+        isShowDelete: false,
+        isShowCreate: false,
+        itemId: null,
+        itemDetails: null,
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
+    const { isShowDelete, isShowCreate, loading, itemId, itemDetails } = state;
+
+    const __handleDelete = async (id) => {
+        try {
+            updateState({ loading: true });
+            const res = await __deleteApiData(
+                `/hsnSets/deleteHsnSetById/${id}`,
+            );
+            if (res?.success) {
+                onDone();
+                updateState({
+                    isShowDelete: false,
+                    itemId: null,
+                });
+            } else {
+                Alert.alert(
+                    "Error",
+                    res?.message || "Failed, Please try again.",
+                );
+            }
+        } catch (error) {
+            Alert.alert("Error", "Something went wrong");
+        } finally {
+            updateState({ loading: false });
+        }
+    };
     return (
         <View style={styles.container}>
-            {hsnData.length > 0 ? (
-                hsnData.map((item, index) => (
-                    <HsnSetCard key={index} {...item} />
+            <DeleteAlert
+                visible={isShowDelete}
+                isLoading={loading}
+                onCancel={() => {
+                    updateState({
+                        isShowDelete: false,
+                        itemId: null,
+                    });
+                }}
+                onDelete={() => {
+                    __handleDelete(itemId);
+                }}
+            />
+            {list?.length > 0 ? (
+                list?.map((item, index) => (
+                    <HsnSetCard
+                        key={index}
+                        {...item}
+                        onDelete={() => {
+                            updateState({
+                                isShowDelete: true,
+                                itemId: item?._id,
+                            });
+                        }}
+                        onEdit={() => {
+                            updateState({
+                                isShowCreate: true,
+                                itemDetails: item,
+                            });
+                        }}
+                    />
                 ))
             ) : (
                 <NoDataCard
@@ -148,16 +197,11 @@ const styles = StyleSheet.create({
         padding: 16,
         position: "relative",
         overflow: "hidden",
-        elevation: 3,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
     },
     activeCard: {
-        borderColor: "#0071BC",
-        borderWidth: 1.5,
-        backgroundColor: "#F0F9FF",
+        // borderColor: "#0071BC",
+        // borderWidth: 1.5,
+        // backgroundColor: "#F0F9FF",
     },
     accentBorder: {
         position: "absolute",

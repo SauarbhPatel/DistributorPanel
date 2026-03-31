@@ -65,6 +65,14 @@ const TaxMaster = ({ navigation }) => {
                     dropDown2Name="Sort By action"
                     searchPlaceHolder="Search name, code, description..."
                     isLoading={loading}
+                    dropDown1List={[
+                        { id: "asc", name: "Sort A-Z" },
+                        { id: "desc", name: "Sort Z-A" },
+                    ]}
+                    dropDown2List={[
+                        { id: "createdAt", name: "Sort A-Z" },
+                        { id: "updatedAt ", name: "Sort Z-A" },
+                    ]}
                 />
                 <TaxSlabList list={list} onChange={updateState} />
             </ScrollView>

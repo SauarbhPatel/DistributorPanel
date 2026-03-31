@@ -1,34 +1,67 @@
 import React from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 
-const TablePagination = ({ currentPage = 1, totalProducts = 5 }) => {
+const TablePagination = ({ pagination = {}, onPageChange = () => {} }) => {
+    const { total = 0, page = 1, limit = 10, totalPages = 1 } = pagination;
+
+    // Calculate showing range
+    const start = (page - 1) * limit + 1;
+    const end = Math.min(page * limit, total);
+
+    const isFirstPage = page === 1;
+    const isLastPage = page === totalPages;
+
     return (
         <View style={styles.footerContainer}>
             <Text style={styles.countText}>
-                Showing <Text style={styles.boldText}>{totalProducts}</Text> of{" "}
-                <Text style={styles.boldText}>{totalProducts}</Text> products
+                Showing{" "}
+                <Text style={styles.boldText}>
+                    {total === 0 ? 0 : start}-{end}
+                </Text>{" "}
+                of <Text style={styles.boldText}>{total}</Text> products
             </Text>
 
             <View style={styles.paginationRow}>
                 <TouchableOpacity
-                    style={styles.outlineButton}
+                    style={[
+                        styles.outlineButton,
+                        isFirstPage && styles.disabledButton,
+                    ]}
+                    disabled={isFirstPage}
+                    onPress={() => onPageChange(page - 1)}
                     activeOpacity={0.7}
                 >
-                    <Text style={styles.outlineButtonText}>Previous</Text>
+                    <Text
+                        style={[
+                            styles.outlineButtonText,
+                            isFirstPage && styles.disabledText,
+                        ]}
+                    >
+                        Previous
+                    </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={styles.activeButton}
-                    activeOpacity={0.8}
-                >
-                    <Text style={styles.activeButtonText}>{currentPage}</Text>
-                </TouchableOpacity>
+                <View style={styles.activeButton}>
+                    <Text style={styles.activeButtonText}>{page}</Text>
+                </View>
 
                 <TouchableOpacity
-                    style={styles.outlineButton}
+                    style={[
+                        styles.outlineButton,
+                        isLastPage && styles.disabledButton,
+                    ]}
+                    disabled={isLastPage}
+                    onPress={() => onPageChange(page + 1)}
                     activeOpacity={0.7}
                 >
-                    <Text style={styles.outlineButtonText}>Next</Text>
+                    <Text
+                        style={[
+                            styles.outlineButtonText,
+                            isLastPage && styles.disabledText,
+                        ]}
+                    >
+                        Next
+                    </Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -36,6 +69,7 @@ const TablePagination = ({ currentPage = 1, totalProducts = 5 }) => {
 };
 
 const styles = StyleSheet.create({
+    footerContainer: {},
     countText: {
         fontSize: 12,
         color: "#64748b",
@@ -74,16 +108,19 @@ const styles = StyleSheet.create({
         height: 43,
         justifyContent: "center",
         alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
         elevation: 3,
     },
     activeButtonText: {
         color: "#fff",
         fontSize: 13,
         fontWeight: "700",
+    },
+    disabledButton: {
+        backgroundColor: "#f1f5f9",
+        borderColor: "#e2e8f0",
+    },
+    disabledText: {
+        color: "#94a3b8",
     },
 });
 

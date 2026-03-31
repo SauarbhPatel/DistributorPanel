@@ -102,9 +102,9 @@ const __getTaxList = async () => {
             return [];
         });
 };
-const __getHsnCodeList = async (taxRate) => {
+const __getHsnCodeList = async (taxRate, search) => {
     return __getApiData(
-        `/hsnCodes/getAllHsnCode?page=1&limit=200&isActive=true&sortBy=createdAt&sortOrder=asc`,
+        `/hsnCodes/getAllHsnCode?search=${search}&page=1&limit=5&isActive=true&sortOrder=asc`,
     )
         .then((res) => {
             if (res.success) {

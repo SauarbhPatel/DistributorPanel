@@ -1,102 +1,71 @@
-import {
-    SafeAreaView,
-    View,
-    Text,
-    StyleSheet,
-    ScrollView,
-    TouchableOpacity,
-    TextInput,
-    FlatList,
-    Alert,
-} from "react-native";
-import { Colors, Fonts, Sizes } from "../../constants/styles";
-import { Feather, MaterialIcons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView, View, ScrollView } from "react-native";
+import { Colors } from "../../constants/styles";
 import { useEffect, useState } from "react";
 import CommonHeader from "../../components/common/CommonHeader";
 import { __deleteApiData, __getApiData } from "../../utils/api";
 import BottomPopup from "../../components/common/BottomPopup";
 import CreateHSNset from "../../components/form/CreateHSNset";
-import { Loader } from "../../modules";
 import HeaderWithSearchAndFilter from "../../components/common/HeaderWithSearchAndFilter";
 import HsnSetList from "../../components/taxManager/HsnSetList";
 import HsnSetModel from "../../components/taxManager/HsnSetModel";
+import TablePagination from "../../components/marketing/TablePagination";
 
 const HsnSet = ({ navigation }) => {
     const [state, setState] = useState({
-        search: "",
         loading: false,
         list: [],
+        pagination: {},
         isShowCreate: false,
+        search: "",
+        dropDown1: null,
+        dropDown2: null,
+        dropDown3: null,
     });
-
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
-    const { search, isShowCreate, loading, list } = state;
+    const {
+        search,
+        isShowCreate,
+        loading,
+        list,
+        dropDown1,
+        dropDown2,
+        dropDown3,
+    } = state;
 
-    const __handleGetData = async (ser) => {
+    const __handleGetData = async (ser = "", page = 1, limit = 5) => {
         try {
             updateState({ loading: true });
+
             const res = await __getApiData(
-                `/hsnSets/getAllHsnSets?page=1&limit=100&search=${ser}&sortBy=createdAt&sortOrder=desc`,
+                `/hsnSets/getAllHsnSets?search=${ser}&page=${page}&limit=${limit}${dropDown3?.id ? `&isActive=${dropDown3?.id.trim()}` : ""}${dropDown1?.id ? `&sortBy=${dropDown1?.id.trim()}` : ""}${dropDown2?.id ? `&sortOrder=${dropDown2?.id.trim()}` : ""}`,
             );
+
+            console.log(res.data?.pagination);
             if (res?.success) {
                 updateState({
-                    list: res.data?.record,
+                    list: res.data?.record || [],
+                    pagination: res.data?.pagination,
                 });
             }
         } catch (error) {
-            console.error("Error creating ticket:", error);
+            console.error("Error:", error);
         } finally {
             updateState({ loading: false });
         }
     };
 
-    useEffect(() => {
-        __handleGetData(search);
-    }, [search]);
-
-    const __handleDelete = (id) => {
-        Alert.alert(
-            "Delete HSN set",
-            "Are you sure you want to delete?",
-            [
-                {
-                    text: "Cancel",
-                    style: "cancel",
-                },
-                {
-                    text: "Delete",
-                    style: "destructive",
-                    onPress: async () => {
-                        try {
-                            updateState({ loading: true });
-
-                            console.log(id);
-                            const res = await __deleteApiData(
-                                `/hsnSets/deleteHsnSetById/${id}`,
-                            );
-                            if (res?.success) {
-                                __handleGetData(search);
-                            } else {
-                                Alert.alert("Error", res?.message);
-                            }
-                        } catch (error) {
-                            Alert.alert("Error", "Something went wrong");
-                        } finally {
-                            updateState({ loading: false });
-                        }
-                    },
-                },
-            ],
-            { cancelable: true },
-        );
+    const handlePageChange = (newPage) => {
+        __handleGetData(search, newPage);
     };
+
+    useEffect(() => {
+        __handleGetData(search, 1);
+    }, [search, dropDown1, dropDown2, dropDown3]);
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
             <CommonHeader title={"HSN Set"} navigation={navigation} />
-            {/* <Loader isShow={loading} /> */}
             <ScrollView
                 contentContainerStyle={{ paddingBottom: 20, paddingTop: 1 }}
             >
@@ -105,18 +74,54 @@ const HsnSet = ({ navigation }) => {
                     onChange={updateState}
                     dec="Manage HSN sets and their codes"
                     buttonName="Add HSN Set"
-                    dropDownCount={2}
+                    dropDownCount={3}
                     dropDown1Name="Sort by"
                     dropDown2Name="Sort By action"
+                    dropDown3Name="Status"
                     searchPlaceHolder="Search name, code, description..."
                     isLoading={loading}
+                    dropDown1List={[
+                        { id: "name", name: "Name" },
+                        { id: "createdAt", name: "Recently Created" },
+                        { id: "updatedAt ", name: "Recently Updated" },
+                    ]}
+                    dropDown2List={[
+                        { id: "asc", name: "Sort A-Z" },
+                        { id: "desc", name: "Sort Z-A" },
+                    ]}
+                    dropDown3List={[
+                        { id: "", name: "All Status" },
+                        { id: "true", name: "Active" },
+                        { id: "false", name: "In-Active" },
+                    ]}
+                    dropDown1={dropDown1}
+                    dropDown2={dropDown2}
+                    dropDown3={dropDown3}
                 />
-                <HsnSetList list={list} onChange={updateState} />
-                {/* {attributeCards()} */}
+                <HsnSetList
+                    list={list}
+                    onChange={updateState}
+                    onDone={() => {
+                        __handleGetData(search, 1);
+                    }}
+                />
+                {list?.length > 0 && (
+                    <View style={{ paddingHorizontal: 16 }}>
+                        <TablePagination
+                            pagination={state.pagination}
+                            onPageChange={handlePageChange}
+                        />
+                    </View>
+                )}
             </ScrollView>
             <HsnSetModel
                 visible={isShowCreate}
-                onClose={() => updateState({ isShowCreate: false })}
+                onClose={(refresh) => {
+                    updateState({ isShowCreate: false });
+                    if (refresh) {
+                        __handleGetData(search, 1);
+                    }
+                }}
             />
             {/* <BottomPopup
                 isShow={isShowCreate}
@@ -133,288 +138,6 @@ const HsnSet = ({ navigation }) => {
             /> */}
         </SafeAreaView>
     );
-
-    function attributeCards() {
-        return (
-            <View style={{ paddingHorizontal: Sizes.fixPadding }}>
-                {list?.map((item) => (
-                    <ListCard
-                        item={item}
-                        key={item?._id}
-                        onDelete={__handleDelete}
-                        onDone={() => __handleGetData(search)}
-                    />
-                ))}
-            </View>
-        );
-    }
 };
 
 export default HsnSet;
-
-const ListCard = ({ item, onDelete, onDone }) => {
-    const [state, setState] = useState({
-        isShowCreate: false,
-    });
-
-    const updateState = (data) => setState((state) => ({ ...state, ...data }));
-
-    const { isShowCreate } = state;
-    // console.log(item);
-    return (
-        <View style={styles.card}>
-            {/* Header */}
-            <BottomPopup
-                isShow={isShowCreate}
-                title="Edit HSN Set"
-                onClose={() => updateState({ isShowCreate: false })}
-                component={
-                    <CreateHSNset
-                        onClose={() => {
-                            updateState({ isShowCreate: false });
-                            onDone();
-                        }}
-                        isEdit
-                        item={item}
-                    />
-                }
-            />
-            <View style={styles.header}>
-                <Text style={styles.name} numberOfLines={1}>
-                    {item.name}
-                </Text>
-            </View>
-
-            {/* Description */}
-            {item.description ? (
-                <Text style={styles.description} numberOfLines={2}>
-                    {item.description}
-                </Text>
-            ) : null}
-
-            {/* HSN Codes */}
-            <View style={styles.chipRow}>
-                {item?.hsnCodesDetails?.map((hsn) => (
-                    <View key={hsn._id} style={styles.chip}>
-                        <Text style={styles.chipText}>{hsn.code}</Text>
-                    </View>
-                ))}
-            </View>
-            {/* Bottom Section */}
-            <View
-                style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginTop: 12,
-                }}
-            >
-                {/* Status */}
-                <View
-                    style={[
-                        {
-                            paddingHorizontal: 10,
-                            paddingVertical: 4,
-                            borderRadius: 20,
-                            backgroundColor: item.isActive
-                                ? "#DCFCE7"
-                                : "#FEE2E2",
-                        },
-                    ]}
-                >
-                    <Text
-                        style={[
-                            {
-                                fontSize: 12,
-                                color: "#6B7280",
-                                marginTop: 2,
-                                color: item.isActive ? "#16A34A" : "#DC2626",
-                            },
-                        ]}
-                    >
-                        {item.isActive ? "Active" : "Inactive"}
-                    </Text>
-                </View>
-
-                {/* Actions */}
-                <View style={{ flexDirection: "row", marginLeft: "auto" }}>
-                    <TouchableOpacity
-                        style={styles.iconBtn}
-                        onPress={() => updateState({ isShowCreate: true })}
-                    >
-                        <Feather name="edit-2" size={18} color="#2563EB" />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={styles.iconBtn}
-                        onPress={() => onDelete(item?._id)}
-                    >
-                        <MaterialIcons
-                            name="delete-outline"
-                            size={20}
-                            color="#DC2626"
-                        />
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </View>
-    );
-};
-
-const StatCard = ({ title, value, colors, icon }) => (
-    <LinearGradient colors={colors} style={styles.statCard}>
-        <View style={{ marginEnd: 10 }}>
-            <Text style={styles.statTitle}>{title}</Text>
-            <Text style={styles.statValue}>{value}</Text>
-        </View>
-        <View style={styles.statIcon}>
-            <Feather name={icon} size={22} color="#fff" />
-        </View>
-    </LinearGradient>
-);
-
-const styles = StyleSheet.create({
-    header: {
-        padding: Sizes.fixPadding,
-    },
-
-    subTitle: {
-        marginTop: 4,
-        ...Fonts.grayColor14Regular,
-    },
-
-    /* ================= Stats Cards ================= */
-
-    statsRow: {
-        flexDirection: "row",
-        paddingHorizontal: Sizes.fixPadding - 5,
-        justifyContent: "space-between",
-    },
-
-    statCard: {
-        flex: 1,
-        borderRadius: Sizes.fixPadding,
-        padding: Sizes.fixPadding,
-        marginHorizontal: 4,
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-
-    statTitle: {
-        color: "#E5E7EB",
-        fontSize: 12,
-    },
-
-    statValue: {
-        color: "#fff",
-        fontSize: 22,
-        fontWeight: "bold",
-        marginTop: 4,
-    },
-
-    statIcon: {
-        backgroundColor: "rgba(255,255,255,0.25)",
-        padding: 10,
-        borderRadius: 12,
-    },
-
-    /* ================= Search + Add ================= */
-
-    searchRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        padding: Sizes.fixPadding,
-    },
-
-    searchBox: {
-        flex: 1,
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: Colors.whiteColor,
-        borderRadius: Sizes.fixPadding,
-        paddingHorizontal: Sizes.fixPadding,
-        height: 45,
-        marginRight: 10,
-    },
-
-    searchInput: {
-        flex: 1,
-        marginLeft: 8,
-    },
-
-    addBtn: {
-        flexDirection: "row",
-        backgroundColor: Colors.primaryColor,
-        paddingHorizontal: 14,
-        height: 45,
-        borderRadius: Sizes.fixPadding,
-        alignItems: "center",
-    },
-
-    addText: {
-        color: Colors.whiteColor,
-        marginLeft: 6,
-        fontWeight: "600",
-    },
-
-    /* ================= Attribute Set Card ================= */
-    card: {
-        backgroundColor: Colors.whiteColor,
-        borderRadius: 12,
-        padding: 14,
-        marginBottom: 12,
-        borderWidth: 1,
-        borderColor: "#E5E7EB",
-    },
-
-    header: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-
-    name: {
-        ...Fonts.blackColor15Medium,
-        flex: 1,
-        marginRight: 10,
-        color: Colors.primaryColor,
-    },
-
-    actions: {
-        flexDirection: "row",
-        marginLeft: "auto",
-    },
-    iconBtn: {
-        padding: 6,
-        marginLeft: 6,
-        backgroundColor: "#F3F4F6",
-        borderRadius: 8,
-    },
-    description: {
-        ...Fonts.grayColor14Medium,
-        fontSize: 13,
-        marginTop: 6,
-    },
-
-    chipRow: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        gap: 8,
-        marginTop: 10,
-    },
-
-    chip: {
-        paddingHorizontal: 12,
-        paddingVertical: 4,
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: "#E5E7EB",
-        backgroundColor: "#F9FAFB",
-    },
-
-    chipText: {
-        fontSize: 12,
-        color: "#111827",
-        fontWeight: "500",
-    },
-});

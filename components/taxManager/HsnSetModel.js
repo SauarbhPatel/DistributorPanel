@@ -11,36 +11,141 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { Loader } from "../../modules";
+import { DropDownTextAreaBox, Loader } from "../../modules";
+import { Alert } from "react-native";
+import { __postApiData, __patchApiData } from "../../utils/api";
+import { __getHsnCodeList } from "../../utils/api/commonApi";
 
 const HsnSetModel = ({ visible, onClose, isEdit = false, item = null }) => {
     const [state, setState] = useState({
         isLoading: false,
         hsnSetName: "",
-        hsnCodes: "", // Can be handled as a string or array depending on your backend
+        hsnCodes: [],
         status: "Active",
         description: "",
+        //
+        hsnCodeList: [],
+        hsnSetFocus: false,
+        hsnCodeListLoading: false,
+        hsnSearch: "",
     });
 
     const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
+    const validateForm = () => {
+        if (!state.hsnSetName.trim()) {
+            Alert.alert("Validation Error", "HSN Set Name is required");
+            return false;
+        }
+
+        // if (!Array.isArray(state.hsnCodes) || state.hsnCodes.length === 0) {
+        //     Alert.alert(
+        //         "Validation Error",
+        //         "Please select at least one HSN code",
+        //     );
+        //     return false;
+        // }
+
+        return true;
+    };
+    const __handleSave = () => {
+        if (!validateForm()) return;
+
+        updateState({ isLoading: true });
+
+        const payload = {
+            name: state.hsnSetName.trim(),
+            description: state.description,
+            hsnCodes: state.hsnCodes?.map((ids) => ids?._id),
+            isActive: state.status === "Active",
+        };
+
+        __postApiData("/hsnSets/createHsnSet", payload)
+            .then((res) => {
+                updateState({ isLoading: false });
+
+                if (res?.success) {
+                    Alert.alert("Success", res.message);
+                    onClose(true);
+                } else {
+                    Alert.alert("Error", res?.message || "Failed");
+                }
+            })
+            .catch(() => {
+                updateState({ isLoading: false });
+                Alert.alert("Error", "Something went wrong");
+            });
+    };
+    const __handleEditSave = () => {
+        if (!validateForm()) return;
+
+        updateState({ isLoading: true });
+
+        const payload = {
+            name: state.hsnSetName.trim(),
+            description: state.description,
+            hsnCodes: state.hsnCodes?.map((ids) => ids?._id),
+            isActive: state.status === "Active",
+        };
+
+        __patchApiData(`/api/hsnSets/updateHsnSetById/${item?._id}`, payload)
+            .then((res) => {
+                updateState({ isLoading: false });
+
+                if (res?.success) {
+                    Alert.alert("Success", res.message);
+                    onClose(true);
+                } else {
+                    Alert.alert("Error", res?.message || "Failed");
+                }
+            })
+            .catch(() => {
+                updateState({ isLoading: false });
+                Alert.alert("Error", "Something went wrong");
+            });
+    };
 
     useEffect(() => {
         if (isEdit && item && visible) {
             updateState({
                 hsnSetName: item?.name || "",
-                hsnCodes: item?.codes || "",
-                status: item?.status || "Active",
+                hsnCodes: item?.hsnCodes || [],
+                status: item?.isActive ? "Active" : "Inactive",
                 description: item?.description || "",
             });
         } else if (!isEdit && visible) {
             updateState({
                 hsnSetName: "",
-                hsnCodes: "",
+                hsnCodes: [],
                 status: "Active",
                 description: "",
             });
         }
     }, [isEdit, item, visible]);
+
+    const __handleGetData = async (search = "") => {
+        try {
+            updateState({
+                hsnCodeListLoading: true,
+            });
+            const codes = await __getHsnCodeList(false, search);
+            updateState({
+                hsnCodeList: codes,
+                hsnCodeListLoading: false,
+            });
+        } catch (error) {}
+    };
+
+    useEffect(() => {
+        __handleGetData(state?.hsnSearch);
+    }, [state?.hsnSearch]);
+
+    const removeHsnCode = (id) => {
+        const updatedList = state.hsnCodes.filter(
+            (item) => item?.id !== id && item?._id !== id,
+        );
+
+        updateState({ hsnCodes: updatedList });
+    };
 
     return (
         <Modal visible={visible} animationType="slide" transparent={true}>
@@ -98,25 +203,77 @@ const HsnSetModel = ({ visible, onClose, isEdit = false, item = null }) => {
                                     HSN Codes{" "}
                                     <Text style={styles.required}>*</Text>
                                 </Text>
-                                <TouchableOpacity style={styles.dropdown}>
-                                    <Text
-                                        style={[
-                                            styles.dropdownText,
-                                            !state.hsnCodes && {
-                                                color: "#94a3b8",
-                                            },
-                                        ]}
-                                    >
-                                        {state.hsnCodes ||
-                                            "Select HSN codes..."}
-                                    </Text>
-                                    <Feather
-                                        name="chevron-down"
-                                        size={20}
-                                        color="#64748b"
-                                    />
-                                </TouchableOpacity>
+
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Search & Select HSN codes..."
+                                    placeholderTextColor="#94a3b8"
+                                    value={state.hsnSearch}
+                                    onChangeText={(val) =>
+                                        updateState({ hsnSearch: val })
+                                    }
+                                />
+                                <DropDownTextAreaBox
+                                    type="select_multi"
+                                    placeholder={"Select Jurisdiction"}
+                                    list={state?.hsnCodeList}
+                                    value={state.hsnCodes}
+                                    isSearchable
+                                    inputCustomStyle={{}}
+                                    onSelected={(value) => {
+                                        updateState({
+                                            hsnCodes: value,
+                                        });
+                                    }}
+                                    customStyle={{
+                                        marginBottom: 5,
+                                        flex: 1,
+                                        marginTop: 10,
+                                    }}
+                                />
                             </View>
+
+                            {state.hsnCodes?.length > 0 ? (
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        gap: 10,
+                                        flexWrap: "wrap",
+                                        marginTop: -10,
+                                        marginBottom: 15,
+                                    }}
+                                >
+                                    {state.hsnCodes?.map((codes, index) => (
+                                        <TouchableOpacity
+                                            onPress={() =>
+                                                removeHsnCode(
+                                                    codes?._id || codes?.id,
+                                                )
+                                            }
+                                            key={
+                                                codes?._id || codes?.id || index
+                                            }
+                                            style={{
+                                                borderWidth: 1,
+                                                borderColor: "green",
+                                                padding: 5,
+                                                paddingHorizontal: 10,
+                                                borderRadius: 30,
+                                                flexDirection: "row",
+                                                gap: 10,
+                                                alignItems: "center",
+                                            }}
+                                        >
+                                            <Text>{codes?.code}</Text>
+                                            <Feather
+                                                name="trash"
+                                                size={14}
+                                                color={"red"}
+                                            />
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            ) : null}
 
                             {/* Status */}
                             <View style={styles.inputGroup}>
@@ -124,7 +281,18 @@ const HsnSetModel = ({ visible, onClose, isEdit = false, item = null }) => {
                                     Status{" "}
                                     <Text style={styles.required}>*</Text>
                                 </Text>
-                                <TouchableOpacity style={styles.dropdown}>
+                                <TouchableOpacity
+                                    style={styles.dropdown}
+                                    onPress={() => {
+                                        updateState({
+                                            status:
+                                                state.status == "Active"
+                                                    ? "Inactive"
+                                                    : "Active",
+                                        });
+                                    }}
+                                    activeOpacity={0.8}
+                                >
                                     <Text style={styles.dropdownText}>
                                         {state.status}
                                     </Text>
@@ -176,7 +344,12 @@ const HsnSetModel = ({ visible, onClose, isEdit = false, item = null }) => {
                         <Text style={styles.cancelText}>Cancel</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity activeOpacity={0.8}>
+                    <TouchableOpacity
+                        activeOpacity={0.8}
+                        onPress={() =>
+                            isEdit ? __handleEditSave() : __handleSave()
+                        }
+                    >
                         <LinearGradient
                             colors={["#0070ba", "#005a96"]}
                             style={styles.saveBtn}

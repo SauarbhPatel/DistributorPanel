@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { DropDownTextAreaBox } from "../../modules";
 const { width } = Dimensions.get("window");
 const HeaderWithSearchAndFilter = ({
     dec,
@@ -20,7 +21,14 @@ const HeaderWithSearchAndFilter = ({
     dropDownCount = 1,
     dropDown1Name,
     dropDown2Name,
+    dropDown3Name,
     isLoading,
+    dropDown1List = [],
+    dropDown2List = [],
+    dropDown3List = [],
+    dropDown1 = null,
+    dropDown2 = null,
+    dropDown3 = null,
 }) => {
     return (
         <View style={styles.container}>
@@ -79,49 +87,107 @@ const HeaderWithSearchAndFilter = ({
                 </View>
 
                 {dropDownCount == 1 ? (
-                    <TouchableOpacity
-                        style={styles.statusDropdown}
-                        activeOpacity={0.9}
-                    >
-                        <Text style={styles.statusText}>{dropDown1Name}</Text>
-                        <Feather
-                            name="chevron-down"
-                            size={16}
-                            color="#6B7280"
-                        />
-                    </TouchableOpacity>
+                    <DropDownTextAreaBox
+                        type="select"
+                        placeholder={dropDown1Name}
+                        list={dropDown1List}
+                        value={dropDown1}
+                        isSearchable
+                        inputCustomStyle={{
+                            ...styles.statusDropdown,
+                        }}
+                        onSelected={(value) => {
+                            onChange({ dropDown1: value });
+                        }}
+                    />
                 ) : null}
             </View>
             {dropDownCount == 2 ? (
-                <View style={[styles.filterRow, { marginTop: 10 }]}>
-                    <TouchableOpacity
-                        style={[
-                            styles.statusDropdown,
-                            { width: (width - 42) / 2 },
-                        ]}
-                        activeOpacity={0.9}
-                    >
-                        <Text style={styles.statusText}>{dropDown1Name}</Text>
-                        <Feather
-                            name="chevron-down"
-                            size={16}
-                            color="#6B7280"
-                        />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[
-                            styles.statusDropdown,
-                            { width: (width - 42) / 2 },
-                        ]}
-                        activeOpacity={0.9}
-                    >
-                        <Text style={styles.statusText}>{dropDown2Name}</Text>
-                        <Feather
-                            name="chevron-down"
-                            size={16}
-                            color="#6B7280"
-                        />
-                    </TouchableOpacity>
+                <View
+                    style={[
+                        styles.filterRow,
+                        { marginTop: 10, flexWrap: "wrap" },
+                    ]}
+                >
+                    <DropDownTextAreaBox
+                        type="select"
+                        placeholder={dropDown1Name}
+                        list={dropDown1List}
+                        value={dropDown1}
+                        isSearchable
+                        inputCustomStyle={{
+                            ...styles.statusDropdown,
+                            width: (width - 42) / 2,
+                        }}
+                        onSelected={(value) => {
+                            onChange({ dropDown1: value });
+                        }}
+                    />
+                    <DropDownTextAreaBox
+                        type="select"
+                        placeholder={dropDown2Name}
+                        list={dropDown2List}
+                        value={dropDown2}
+                        isSearchable
+                        inputCustomStyle={{
+                            ...styles.statusDropdown,
+                            width: (width - 42) / 2,
+                        }}
+                        onSelected={(value) => {
+                            onChange({ dropDown2: value });
+                        }}
+                    />
+                </View>
+            ) : null}
+            {dropDownCount == 3 ? (
+                <View
+                    style={[
+                        styles.filterRow,
+                        { marginTop: 10, flexWrap: "wrap" },
+                    ]}
+                >
+                    <DropDownTextAreaBox
+                        type="select"
+                        placeholder={dropDown1Name}
+                        list={dropDown1List}
+                        value={dropDown1}
+                        isSearchable
+                        inputCustomStyle={{
+                            ...styles.statusDropdown,
+                            width: (width - 42) / 2,
+                        }}
+                        onSelected={(value) => {
+                            onChange({ dropDown1: value });
+                        }}
+                    />
+                    <DropDownTextAreaBox
+                        type="select"
+                        placeholder={dropDown2Name}
+                        list={dropDown2List}
+                        value={dropDown2}
+                        isSearchable
+                        inputCustomStyle={{
+                            ...styles.statusDropdown,
+                            width: (width - 42) / 2,
+                        }}
+                        onSelected={(value) => {
+                            onChange({ dropDown2: value });
+                        }}
+                    />
+                    <DropDownTextAreaBox
+                        type="select"
+                        placeholder={dropDown3Name}
+                        list={dropDown3List}
+                        value={dropDown3}
+                        isSearchable
+                        inputCustomStyle={{
+                            ...styles.statusDropdown,
+                            width: width - 32,
+                        }}
+                        onSelected={(value) => {
+                            onChange({ dropDown3: value });
+                        }}
+                    />
                 </View>
             ) : null}
         </View>

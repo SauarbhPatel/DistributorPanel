@@ -1,22 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
     StyleSheet,
     TouchableOpacity,
     ScrollView,
+    Alert,
 } from "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors, Sizes } from "../../constants/styles";
 import NoDataCard from "../common/NoDataCard";
+import DeleteAlert from "../common/DeleteAlert";
+import { __deleteApiData } from "../../utils/api";
+import TaxKindModel from "./TaxKindModel";
 
 const TaxKindCard = ({
     name,
-    subtitle,
     code,
     description,
-    status,
     isActive,
+    onDelete = () => {},
+    onEdit = () => {},
 }) => {
     const activeBlue = "#0071BC";
     const statusGreen = "#10B981";
@@ -34,10 +38,13 @@ const TaxKindCard = ({
                     </View>
                     <View>
                         <Text style={styles.taxNameText}>{name}</Text>
-                        <Text style={styles.taxSubtitleText}>{subtitle}</Text>
+                        {/* <Text style={styles.taxSubtitleText}>{code}</Text> */}
                     </View>
                 </View>
-                <TouchableOpacity style={styles.deleteButton}>
+                <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => onDelete()}
+                >
                     <Feather name="trash-2" size={18} color="#FF5252" />
                 </TouchableOpacity>
             </View>
@@ -58,18 +65,24 @@ const TaxKindCard = ({
                                 { backgroundColor: statusGreen },
                             ]}
                         />
-                        <Text style={styles.statusText}>{status}</Text>
+                        <Text style={styles.statusText}>
+                            {isActive ? "Active" : "In-Active"}
+                        </Text>
                     </View>
                 </View>
             </View>
 
             <View style={styles.descriptionContainer}>
                 <Text style={styles.label}>DESCRIPTION</Text>
-                <Text style={styles.descriptionText}>{description}</Text>
+                <Text style={styles.descriptionText}>{description || "-"}</Text>
             </View>
 
             <View style={styles.actionRow}>
-                <TouchableOpacity style={styles.editButton} activeOpacity={0.8}>
+                <TouchableOpacity
+                    style={styles.editButton}
+                    activeOpacity={0.8}
+                    onPress={onEdit}
+                >
                     <Feather name="edit-3" size={14} color="#FFF" />
                     <Text style={styles.editButtonText}>Edit Details</Text>
                 </TouchableOpacity>
@@ -85,31 +98,87 @@ const TaxKindCard = ({
     );
 };
 
-const TaxKindList = ({ onChange = () => {} }) => {
-    const taxData = [
-        {
-            name: "GST",
-            subtitle: "National consumption tax",
-            code: "GST",
-            description:
-                "Goods and Services Tax (GST) is an indirect tax used in India on the supply of goods and services.",
-            status: "ACTIVE",
-        },
-        {
-            name: "VAT",
-            subtitle: "Value added tax",
-            code: "VAT",
-            description:
-                "Value Added Tax is a consumption tax placed on a product whenever value is added at each stage of the supply chain.",
-            status: "ACTIVE",
-        },
-    ];
+const TaxKindList = ({ onChange = () => {}, list = [], onDone = () => {} }) => {
+    const [state, setState] = useState({
+        loading: false,
+        isShowDelete: false,
+        isShowCreate: false,
+        itemId: null,
+        itemDetails: null,
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+
+    const { isShowDelete, isShowCreate, loading, itemId, itemDetails } = state;
+
+    const __handleDelete = async (id) => {
+        try {
+            updateState({ loading: true });
+            const res = await __deleteApiData(
+                `/tax-kinds/deleteTaxKindById/${id}`,
+            );
+            if (res?.success) {
+                onDone();
+                updateState({
+                    isShowDelete: false,
+                    itemId: null,
+                });
+            } else {
+                Alert.alert(
+                    "Error",
+                    res?.message || "Failed, Please try again.",
+                );
+            }
+        } catch (error) {
+            Alert.alert("Error", "Something went wrong");
+        } finally {
+            updateState({ loading: false });
+        }
+    };
 
     return (
         <View style={styles.container}>
-            {taxData.length > 0 ? (
-                taxData.map((item, index) => (
-                    <TaxKindCard key={index} {...item} />
+            <DeleteAlert
+                visible={isShowDelete}
+                isLoading={loading}
+                onCancel={() => {
+                    updateState({
+                        isShowDelete: false,
+                        itemId: null,
+                    });
+                }}
+                onDelete={() => {
+                    __handleDelete(itemId);
+                }}
+            />
+            <TaxKindModel
+                item={itemDetails}
+                visible={isShowCreate}
+                onClose={(refresh) => {
+                    updateState({ isShowCreate: false });
+                    if (refresh) {
+                        onDone();
+                    }
+                }}
+                isEdit
+            />
+            {list.length > 0 ? (
+                list.map((item, index) => (
+                    <TaxKindCard
+                        key={index}
+                        {...item}
+                        onDelete={() => {
+                            updateState({
+                                isShowDelete: true,
+                                itemId: item?._id,
+                            });
+                        }}
+                        onEdit={() => {
+                            updateState({
+                                isShowCreate: true,
+                                itemDetails: item,
+                            });
+                        }}
+                    />
                 ))
             ) : (
                 <NoDataCard
@@ -135,7 +204,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#F8FAFC",
         padding: 15,
-        paddingBottom: 30,
+        paddingBottom: 0,
     },
     scrollPadding: {
         padding: 15,
@@ -157,18 +226,8 @@ const styles = StyleSheet.create({
         padding: 16,
         position: "relative",
         overflow: "hidden",
-        // Shadow for Mobile depth
-        elevation: 3,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
     },
-    activeCard: {
-        borderColor: "#0071BC",
-        borderWidth: 1.5,
-        backgroundColor: "#F0F9FF",
-    },
+    activeCard: {},
     accentBorder: {
         position: "absolute",
         left: 0,

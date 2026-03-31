@@ -12,6 +12,8 @@ import {
 import { Feather, FontAwesome6 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Loader } from "../../modules";
+import { Alert } from "react-native";
+import { __postApiData, __patchApiData } from "../../utils/api";
 
 const TaxKindModel = ({ visible, onClose, isEdit = false, item = null }) => {
     const [state, setState] = useState({
@@ -24,13 +26,91 @@ const TaxKindModel = ({ visible, onClose, isEdit = false, item = null }) => {
 
     const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
 
+    const validateForm = () => {
+        if (!state.taxKindName.trim()) {
+            Alert.alert("Validation Error", "Tax Kind Name is required");
+            return false;
+        }
+
+        if (state.taxKindName.trim().length < 2) {
+            Alert.alert(
+                "Validation Error",
+                "Name must be at least 2 characters",
+            );
+            return false;
+        }
+
+        if (!state.taxKindCode.trim()) {
+            Alert.alert("Validation Error", "Tax Kind Code is required");
+            return false;
+        }
+
+        return true;
+    };
+
+    const __handleSave = () => {
+        if (!validateForm()) return;
+
+        updateState({ isLoading: true });
+
+        const payload = {
+            name: state.taxKindName.trim(),
+            code: state.taxKindCode.trim(),
+            description: state.description,
+            isActive: state.status === "Active",
+        };
+
+        __postApiData("/tax-kinds/createTaxKind", payload)
+            .then((res) => {
+                updateState({ isLoading: false });
+
+                if (res?.success) {
+                    Alert.alert("Success", res.message);
+                    onClose(true); // pass refresh flag
+                } else {
+                    Alert.alert("Error", res?.message || "Failed");
+                }
+            })
+            .catch(() => {
+                updateState({ isLoading: false });
+                Alert.alert("Error", "Something went wrong");
+            });
+    };
+
+    const __handleEditSave = () => {
+        if (!validateForm()) return;
+
+        updateState({ isLoading: true });
+
+        const payload = {
+            name: state.taxKindName.trim(),
+            code: state.taxKindCode.trim(),
+            description: state.description,
+            isActive: state.status === "Active",
+        };
+        __patchApiData(`/tax-kinds/updateTaxKindById/${item?._id}`, payload)
+            .then((res) => {
+                updateState({ isLoading: false });
+
+                if (res?.success) {
+                    Alert.alert("Success", res.message);
+                    onClose(true);
+                } else {
+                    Alert.alert("Error", res?.message || "Failed");
+                }
+            })
+            .catch(() => {
+                updateState({ isLoading: false });
+                Alert.alert("Error", "Something went wrong");
+            });
+    };
     useEffect(() => {
         if (isEdit && item && visible) {
             updateState({
                 taxKindName: item?.name || "",
                 taxKindCode: item?.code || "",
                 description: item?.description || "",
-                status: item?.status || "Active",
+                status: item?.isActive ? "Active" : "Inactive",
             });
         } else if (!isEdit && visible) {
             updateState({
@@ -41,7 +121,6 @@ const TaxKindModel = ({ visible, onClose, isEdit = false, item = null }) => {
             });
         }
     }, [isEdit, item, visible]);
-
     return (
         <Modal visible={visible} animationType="slide" transparent={true}>
             <Loader isShow={state.isLoading} />
@@ -99,11 +178,11 @@ const TaxKindModel = ({ visible, onClose, isEdit = false, item = null }) => {
                                 <TextInput
                                     style={[
                                         styles.input,
-                                        isEdit && styles.disabledInput,
+                                        // isEdit && styles.disabledInput,
                                     ]}
                                     placeholder="e.g. colour, battery_capacity"
                                     placeholderTextColor="#94a3b8"
-                                    editable={!isEdit}
+                                    // editable={!isEdit}
                                     value={state.taxKindCode}
                                     onChangeText={(val) =>
                                         updateState({ taxKindCode: val })
@@ -128,7 +207,18 @@ const TaxKindModel = ({ visible, onClose, isEdit = false, item = null }) => {
 
                             <View style={styles.inputGroup}>
                                 <Text style={styles.label}>Status</Text>
-                                <TouchableOpacity style={styles.dropdown}>
+                                <TouchableOpacity
+                                    style={styles.dropdown}
+                                    activeOpacity={0.8}
+                                    onPress={() => {
+                                        updateState({
+                                            status:
+                                                state.status == "Active"
+                                                    ? "Inactive"
+                                                    : "Active",
+                                        });
+                                    }}
+                                >
                                     <Text style={styles.dropdownText}>
                                         {state.status}
                                     </Text>
@@ -164,7 +254,12 @@ const TaxKindModel = ({ visible, onClose, isEdit = false, item = null }) => {
                         <Text style={styles.cancelText}>Cancel</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity activeOpacity={0.8} style={{}}>
+                    <TouchableOpacity
+                        activeOpacity={0.8}
+                        onPress={() =>
+                            isEdit ? __handleEditSave() : __handleSave()
+                        }
+                    >
                         <LinearGradient
                             colors={["#0070ba", "#005a96"]}
                             style={styles.saveBtn}
