@@ -37,13 +37,13 @@ const HsnSetModel = ({ visible, onClose, isEdit = false, item = null }) => {
             return false;
         }
 
-        // if (!Array.isArray(state.hsnCodes) || state.hsnCodes.length === 0) {
-        //     Alert.alert(
-        //         "Validation Error",
-        //         "Please select at least one HSN code",
-        //     );
-        //     return false;
-        // }
+        if (!Array.isArray(state.hsnCodes) || state.hsnCodes.length === 0) {
+            Alert.alert(
+                "Validation Error",
+                "Please select at least one HSN code",
+            );
+            return false;
+        }
 
         return true;
     };
@@ -87,7 +87,7 @@ const HsnSetModel = ({ visible, onClose, isEdit = false, item = null }) => {
             isActive: state.status === "Active",
         };
 
-        __patchApiData(`/api/hsnSets/updateHsnSetById/${item?._id}`, payload)
+        __patchApiData(`/hsnSets/updateHsnSetById/${item?._id}`, payload)
             .then((res) => {
                 updateState({ isLoading: false });
 
@@ -108,7 +108,12 @@ const HsnSetModel = ({ visible, onClose, isEdit = false, item = null }) => {
         if (isEdit && item && visible) {
             updateState({
                 hsnSetName: item?.name || "",
-                hsnCodes: item?.hsnCodes || [],
+                hsnCodes:
+                    item?.hsnCodesDetails?.map((hsn) => ({
+                        ...hsn,
+                        id: hsn?._id,
+                        name: hsn?.name,
+                    })) || [],
                 status: item?.isActive ? "Active" : "Inactive",
                 description: item?.description || "",
             });

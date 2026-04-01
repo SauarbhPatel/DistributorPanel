@@ -1,14 +1,6 @@
 import React, { useState } from "react";
-import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    ScrollView,
-    Alert,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Colors, Sizes } from "../../constants/styles";
 import NoDataCard from "../common/NoDataCard";
 import DeleteAlert from "../common/DeleteAlert";
 import { __deleteApiData } from "../../utils/api";
@@ -26,7 +18,7 @@ const TaxKindCard = ({
     const statusGreen = "#10B981";
 
     return (
-        <View style={[styles.card, isActive && styles.activeCard]}>
+        <View style={[styles.card]}>
             <View style={styles.cardHeader}>
                 <View style={styles.headerLeft}>
                     <View style={styles.iconContainer}>
@@ -62,7 +54,11 @@ const TaxKindCard = ({
                         <View
                             style={[
                                 styles.statusDot,
-                                { backgroundColor: statusGreen },
+                                {
+                                    backgroundColor: isActive
+                                        ? statusGreen
+                                        : "#EF4444",
+                                },
                             ]}
                         />
                         <Text style={styles.statusText}>

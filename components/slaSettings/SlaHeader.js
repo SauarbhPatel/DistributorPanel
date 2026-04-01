@@ -27,7 +27,7 @@ const SlaHeader = ({
     property = null,
     propertyID = null,
     linkName = null,
-    buttonsCommponend = <></>,
+    buttonsCommponend = null,
     syncButton = false,
     feedButton = false,
     reportButton = false,
@@ -127,6 +127,7 @@ const SlaHeader = ({
                     marginTop: 15,
                 }}
             >
+                {buttonsCommponend}
                 {property && (
                     <TouchableOpacity style={styles.status} activeOpacity={0.8}>
                         <View>

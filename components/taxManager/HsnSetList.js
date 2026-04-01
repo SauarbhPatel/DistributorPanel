@@ -4,6 +4,7 @@ import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import NoDataCard from "../common/NoDataCard";
 import { __deleteApiData } from "../../utils/api";
 import DeleteAlert from "../common/DeleteAlert";
+import HsnSetModel from "./HsnSetModel";
 
 const HsnSetCard = ({
     name,
@@ -129,6 +130,8 @@ const HsnSetList = ({ onChange = () => {}, list = [], onDone = () => {} }) => {
             updateState({ loading: false });
         }
     };
+
+    console.log(JSON.stringify(itemDetails));
     return (
         <View style={styles.container}>
             <DeleteAlert
@@ -142,6 +145,18 @@ const HsnSetList = ({ onChange = () => {}, list = [], onDone = () => {} }) => {
                 }}
                 onDelete={() => {
                     __handleDelete(itemId);
+                }}
+            />
+
+            <HsnSetModel
+                isEdit
+                item={itemDetails}
+                visible={isShowCreate}
+                onClose={(refresh) => {
+                    updateState({ isShowCreate: false });
+                    if (refresh) {
+                        onDone();
+                    }
                 }}
             />
             {list?.length > 0 ? (

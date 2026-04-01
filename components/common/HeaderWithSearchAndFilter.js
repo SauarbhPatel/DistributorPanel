@@ -14,10 +14,12 @@ import { DropDownTextAreaBox } from "../../modules";
 const { width } = Dimensions.get("window");
 const HeaderWithSearchAndFilter = ({
     dec,
+    hideExport = false,
     buttonName,
     search,
     searchPlaceHolder = "",
     onChange = () => {},
+    onPressClearAll = () => {},
     dropDownCount = 1,
     dropDown1Name,
     dropDown2Name,
@@ -29,44 +31,53 @@ const HeaderWithSearchAndFilter = ({
     dropDown1 = null,
     dropDown2 = null,
     dropDown3 = null,
+    showClearButton = false,
 }) => {
     return (
         <View style={styles.container}>
-            <View style={styles.textSection}>
-                {/* <Text style={styles.titleText}>Shipping Zones</Text> */}
-                <Text style={styles.descriptionText}>{dec}</Text>
-            </View>
+            {dec ? (
+                <View style={styles.textSection}>
+                    <Text style={styles.descriptionText}>{dec}</Text>
+                </View>
+            ) : null}
 
-            <View style={styles.actionRow}>
-                <TouchableOpacity style={styles.secondaryButton}>
-                    <Feather name="download" size={16} color="#4B5563" />
-                    <Text style={styles.secondaryButtonText}>Export</Text>
-                </TouchableOpacity>
+            {hideExport ? null : (
+                <View style={styles.actionRow}>
+                    <TouchableOpacity style={styles.secondaryButton}>
+                        <Feather name="download" size={16} color="#4B5563" />
+                        <Text style={styles.secondaryButtonText}>Export</Text>
+                    </TouchableOpacity>
 
-                <TouchableOpacity style={styles.secondaryButton}>
-                    <MaterialCommunityIcons
-                        name="file-document-outline"
-                        size={16}
-                        color="#4B5563"
-                    />
-                    <Text style={styles.secondaryButtonText}>Bulk Export</Text>
-                </TouchableOpacity>
-            </View>
-
-            <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => onChange({ isShowCreate: true })}
-            >
-                <LinearGradient
-                    colors={["#0061A8", "#004A80"]}
-                    style={styles.primaryButton}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
+                    <TouchableOpacity style={styles.secondaryButton}>
+                        <MaterialCommunityIcons
+                            name="file-document-outline"
+                            size={16}
+                            color="#4B5563"
+                        />
+                        <Text style={styles.secondaryButtonText}>
+                            Bulk Export
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+            {buttonName ? (
+                <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => onChange({ isShowCreate: true })}
                 >
-                    <Feather name="plus" size={18} color="#FFF" />
-                    <Text style={styles.primaryButtonText}>{buttonName}</Text>
-                </LinearGradient>
-            </TouchableOpacity>
+                    <LinearGradient
+                        colors={["#0061A8", "#004A80"]}
+                        style={styles.primaryButton}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                    >
+                        <Feather name="plus" size={18} color="#FFF" />
+                        <Text style={styles.primaryButtonText}>
+                            {buttonName}
+                        </Text>
+                    </LinearGradient>
+                </TouchableOpacity>
+            ) : null}
 
             <View style={styles.filterRow}>
                 <View style={styles.searchBar}>
@@ -182,12 +193,28 @@ const HeaderWithSearchAndFilter = ({
                         isSearchable
                         inputCustomStyle={{
                             ...styles.statusDropdown,
-                            width: width - 32,
+                            width: showClearButton
+                                ? (width - 42) / 2
+                                : width - 32,
                         }}
                         onSelected={(value) => {
                             onChange({ dropDown3: value });
                         }}
                     />
+                    {showClearButton ? (
+                        <TouchableOpacity
+                            style={{
+                                ...styles.statusDropdown,
+                                width: (width - 42) / 2,
+                                justifyContent: "center",
+                            }}
+                            onPress={onPressClearAll}
+                        >
+                            <Text style={styles.secondaryButtonText}>
+                                Clear All
+                            </Text>
+                        </TouchableOpacity>
+                    ) : null}
                 </View>
             ) : null}
         </View>

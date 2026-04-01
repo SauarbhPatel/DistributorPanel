@@ -7,45 +7,118 @@ import {
     TouchableOpacity,
     ScrollView,
     Modal,
-    Animated,
     Dimensions,
-    Pressable,
 } from "react-native";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
 const { height } = Dimensions.get("window");
+import { Alert } from "react-native";
+import { __postApiData, __patchApiData } from "../../utils/api";
+import { Loader } from "../../modules";
 
-const TaxTypeModel = ({ visible, onClose, initialData = null }) => {
+const TaxTypeModel = ({ visible, onClose, isEdit = false, item = null }) => {
     const [formData, setFormData] = useState({
         name: "",
         code: "",
-        kind: "GST",
-        jurisdiction: "Active",
         description: "",
         isActive: true,
+        isLoading: false,
     });
+    const validateForm = () => {
+        if (!formData.name.trim()) {
+            Alert.alert("Validation Error", "Name is required");
+            return false;
+        }
+        if (!formData.code.trim()) {
+            Alert.alert("Validation Error", "Code is required");
+            return false;
+        }
+        return true;
+    };
+    const __handleSave = () => {
+        if (!validateForm()) return;
 
-    // Sync state when editing
+        setFormData((prev) => ({ ...prev, isLoading: true }));
+
+        const payload = {
+            name: formData.name.trim(),
+            code: formData.code.trim(),
+            description: formData.description,
+            isActive: formData.isActive,
+        };
+
+        __postApiData("/taxTypes/createTaxType", payload)
+            .then((res) => {
+                setFormData((prev) => ({ ...prev, isLoading: false }));
+
+                if (res?.success) {
+                    Alert.alert("Success", res.message);
+                    onClose(true);
+                } else {
+                    Alert.alert("Error", res?.message || "Failed");
+                }
+            })
+            .catch(() => {
+                setFormData((prev) => ({ ...prev, isLoading: false }));
+                Alert.alert("Error", "Something went wrong");
+            });
+    };
+    const __handleEditSave = () => {
+        if (!validateForm()) return;
+
+        setFormData((prev) => ({ ...prev, isLoading: true }));
+
+        const payload = {
+            name: formData.name.trim(),
+            code: formData.code.trim(),
+            description: formData.description,
+            isActive: formData.isActive,
+        };
+
+        __patchApiData(`/taxTypes/updateTaxTypeById/${item?._id}`, payload)
+            .then((res) => {
+                setFormData((prev) => ({ ...prev, isLoading: false }));
+
+                if (res?.success) {
+                    Alert.alert("Success", res.message);
+                    onClose(true);
+                } else {
+                    Alert.alert("Error", res?.message || "Failed");
+                }
+            })
+            .catch(() => {
+                setFormData((prev) => ({ ...prev, isLoading: false }));
+                Alert.alert("Error", "Something went wrong");
+            });
+    };
+
     useEffect(() => {
-        if (initialData) {
+        if (isEdit && item && visible) {
             setFormData({
-                name: initialData.taxTypeName || "",
-                code: initialData.taxCode || "",
-                kind: initialData.kind || "GST",
-                jurisdiction: initialData.jurisdiction || "Active",
-                description: initialData.description || "",
-                isActive: initialData.status === "Active",
+                name: item?.name || "",
+                code: item?.code || "",
+                description: item?.description || "",
+                isActive: item?.isActive ?? true,
+                isLoading: false,
+            });
+        } else if (!isEdit && visible) {
+            setFormData({
+                name: "",
+                code: "",
+                description: "",
+                isActive: true,
+                isLoading: false,
             });
         }
-    }, [initialData, visible]);
-
+    }, [item, visible, isEdit]);
     return (
         <Modal visible={visible} animationType="slide" transparent={true}>
+            <Loader isShow={formData.isLoading} />
             <View style={styles.container}>
                 <View style={styles.header}>
                     <Text style={styles.headerTitle}>
-                        {initialData ? "Edit Tax Type" : "Add Tax Type"}
+                        {item ? "Edit Tax Type" : "Add Tax Type"}
                     </Text>
                     <Text style={styles.headerSubtitle}>
                         Define tax type, rate, scope, and rules. Save as Draft
@@ -80,8 +153,7 @@ const TaxTypeModel = ({ visible, onClose, initialData = null }) => {
                         {/* Form Fields */}
                         <View style={styles.inputGroup}>
                             <Text style={styles.inputLabel}>
-                                Tax Name{" "}
-                                <Text style={{ color: "#EF4444" }}>*</Text>
+                                Name <Text style={{ color: "#EF4444" }}>*</Text>
                             </Text>
                             <TextInput
                                 style={styles.textInput}
@@ -95,8 +167,7 @@ const TaxTypeModel = ({ visible, onClose, initialData = null }) => {
 
                         <View style={styles.inputGroup}>
                             <Text style={styles.inputLabel}>
-                                Tax Code{" "}
-                                <Text style={{ color: "#EF4444" }}>*</Text>
+                                Code <Text style={{ color: "#EF4444" }}>*</Text>
                             </Text>
                             <TextInput
                                 style={styles.textInput}
@@ -126,7 +197,16 @@ const TaxTypeModel = ({ visible, onClose, initialData = null }) => {
 
                         <View style={styles.inputGroup}>
                             <Text style={styles.inputLabel}>Status</Text>
-                            <TouchableOpacity style={styles.pickerButton}>
+                            <TouchableOpacity
+                                style={styles.pickerButton}
+                                activeOpacity={0.8}
+                                onPress={() =>
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        isActive: !prev.isActive,
+                                    }))
+                                }
+                            >
                                 <Text style={styles.pickerText}>
                                     {formData.isActive ? "Active" : "Inactive"}
                                 </Text>
@@ -161,7 +241,12 @@ const TaxTypeModel = ({ visible, onClose, initialData = null }) => {
                         <Text style={styles.cancelText}>Cancel</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity activeOpacity={0.8} style={{}}>
+                    <TouchableOpacity
+                        activeOpacity={0.8}
+                        onPress={() =>
+                            isEdit ? __handleEditSave() : __handleSave()
+                        }
+                    >
                         <LinearGradient
                             colors={["#0070ba", "#005a96"]}
                             style={styles.saveBtn}

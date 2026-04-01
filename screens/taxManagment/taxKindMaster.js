@@ -40,7 +40,6 @@ const TaxKindMaster = ({ navigation }) => {
                 `/tax-kinds/getAllTaxKinds?search=${ser}&page=${page}&limit=${limit}${dropDown3?.id ? `&isActive=${dropDown3?.id.trim()}` : ""}${dropDown1?.id ? `&sortBy=${dropDown1?.id.trim()}` : ""}${dropDown2?.id ? `&sortOrder=${dropDown2?.id.trim()}` : ""}`,
             );
 
-            console.log(res.data?.pagination);
             if (res?.success) {
                 updateState({
                     list: res.data?.records,
@@ -73,9 +72,6 @@ const TaxKindMaster = ({ navigation }) => {
                     dec="Define tax kinds — GST, VAT, Sales Tax, etc."
                     buttonName="Add Tax Kind"
                     dropDownCount={3}
-                    dropDown1Name="Sort by"
-                    dropDown2Name="Sort By action"
-                    dropDown3Name="Status"
                     searchPlaceHolder="Search name, code, description..."
                     isLoading={loading}
                     dropDown1List={[

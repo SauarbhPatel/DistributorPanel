@@ -27,17 +27,21 @@ const NoDataCard = ({
             <Text style={styles.noDataTitle}>{title}</Text>
             <Text style={styles.noDataDescription}>{subTitle}</Text>
 
-            <TouchableOpacity onPress={onCreatePress} activeOpacity={0.8}>
-                <LinearGradient
-                    colors={["#0071BC", "#005A96"]}
-                    style={styles.createButton}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                >
-                    <Feather name="plus" size={18} color="#FFF" />
-                    <Text style={styles.createButtonText}>{buttonName}</Text>
-                </LinearGradient>
-            </TouchableOpacity>
+            {buttonName ? (
+                <TouchableOpacity onPress={onCreatePress} activeOpacity={0.8}>
+                    <LinearGradient
+                        colors={["#0071BC", "#005A96"]}
+                        style={styles.createButton}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                    >
+                        <Feather name="plus" size={18} color="#FFF" />
+                        <Text style={styles.createButtonText}>
+                            {buttonName}
+                        </Text>
+                    </LinearGradient>
+                </TouchableOpacity>
+            ) : null}
         </View>
     );
 };

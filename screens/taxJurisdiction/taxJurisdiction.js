@@ -37,16 +37,7 @@ const TaxJurisdiction = ({ navigation }) => {
 
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
-    const {
-        search,
-        isShowCreate,
-        loading,
-        loading1,
-        list,
-        totalAttributes,
-        filterableAttributes,
-        variantAttributes,
-    } = state;
+    const { search, isShowCreate, loading, list } = state;
 
     const __handleGetData = async (ser) => {
         try {

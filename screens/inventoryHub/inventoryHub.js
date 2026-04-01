@@ -19,18 +19,26 @@ const PRODUCT_MENU = [
         title: "My Listings",
         icon: "list-alt",
         screen: "MyListings",
+        api: "/getMyListings",
     },
     {
         title: "Seller Fulfilled",
         icon: "category",
         screen: "MyListings",
+        api: "",
     },
     {
         title: "Warehouse Fulfilled",
         icon: "category",
         screen: "MyListings",
+        api: "",
     },
-    { title: "B2B Listings", icon: "layers", screen: "" },
+    {
+        title: "B2B Listings",
+        icon: "layers",
+        screen: "MyListings",
+        api: "",
+    },
 ];
 
 const InventoryHub = ({ navigation }) => {
@@ -57,6 +65,7 @@ const InventoryHub = ({ navigation }) => {
                                 onPress={() =>
                                     navigation.navigate(item.screen, {
                                         name: item.title,
+                                        api: item.api,
                                     })
                                 }
                             >

@@ -21,76 +21,46 @@ import { Loader } from "../../modules";
 import HeaderWithSearchAndFilter from "../../components/common/HeaderWithSearchAndFilter";
 import TaxTypeList from "../../components/taxManager/TaxTypeList";
 import TaxTypeModel from "../../components/taxManager/TaxTypeModel";
+import TablePagination from "../../components/marketing/TablePagination";
 
 const TaxTypes = ({ navigation }) => {
-    // const [search, setSearch] = useState("");
     const [state, setState] = useState({
         loading: false,
         list: [],
-        search: "",
+        pagination: {},
         isShowCreate: false,
+        search: "",
+        dropDown1: null,
     });
-
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
-    const { isShowCreate, loading, list, search } = state;
+    const { search, isShowCreate, loading, list, dropDown1 } = state;
 
-    const __handleGetData = async (ser) => {
+    const __handleGetData = async (ser = "", page = 1, limit = 5) => {
         try {
             updateState({ loading: true });
-            const res = await __getApiData(`/taxTypes/getAllTaxTypes`);
-            console.log(JSON.stringify(res));
+
+            const res = await __getApiData(
+                `/taxTypes/getAllTaxTypes?search=${ser}&page=${page}&limit=${limit}${dropDown1?.id ? `&isActive=${dropDown1?.id.trim()}` : ""}`,
+            );
             if (res?.success) {
                 updateState({
                     list: res.data?.records,
+                    pagination: res.data?.pagination,
                 });
             }
         } catch (error) {
-            console.error("Error creating ticket:", error);
+            console.error("Error:", error);
         } finally {
             updateState({ loading: false });
         }
     };
-
-    useEffect(() => {
-        __handleGetData();
-    }, []);
-
-    const __handleDelete = (id) => {
-        Alert.alert(
-            "Delete Tax Type",
-            "Are you sure you want to delete?",
-            [
-                {
-                    text: "Cancel",
-                    style: "cancel",
-                },
-                {
-                    text: "Delete",
-                    style: "destructive",
-                    onPress: async () => {
-                        try {
-                            updateState({ loading: true });
-
-                            const res = await __postApiData(
-                                `/taxTypes/deleteTaxTypeById/${id}`,
-                            );
-                            if (res?.success) {
-                                __handleGetData(search);
-                            } else {
-                                Alert.alert("Error", res?.message);
-                            }
-                        } catch (error) {
-                            Alert.alert("Error", "Something went wrong");
-                        } finally {
-                            updateState({ loading: false });
-                        }
-                    },
-                },
-            ],
-            { cancelable: true },
-        );
+    const handlePageChange = (newPage) => {
+        __handleGetData(search, newPage);
     };
+    useEffect(() => {
+        __handleGetData(search, 1);
+    }, [search, dropDown1]);
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
@@ -103,320 +73,44 @@ const TaxTypes = ({ navigation }) => {
                     onChange={updateState}
                     dec="Manage tax type configurations"
                     buttonName="Add Tax Type"
-                    dropDownCount={2}
-                    dropDown1Name="Sort by"
-                    dropDown2Name="Sort By action"
                     searchPlaceHolder="Search name, code, description..."
                     isLoading={loading}
+                    dropDownCount={1}
+                    dropDown1Name="Status"
+                    dropDown1List={[
+                        { id: "", name: "All Status" },
+                        { id: "true", name: "Active" },
+                        { id: "false", name: "In-Active" },
+                    ]}
+                    dropDown1={dropDown1}
                 />
-                <TaxTypeList list={list} onChange={updateState} />
-
-                {/* {attributeCards()} */}
+                <TaxTypeList
+                    list={list}
+                    onChange={updateState}
+                    onDone={() => {
+                        __handleGetData(search, 1);
+                    }}
+                />
+                {list?.length > 0 && (
+                    <View style={{ paddingHorizontal: 16 }}>
+                        <TablePagination
+                            pagination={state.pagination}
+                            onPageChange={handlePageChange}
+                        />
+                    </View>
+                )}
             </ScrollView>
             <TaxTypeModel
                 visible={isShowCreate}
-                onClose={() => updateState({ isShowCreate: false })}
+                onClose={(refresh) => {
+                    updateState({ isShowCreate: false });
+                    if (refresh) {
+                        __handleGetData(search, 1);
+                    }
+                }}
             />
-            {/* <BottomPopup
-                isShow={isShowCreate}
-                title="Add Tax Type"
-                // top="55%"
-                onClose={() => updateState({ isShowCreate: false })}
-                component={
-                    <CreateTaxType
-                        onClose={() => {
-                            updateState({ isShowCreate: false });
-                            __handleGetData(search);
-                        }}
-                    />
-                }
-            /> */}
         </SafeAreaView>
     );
-
-    function attributeCards() {
-        return (
-            <View style={{ paddingHorizontal: Sizes.fixPadding }}>
-                {list
-                    ?.filter(
-                        (item) =>
-                            item?.name
-                                ?.toLowerCase()
-                                .includes(search.toLowerCase()) ||
-                            item?.code
-                                ?.toLowerCase()
-                                .includes(search.toLowerCase()),
-                    )
-                    ?.map((item) => (
-                        <ListCard
-                            item={item}
-                            key={item?._id}
-                            onDelete={__handleDelete}
-                            onDone={() => __handleGetData(search)}
-                        />
-                    ))}
-            </View>
-        );
-    }
 };
 
 export default TaxTypes;
-
-const ListCard = ({ item, onDelete, onDone = () => {} }) => {
-    const [state, setState] = useState({
-        isShowCreate: false,
-    });
-
-    const updateState = (data) => setState((state) => ({ ...state, ...data }));
-
-    const { isShowCreate } = state;
-    return (
-        <View style={styles.card}>
-            {/* Top Row */}
-            <BottomPopup
-                isShow={isShowCreate}
-                title="Edit Tax Types"
-                onClose={() => updateState({ isShowCreate: false })}
-                component={
-                    <CreateTaxType
-                        onClose={() => {
-                            updateState({ isShowCreate: false });
-                            onDone();
-                        }}
-                        isEdit
-                        item={item}
-                    />
-                }
-            />
-            <View style={styles.topRow}>
-                <View style={{ width: "80%" }}>
-                    <Text style={styles.hsnCode}>
-                        <Text
-                            style={{
-                                color: Colors.lightGrayColor,
-                                fontWeight: "400",
-                            }}
-                        >
-                            Tax Types:
-                        </Text>{" "}
-                        {item.name}
-                    </Text>
-                </View>
-
-                <View style={styles.badge}>
-                    <Text style={styles.badgeText}>{item.code}</Text>
-                </View>
-            </View>
-
-            {/* Bottom Row */}
-            <View style={styles.bottomRow}>
-                <View
-                    style={[
-                        styles.statusDot,
-                        {
-                            backgroundColor: item.isActive
-                                ? "#16A34A"
-                                : "#DC2626",
-                        },
-                    ]}
-                />
-                <Text style={styles.statusText}>
-                    {item.isActive ? "Active" : "Inactive"}
-                </Text>
-
-                <View style={styles.actionRow}>
-                    <TouchableOpacity
-                        style={styles.iconBtn}
-                        onPress={() => {
-                            updateState({ isShowCreate: true });
-                        }}
-                    >
-                        <Feather name="edit-2" size={18} color="#2563EB" />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={styles.iconBtn}
-                        onPress={() => onDelete(item?._id)}
-                    >
-                        <MaterialIcons
-                            name="delete-outline"
-                            size={20}
-                            color="#DC2626"
-                        />
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </View>
-    );
-};
-
-const StatCard = ({ title, value, colors, icon }) => (
-    <LinearGradient colors={colors} style={styles.statCard}>
-        <View style={{ marginEnd: 10 }}>
-            <Text style={styles.statTitle}>{title}</Text>
-            <Text style={styles.statValue}>{value}</Text>
-        </View>
-        <View style={styles.statIcon}>
-            <Feather name={icon} size={22} color="#fff" />
-        </View>
-    </LinearGradient>
-);
-
-const styles = StyleSheet.create({
-    header: {
-        padding: Sizes.fixPadding,
-    },
-
-    subTitle: {
-        marginTop: 4,
-        ...Fonts.grayColor14Regular,
-    },
-
-    /* ================= Stats Cards ================= */
-
-    statsRow: {
-        flexDirection: "row",
-        paddingHorizontal: Sizes.fixPadding - 5,
-        justifyContent: "space-between",
-    },
-
-    statCard: {
-        flex: 1,
-        borderRadius: Sizes.fixPadding,
-        padding: Sizes.fixPadding,
-        marginHorizontal: 4,
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-
-    statTitle: {
-        color: "#E5E7EB",
-        fontSize: 12,
-    },
-
-    statValue: {
-        color: "#fff",
-        fontSize: 22,
-        fontWeight: "bold",
-        marginTop: 4,
-    },
-
-    statIcon: {
-        backgroundColor: "rgba(255,255,255,0.25)",
-        padding: 10,
-        borderRadius: 12,
-    },
-
-    /* ================= Search + Add ================= */
-
-    searchRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        padding: Sizes.fixPadding,
-    },
-
-    searchBox: {
-        flex: 1,
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: Colors.whiteColor,
-        borderRadius: Sizes.fixPadding,
-        paddingHorizontal: Sizes.fixPadding,
-        height: 45,
-        marginRight: 10,
-    },
-
-    searchInput: {
-        flex: 1,
-        marginLeft: 8,
-    },
-
-    addBtn: {
-        flexDirection: "row",
-        backgroundColor: Colors.primaryColor,
-        paddingHorizontal: 14,
-        height: 45,
-        borderRadius: Sizes.fixPadding,
-        alignItems: "center",
-    },
-
-    addText: {
-        color: Colors.whiteColor,
-        marginLeft: 6,
-        fontWeight: "600",
-    },
-
-    /* ================= Attribute Set Card ================= */
-    card: {
-        backgroundColor: "#fff",
-        borderRadius: 14,
-        padding: 14,
-        marginBottom: 12,
-        // elevation: 2,
-    },
-
-    topRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
-    },
-
-    hsnCode: {
-        fontSize: 14,
-        fontWeight: "700",
-        color: "#2563EB",
-    },
-
-    description: {
-        ...Fonts.grayColor14Medium,
-        fontSize: 12,
-        color: Colors.lightGrayColor,
-        marginTop: 4,
-        maxWidth: "90%",
-    },
-
-    badge: {
-        backgroundColor: "#EFF6FF",
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 20,
-        // flex: 1,
-    },
-
-    badgeText: {
-        fontSize: 12,
-        fontWeight: "600",
-        color: "#2563EB",
-    },
-
-    bottomRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginTop: 12,
-    },
-
-    statusDot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-        marginRight: 6,
-    },
-
-    statusText: {
-        fontSize: 12,
-        color: "#6B7280",
-    },
-
-    actionRow: {
-        flexDirection: "row",
-        marginLeft: "auto",
-    },
-
-    iconBtn: {
-        padding: 6,
-        marginLeft: 6,
-        backgroundColor: "#F3F4F6",
-        borderRadius: 8,
-    },
-});

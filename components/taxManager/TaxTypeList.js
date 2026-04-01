@@ -1,8 +1,11 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import NoDataCard from "../common/NoDataCard";
+import { __deleteApiData } from "../../utils/api";
+import DeleteAlert from "../common/DeleteAlert";
+import TaxTypeModel from "./TaxTypeModel";
 
 const TaxTypeCard = ({
     name,
@@ -21,13 +24,9 @@ const TaxTypeCard = ({
             <View
                 style={[
                     styles.accentBorder,
-                    {
-                        backgroundColor:
-                            status === "Active" ? statusGreen : "#94A3B8",
-                    },
+                    { backgroundColor: isActive ? activeBlue : statusGreen },
                 ]}
             />
-
             <View style={styles.cardHeader}>
                 <View style={styles.headerLeft}>
                     <View style={styles.iconContainer}>
@@ -39,9 +38,6 @@ const TaxTypeCard = ({
                     </View>
                     <View>
                         <Text style={styles.taxNameText}>{name}</Text>
-                        <Text style={styles.taxSubtitleText}>
-                            Tax Type Configuration
-                        </Text>
                     </View>
                 </View>
                 <TouchableOpacity
@@ -68,15 +64,14 @@ const TaxTypeCard = ({
                             style={[
                                 styles.statusDot,
                                 {
-                                    backgroundColor:
-                                        status === "Active"
-                                            ? statusGreen
-                                            : "#EF4444",
+                                    backgroundColor: isActive
+                                        ? statusGreen
+                                        : "#EF4444",
                                 },
                             ]}
                         />
                         <Text style={styles.statusText}>
-                            {status?.toUpperCase()}
+                            {isActive ? "Active" : "In-Active"}
                         </Text>
                     </View>
                 </View>
@@ -85,8 +80,7 @@ const TaxTypeCard = ({
             <View style={styles.descriptionContainer}>
                 <Text style={styles.label}>DESCRIPTION</Text>
                 <Text style={styles.descriptionText} numberOfLines={2}>
-                    {description ||
-                        "No description provided for this tax type."}
+                    {description || "-"}
                 </Text>
             </View>
 
@@ -111,54 +105,88 @@ const TaxTypeCard = ({
     );
 };
 
-const TaxTypeList = ({
-    data = [
-        {
-            taxTypeName: "GST",
-            taxCode: "GST",
-            status: "Active",
-            description:
-                "Goods and Services Tax applicable on all intra-state and inter-state supplies in India.",
-        },
-        {
-            taxTypeName: "VAT",
-            taxCode: "VAT_INT",
-            status: "Active",
-            description:
-                "Value Added Tax for international exports and specific high-value items.",
-        },
-        {
-            taxTypeName: "Cess",
-            taxCode: "CESS_01",
-            status: "Inactive",
-            description:
-                "Additional cess applicable on luxury items and tobacco products.",
-        },
-        {
-            taxTypeName: "Service Tax",
-            taxCode: "SRV_TAX",
-            status: "Active",
-            description:
-                "Legacy service tax components for specific maintenance contracts.",
-        },
-    ],
-    onChange = () => {},
-    onEdit,
-    onDelete,
-}) => {
+const TaxTypeList = ({ list, onChange = () => {}, onDone = () => {} }) => {
+    const [state, setState] = useState({
+        loading: false,
+        isShowDelete: false,
+        isShowCreate: false,
+        itemId: null,
+        itemDetails: null,
+    });
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
+
+    const { isShowDelete, isShowCreate, loading, itemId, itemDetails } = state;
+    const __handleDelete = async (id) => {
+        try {
+            updateState({ loading: true });
+            const res = await __deleteApiData(
+                `/taxTypes/deleteTaxTypeById/${id}`,
+            );
+
+            console.log(res);
+            if (res?.success) {
+                onDone();
+                updateState({
+                    isShowDelete: false,
+                    itemId: null,
+                });
+            } else {
+                Alert.alert(
+                    "Error",
+                    res?.message || "Failed, Please try again.",
+                );
+            }
+        } catch (error) {
+            Alert.alert("Error", "Something went wrong");
+        } finally {
+            updateState({ loading: false });
+        }
+    };
+
     return (
         <View style={styles.container}>
-            {data.length > 0 ? (
-                data.map((item, index) => (
+            <DeleteAlert
+                visible={isShowDelete}
+                isLoading={loading}
+                onCancel={() => {
+                    updateState({
+                        isShowDelete: false,
+                        itemId: null,
+                    });
+                }}
+                onDelete={() => {
+                    __handleDelete(itemId);
+                }}
+            />
+            <TaxTypeModel
+                item={itemDetails}
+                visible={isShowCreate}
+                onClose={(refresh) => {
+                    updateState({ isShowCreate: false });
+                    if (refresh) {
+                        onDone();
+                    }
+                }}
+                isEdit
+            />
+
+            {list.length > 0 ? (
+                list.map((item, index) => (
                     <TaxTypeCard
                         key={index}
-                        name={item.taxTypeName}
-                        code={item.taxCode}
-                        description={item.description}
-                        status={item.status}
-                        isActive={index === 0}
-                        onEdit={() => onEdit && onEdit(item)}
-                        onDelete={() => onDelete && onDelete(item)}
+                        {...item}
+                        onDelete={() => {
+                            updateState({
+                                isShowDelete: true,
+                                itemId: item?._id,
+                            });
+                        }}
+                        onEdit={() => {
+                            updateState({
+                                isShowCreate: true,
+                                itemDetails: item,
+                            });
+                        }}
                     />
                 ))
             ) : (
@@ -195,11 +223,6 @@ const styles = StyleSheet.create({
         padding: 16,
         position: "relative",
         overflow: "hidden",
-        elevation: 3,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
     },
     activeCard: {
         borderColor: "#0071BC",

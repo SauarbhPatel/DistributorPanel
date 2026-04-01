@@ -320,9 +320,7 @@ const __getProductCategoryList = async () => {
 const __getAttributeSetById = async (id) => {
     return __getApiData(`/attributeSet/getAttributeSetById/${id}`)
         .then((res) => {
-            // console.log(JSON.stringify(res));
             if (res.success) {
-                // return createCategoryList(res?.data?.nestedData);
                 return res?.data;
             }
             return null;
@@ -332,10 +330,26 @@ const __getAttributeSetById = async (id) => {
         });
 };
 const __getTaxJurisdictionsList = async () => {
-    return __getApiData(`/jurisdictions/getAllJurisdictions?page=1&limit=10`)
+    return __getApiData(`/jurisdictions/getAllJurisdictions?page=1&limit=100`)
         .then((res) => {
             if (res.success) {
                 return createCategoryList(res?.data?.records);
+            }
+            return [];
+        })
+        .catch((error) => {
+            return [];
+        });
+};
+const __getTaxKindList = async () => {
+    return __getApiData(`/tax-kinds/getTaxKindsForDropdown`)
+        .then((res) => {
+            if (res.success) {
+                return res?.data?.records?.map((item) => ({
+                    ...item,
+                    id: item?._id,
+                    name: item?.name,
+                }));
             }
             return [];
         })
@@ -364,4 +378,5 @@ export {
     __getAttributeSetById,
     __getShippingList,
     __getShippingZoneList,
+    __getTaxKindList,
 };

@@ -114,6 +114,7 @@ const TaxSlabModal = ({ visible, onClose, isEdit = false, item = null }) => {
         return true;
     };
     const __handleSave = () => {
+        console.log("first");
         if (!validateForm()) return;
         try {
             updateState({ isLoading: true });
@@ -525,15 +526,17 @@ const TaxSlabModal = ({ visible, onClose, isEdit = false, item = null }) => {
                         <Text style={styles.cancelText}>Cancel</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity activeOpacity={0.8}>
+                    <TouchableOpacity
+                        activeOpacity={0.8}
+                        onPress={() =>
+                            isEdit ? __handleEditSave() : __handleSave()
+                        }
+                    >
                         <LinearGradient
                             colors={["#0070ba", "#005a96"]}
                             style={styles.saveBtn}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 0 }}
-                            onPress={() =>
-                                isEdit ? __handleEditSave() : __handleSave()
-                            }
                         >
                             <Text style={styles.saveBtnText}>
                                 {isEdit ? "Update" : "Save"}
