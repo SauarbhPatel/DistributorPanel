@@ -15,6 +15,7 @@ const stepsData = [
     { title: "Tax Rules", subtitle: "Tax setup" },
     { title: "Commission", subtitle: "Fees & margin" },
     { title: "Shipping Rules", subtitle: "Delivery setup" },
+    { title: "Media Upload", subtitle: "Image & Icon" },
     { title: "SEO", subtitle: "Search boost" },
     { title: "Review & Publish", subtitle: "Check & go" },
 ];
@@ -25,6 +26,7 @@ const stepsData2 = [
     { title: "Compliance", subtitle: "Legal info" },
     { title: "Commission", subtitle: "Fees & margin" },
     { title: "Shipping Rules", subtitle: "Delivery setup" },
+    { title: "Media Upload", subtitle: "Image & Icon" },
     { title: "SEO", subtitle: "Search boost" },
     { title: "Review & Publish", subtitle: "Check & go" },
 ];

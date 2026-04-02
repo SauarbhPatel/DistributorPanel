@@ -9,22 +9,21 @@ import {
 import { Feather, AntDesign } from "@expo/vector-icons";
 import { DropDownTextAreaBox } from "../../modules";
 
-const Form5 = ({ state, updateState }) => {
+const Form7 = ({ state, updateState }) => {
     const removeDoc = (index) => {
-        const updated = [...state.hsnSetIds];
+        const updated = [...state.shippingZoneIds];
         updated.splice(index, 1);
-        updateState({ hsnSetIds: updated });
+        updateState({ shippingZoneIds: updated });
     };
 
     return (
         <View style={styles.container}>
-            {/* Header */}
             <View style={styles.header}>
                 <View style={{ flex: 1 }}>
-                    <Text style={styles.title}>Tax Rules</Text>
+                    <Text style={styles.title}>Shipping & Logistics Rules</Text>
                     <Text style={styles.subtitle}>
-                        Select an HSN Set created in Tax Manager. It is assigned
-                        to this category at creation.
+                        Select a shipping template created in Manage Shipping
+                        Methods. It is assigned to this category at creation.
                     </Text>
                 </View>
                 <Feather name="info" size={18} color="#3b82f6" />
@@ -34,33 +33,33 @@ const Form5 = ({ state, updateState }) => {
             <View style={styles.body}>
                 {/* Dropdown */}
                 <View style={styles.inputGroup}>
-                    <Text style={styles.label}>HSN Set</Text>
+                    <Text style={styles.label}>Shipping Zones * </Text>
 
                     <DropDownTextAreaBox
                         type="select"
-                        placeholder={"Select HSN set..."}
-                        list={state?.hsnSetList}
+                        placeholder={"Select Shipping Zones..."}
+                        list={state?.shippingZoneList}
                         value={null}
                         isSearchable
                         inputCustomStyle={{}}
                         onSelected={(value) => {
                             updateState({
-                                hsnSetIds: state.hsnSetIds.find(
+                                shippingZoneIds: state.shippingZoneIds.find(
                                     (ids) => ids?.id == value?.id,
                                 )
-                                    ? state.hsnSetIds
-                                    : [...state.hsnSetIds, value],
+                                    ? state.shippingZoneIds
+                                    : [...state.shippingZoneIds, value],
                             });
                         }}
                         customStyle={{ marginBottom: 5, flex: 1 }}
                     />
                 </View>
 
-                {/* ✅ Selected Documents */}
-                {state?.hsnSetIds?.length > 0 && (
+                {state?.shippingZoneIds?.length > 0 && (
                     <View style={styles.selectedBox}>
                         <Text style={styles.selectedTitle}>
-                            • Selected HSN sets ({state?.hsnSetIds?.length})
+                            • Selected shipping zones (
+                            {state?.shippingZoneIds?.length})
                         </Text>
 
                         <ScrollView
@@ -68,7 +67,7 @@ const Form5 = ({ state, updateState }) => {
                             showsHorizontalScrollIndicator={false}
                             contentContainerStyle={styles.tagContainer}
                         >
-                            {state?.hsnSetIds?.map((doc, index) => (
+                            {state?.shippingZoneIds?.map((doc, index) => (
                                 <View key={index} style={styles.tag}>
                                     <Text style={styles.tagText}>
                                         {doc?.name}
@@ -90,19 +89,18 @@ const Form5 = ({ state, updateState }) => {
                 )}
             </View>
 
-            {/* Footer */}
             <View style={styles.footer}>
                 <Feather name="message-square" size={14} color="#9ca3af" />
                 <Text style={styles.footerText}>
-                    HSN sets are managed in Tax Manager and assigned at the
-                    category level.
+                    Select the shipping template to define delivery rules for
+                    this category.
                 </Text>
             </View>
         </View>
     );
 };
 
-export default Form5;
+export default Form7;
 
 const styles = StyleSheet.create({
     container: {

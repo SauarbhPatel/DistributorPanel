@@ -21,11 +21,20 @@ import Form3 from "./Form3";
 import Form4 from "./Form4";
 import Form5 from "./Form5";
 import {
+    __getAllComplianceDocumentList,
     __getAttributeSetList,
+    __getHsnSetList,
     __getProductCategoryList,
+    __getShippingZoneList,
     __getTaxTypeList,
 } from "../../utils/api/commonApi";
 import { ValidateForm } from "./FieldValidation";
+import Form6 from "./Form6";
+import Form9 from "./Form9";
+import Form8 from "./Form8";
+import Final from "./Final";
+import Form7 from "./Form7";
+import { Colors } from "../../constants/styles";
 
 const CategoryManagmentModel = ({
     visible,
@@ -45,8 +54,41 @@ const CategoryManagmentModel = ({
         status: "Active",
 
         //
+        selectedSets: [],
+        //
+        variantAttributes: [],
+        //
+        selectedDocs: [],
+        //
+        hsnSetIds: [],
+        //
+        commissionPercentage: "",
+        closingFees: "",
+        sellerTierOverrides: [
+            {
+                sellerTier: "",
+                commissionPercentage: "0",
+            },
+        ],
+        //
+        shippingZoneIds: [],
+        //
+        icon: "",
+        image: "",
+        //
+        metaTitle: "",
+        metaDescription: "",
+        canonicalUrl: "",
+        priorityScore: "0",
+        displayOrder: "0",
+        visibleForConsumer: true,
+        isActive: true,
+        //
         categoryList: [],
         attributeSetList: [],
+        documentList: [],
+        hsnSetList: [],
+        shippingZoneList: [],
     });
 
     const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
@@ -54,9 +96,15 @@ const CategoryManagmentModel = ({
         try {
             const cList = await __getProductCategoryList();
             const attra = await __getAttributeSetList(true);
+            const docList = await __getAllComplianceDocumentList();
+            const hsnList = await __getHsnSetList();
+            const shippingList = await __getShippingZoneList();
             updateState({
                 categoryList: cList,
                 attributeSetList: attra,
+                documentList: docList,
+                hsnSetList: hsnList,
+                shippingZoneList: shippingList,
             });
         } catch (error) {}
     };
@@ -64,6 +112,7 @@ const CategoryManagmentModel = ({
     useEffect(() => {
         __handleGetData();
     }, []);
+
     return (
         <Modal visible={visible} animationType="slide" transparent={true}>
             <Loader isShow={state.isLoading} />
@@ -80,7 +129,7 @@ const CategoryManagmentModel = ({
                 <HorizontalStepper
                     activeStep={activeStep}
                     setActiveStep={setActiveStep}
-                    hideTax={state?.parentCategory ? true : null}
+                    hideTax={state?.parentCategory?.id ? true : null}
                 />
                 <ScrollView
                     style={styles.content}
@@ -99,18 +148,130 @@ const CategoryManagmentModel = ({
                     <View
                         style={{ display: activeStep == 2 ? "flex" : "none" }}
                     >
-                        <Form3 />
+                        <Form3 state={state} updateState={updateState} />
                     </View>
                     <View
                         style={{ display: activeStep == 3 ? "flex" : "none" }}
                     >
-                        <Form4 />
+                        <Form4 state={state} updateState={updateState} />
                     </View>
-                    <View
-                        style={{ display: activeStep == 4 ? "flex" : "none" }}
-                    >
-                        <Form5 />
-                    </View>
+                    {state?.parentCategory?.id ? (
+                        <>
+                            <View
+                                style={{
+                                    display: activeStep == 4 ? "flex" : "none",
+                                }}
+                            >
+                                <Form6
+                                    state={state}
+                                    updateState={updateState}
+                                />
+                            </View>
+                            <View
+                                style={{
+                                    display: activeStep == 5 ? "flex" : "none",
+                                }}
+                            >
+                                <Form7
+                                    state={state}
+                                    updateState={updateState}
+                                />
+                            </View>
+                            <View
+                                style={{
+                                    display: activeStep == 6 ? "flex" : "none",
+                                }}
+                            >
+                                <Form8
+                                    state={state}
+                                    updateState={updateState}
+                                />
+                            </View>
+                            <View
+                                style={{
+                                    display: activeStep == 7 ? "flex" : "none",
+                                }}
+                            >
+                                <Form9
+                                    state={state}
+                                    updateState={updateState}
+                                />
+                            </View>
+                            <View
+                                style={{
+                                    display: activeStep == 8 ? "flex" : "none",
+                                }}
+                            >
+                                <Final
+                                    state={state}
+                                    updateState={updateState}
+                                />
+                            </View>
+                        </>
+                    ) : (
+                        <>
+                            <View
+                                style={{
+                                    display: activeStep == 4 ? "flex" : "none",
+                                }}
+                            >
+                                <Form5
+                                    state={state}
+                                    updateState={updateState}
+                                />
+                            </View>
+                            <View
+                                style={{
+                                    display: activeStep == 5 ? "flex" : "none",
+                                }}
+                            >
+                                <Form6
+                                    state={state}
+                                    updateState={updateState}
+                                />
+                            </View>
+                            <View
+                                style={{
+                                    display: activeStep == 6 ? "flex" : "none",
+                                }}
+                            >
+                                <Form7
+                                    state={state}
+                                    updateState={updateState}
+                                />
+                            </View>
+                            <View
+                                style={{
+                                    display: activeStep == 7 ? "flex" : "none",
+                                }}
+                            >
+                                <Form8
+                                    state={state}
+                                    updateState={updateState}
+                                />
+                            </View>
+                            <View
+                                style={{
+                                    display: activeStep == 8 ? "flex" : "none",
+                                }}
+                            >
+                                <Form9
+                                    state={state}
+                                    updateState={updateState}
+                                />
+                            </View>
+                            <View
+                                style={{
+                                    display: activeStep == 9 ? "flex" : "none",
+                                }}
+                            >
+                                <Final
+                                    state={state}
+                                    updateState={updateState}
+                                />
+                            </View>
+                        </>
+                    )}
                 </ScrollView>
                 <View style={styles.footer}>
                     <TouchableOpacity
@@ -124,8 +285,53 @@ const CategoryManagmentModel = ({
                         />
                         <Text style={styles.cancelText}>Cancel</Text>
                     </TouchableOpacity>
-
                     <TouchableOpacity
+                        onPress={() => {
+                            activeStep !== 0 && setActiveStep(activeStep - 1);
+                        }}
+                        style={{
+                            ...styles.cancelBtn,
+                            padding: 7,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            borderRadius: 5,
+                        }}
+                    >
+                        <Feather
+                            name="chevron-left"
+                            size={18}
+                            color="#64748b"
+                        />
+                        <Text style={styles.cancelText}>Previous</Text>
+                    </TouchableOpacity>
+                    {((state?.parentCategory?.id && activeStep != 8) ||
+                        (!state?.parentCategory?.id && activeStep != 9)) && (
+                        <TouchableOpacity
+                            activeOpacity={0.8}
+                            onPress={() => {
+                                if (!ValidateForm(Number(activeStep), state))
+                                    return;
+                                setActiveStep(activeStep + 1);
+                            }}
+                            style={{
+                                ...styles.cancelBtn,
+                                backgroundColor: Colors.primaryColor,
+                                padding: 7,
+                                justifyContent: "center",
+                                alignItems: "center",
+                                borderRadius: 5,
+                            }}
+                        >
+                            <Text style={styles.saveBtnText}>Next Step</Text>
+                            <Feather
+                                name="chevron-right"
+                                size={18}
+                                color={Colors.whiteColor}
+                            />
+                        </TouchableOpacity>
+                    )}
+
+                    {/* <TouchableOpacity
                         activeOpacity={0.8}
                         onPress={() => {
                             if (!ValidateForm(Number(activeStep), state))
@@ -146,7 +352,7 @@ const CategoryManagmentModel = ({
                                 color="#fff"
                             />
                         </LinearGradient>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </SafeAreaView>
         </Modal>

@@ -7,41 +7,12 @@ import {
     ScrollView,
 } from "react-native";
 import { Feather, AntDesign } from "@expo/vector-icons";
+import { DropDownTextAreaBox } from "../../modules";
 
-const Form2 = (state, updateState) => {
-    // const [state, setState] = useState({
-    //     attributeSet: "Walkie Talkie Attributes",
-
-    //     // ✅ UPDATED: multiple sets instead of single array
-    //     selectedSets: [
-    //         {
-    //             title: "Walkie Talkie Specifications",
-    //             attributes: [
-    //                 "Brand",
-    //                 "Frequency",
-    //                 "Output Power",
-    //                 "License Type",
-    //                 "Color",
-    //             ],
-    //         },
-    //         {
-    //             title: "Skin Care Product Attributes",
-    //             attributes: [],
-    //         },
-    //     ],
-    // });
-
-    // const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
-
+const Form2 = ({ state, updateState }) => {
     const removeSet = (index) => {
         const updated = [...state.selectedSets];
         updated.splice(index, 1);
-        updateState({ selectedSets: updated });
-    };
-
-    const removeAttribute = (setIndex, attrIndex) => {
-        const updated = [...state.selectedSets];
-        updated[setIndex].attributes.splice(attrIndex, 1);
         updateState({ selectedSets: updated });
     };
 
@@ -63,19 +34,30 @@ const Form2 = (state, updateState) => {
 
             {/* Body */}
             <View style={styles.body}>
-                {/* Dropdown (SAME) */}
                 <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Attribute Set</Text>
-                    <TouchableOpacity style={styles.dropdown}>
-                        <Text style={styles.dropdownText}>
-                            {state.attributeSet}
-                        </Text>
-                        <Feather
-                            name="chevron-down"
-                            size={18}
-                            color="#6b7280"
-                        />
-                    </TouchableOpacity>
+                    <Text style={styles.label}>Attribute Set *</Text>
+
+                    <DropDownTextAreaBox
+                        // type="select_multi"
+                        type="select"
+                        placeholder={"Select Attribute Set"}
+                        list={state?.attributeSetList}
+                        value={null}
+                        isSearchable
+                        inputCustomStyle={{}}
+                        onSelected={(value) => {
+                            updateState({
+                                selectedSets: state.selectedSets.find(
+                                    (ids) => ids?.id == value?.id,
+                                )
+                                    ? state.selectedSets
+                                    : [...state.selectedSets, value],
+
+                                variantAttributes: [],
+                            });
+                        }}
+                        customStyle={{ marginBottom: 5, flex: 1 }}
+                    />
                 </View>
 
                 <View style={styles.selectedBox}>
@@ -88,9 +70,8 @@ const Form2 = (state, updateState) => {
 
                     {state?.selectedSets?.map((set, setIndex) => (
                         <View key={setIndex} style={styles.setCard}>
-                            {/* Header */}
                             <View style={styles.setHeader}>
-                                <Text style={styles.setTitle}>{set.title}</Text>
+                                <Text style={styles.setTitle}>{set.name}</Text>
 
                                 <TouchableOpacity
                                     onPress={() => removeSet(setIndex)}
@@ -103,38 +84,31 @@ const Form2 = (state, updateState) => {
                                 </TouchableOpacity>
                             </View>
 
-                            {/* Attributes */}
-                            {set?.attributes.length > 0 && (
+                            {set?.regularAttributes?.length > 0 && (
                                 <ScrollView
                                     horizontal
                                     showsHorizontalScrollIndicator={false}
                                     contentContainerStyle={styles.tagContainer}
                                 >
-                                    {set?.attributes.map((item, attrIndex) => (
-                                        <View
-                                            key={attrIndex}
-                                            style={styles.tag}
-                                        >
-                                            <Text style={styles.tagText}>
-                                                {item}
-                                            </Text>
-
-                                            <TouchableOpacity
-                                                onPress={() =>
-                                                    removeAttribute(
-                                                        setIndex,
-                                                        attrIndex,
-                                                    )
-                                                }
+                                    {set?.regularAttributes.map(
+                                        (item, attrIndex) => (
+                                            <View
+                                                key={attrIndex}
+                                                style={styles.tag}
                                             >
-                                                <AntDesign
-                                                    name="closecircle"
-                                                    size={12}
-                                                    color="#ef4444"
-                                                />
-                                            </TouchableOpacity>
-                                        </View>
-                                    ))}
+                                                <Text style={styles.tagText}>
+                                                    {item?.name}
+                                                    <Text
+                                                        style={{
+                                                            color: "#ef4444",
+                                                        }}
+                                                    >
+                                                        *
+                                                    </Text>
+                                                </Text>
+                                            </View>
+                                        ),
+                                    )}
                                 </ScrollView>
                             )}
                         </View>

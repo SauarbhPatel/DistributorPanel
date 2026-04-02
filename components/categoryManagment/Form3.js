@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo } from "react";
 import {
     View,
     Text,
@@ -8,65 +8,34 @@ import {
 } from "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 
-const Form3 = () => {
-    const [attributes, setAttributes] = useState([
-        {
-            name: "Brand",
-            type: "TEXT",
-            required: true,
-            variant: true,
-            selected: true,
-        },
-        {
-            name: "Frequency",
-            type: "DROPDOWN",
-            required: true,
-            variant: true,
-            selected: true,
-        },
-        {
-            name: "Output Power",
-            type: "TEXT",
-            required: true,
-            variant: true,
-            selected: true,
-        },
-        {
-            name: "License Type",
-            type: "TEXT",
-            required: true,
-            variant: false,
-            selected: false,
-        },
-        {
-            name: "Battery Capacity",
-            type: "NUMBER",
-            required: false,
-            variant: true,
-            selected: false,
-        },
-        {
-            name: "Color",
-            type: "DROPDOWN",
-            required: false,
-            variant: true,
-            selected: false,
-        },
-    ]);
+const Form3 = ({ state, updateState }) => {
+    const selectedSets = state?.selectedSets || [];
+    const selectedVariantAttributes = state?.variantAttributes || [];
 
-    const toggleSelect = (index) => {
-        const updated = [...attributes];
-        updated[index].selected = !updated[index].selected;
-        setAttributes(updated);
+    const allVariantAttributes = useMemo(() => {
+        return selectedSets.flatMap((item) => item.variantAttributes || []);
+    }, [selectedSets]);
+
+    const selectedIds = useMemo(() => {
+        return new Set(selectedVariantAttributes.map((item) => item._id));
+    }, [selectedVariantAttributes]);
+
+    const toggleAttribute = (item) => {
+        let updated;
+
+        if (selectedIds.has(item._id)) {
+            updated = selectedVariantAttributes.filter(
+                (i) => i._id !== item._id,
+            );
+        } else {
+            updated = [...selectedVariantAttributes, item];
+        }
+
+        updateState({ variantAttributes: updated });
     };
-
-    const selectedVariants = attributes.filter(
-        (item) => item.selected && item.variant,
-    );
 
     return (
         <View style={styles.container}>
-            {/* Header */}
             <View style={styles.header}>
                 <View style={{ flex: 1 }}>
                     <Text style={styles.title}>
@@ -79,58 +48,64 @@ const Form3 = () => {
                 <Feather name="info" size={18} color="#3b82f6" />
             </View>
 
-            {/* Attribute List */}
             <View style={styles.body}>
-                {attributes.map((item, index) => (
-                    <TouchableOpacity
-                        key={index}
-                        style={styles.card}
-                        activeOpacity={0.8}
-                        onPress={() => toggleSelect(index)}
-                    >
-                        {/* Left */}
-                        <View style={styles.left}>
-                            {/* Custom Checkbox */}
-                            <View
-                                style={{
-                                    ...styles.checkbox,
-                                    backgroundColor: !item.selected
-                                        ? "#fff"
-                                        : "#6366f1",
-                                }}
-                            >
-                                {item.selected && (
-                                    <MaterialCommunityIcons
-                                        name="check-bold"
-                                        size={14}
-                                        color="#fff"
-                                    />
-                                )}
+                {allVariantAttributes.map((item) => {
+                    const isSelected = selectedIds.has(item._id);
+
+                    return (
+                        <TouchableOpacity
+                            key={item._id}
+                            style={styles.card}
+                            activeOpacity={0.8}
+                            onPress={() => toggleAttribute(item)}
+                        >
+                            <View style={styles.left}>
+                                <View
+                                    style={[
+                                        styles.checkbox,
+                                        {
+                                            backgroundColor: isSelected
+                                                ? "#6366f1"
+                                                : "#fff",
+                                        },
+                                    ]}
+                                >
+                                    {isSelected && (
+                                        <MaterialCommunityIcons
+                                            name="check-bold"
+                                            size={14}
+                                            color="#fff"
+                                        />
+                                    )}
+                                </View>
+
+                                <Text style={styles.name}>{item.name}</Text>
                             </View>
 
-                            <Text style={styles.name}>{item.name}</Text>
-                        </View>
+                            <View style={styles.right}>
+                                <Text style={styles.typeTag}>{item.type}</Text>
 
-                        {/* Right */}
-                        <View style={styles.right}>
-                            <Text style={styles.typeTag}>{item.type}</Text>
+                                {item.isMandatory && (
+                                    <Text style={styles.requiredTag}>
+                                        REQUIRED
+                                    </Text>
+                                )}
 
-                            {item.required && (
-                                <Text style={styles.requiredTag}>REQUIRED</Text>
-                            )}
-
-                            {item.variant && (
-                                <Text style={styles.variantTag}>VARIANT</Text>
-                            )}
-                        </View>
-                    </TouchableOpacity>
-                ))}
+                                {item.isVariant && (
+                                    <Text style={styles.variantTag}>
+                                        VARIANT
+                                    </Text>
+                                )}
+                            </View>
+                        </TouchableOpacity>
+                    );
+                })}
             </View>
 
-            {/* Selected Variants */}
             <View style={styles.selectedBox}>
                 <Text style={styles.selectedTitle}>
-                    • VARIANT-ENABLED ATTRIBUTES ({selectedVariants.length})
+                    • VARIANT-ENABLED ATTRIBUTES (
+                    {selectedVariantAttributes.length})
                 </Text>
 
                 <ScrollView
@@ -138,15 +113,14 @@ const Form3 = () => {
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.tagContainer}
                 >
-                    {selectedVariants.map((item, index) => (
-                        <View key={index} style={styles.tag}>
+                    {selectedVariantAttributes.map((item) => (
+                        <View key={item._id} style={styles.tag}>
                             <Text style={styles.tagText}>{item.name}</Text>
                         </View>
                     ))}
                 </ScrollView>
             </View>
 
-            {/* Footer */}
             <View style={styles.footer}>
                 <Feather name="message-square" size={14} color="#9ca3af" />
                 <Text style={styles.footerText}>

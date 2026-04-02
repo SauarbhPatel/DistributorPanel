@@ -7,15 +7,9 @@ import {
     ScrollView,
 } from "react-native";
 import { Feather, AntDesign } from "@expo/vector-icons";
+import { DropDownTextAreaBox } from "../../modules";
 
-const Form4 = () => {
-    const [state, setState] = useState({
-        documentType: "",
-        selectedDocs: ["WPC Certificate"],
-    });
-
-    const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
-
+const Form4 = ({ state, updateState }) => {
     const removeDoc = (index) => {
         const updated = [...state.selectedDocs];
         updated.splice(index, 1);
@@ -24,7 +18,6 @@ const Form4 = () => {
 
     return (
         <View style={styles.container}>
-            {/* Header */}
             <View style={styles.header}>
                 <View style={{ flex: 1 }}>
                     <Text style={styles.title}>Compliance Configuration</Text>
@@ -37,24 +30,32 @@ const Form4 = () => {
                 <Feather name="info" size={18} color="#3b82f6" />
             </View>
 
-            {/* Body */}
             <View style={styles.body}>
-                {/* Dropdown */}
                 <View style={styles.inputGroup}>
                     <Text style={styles.label}>
                         Document types (from Compliance manager)
                     </Text>
 
-                    <TouchableOpacity style={styles.dropdown}>
-                        <Text style={styles.placeholder}>
-                            Select document types...
-                        </Text>
-                        <Feather
-                            name="chevron-down"
-                            size={18}
-                            color="#6b7280"
-                        />
-                    </TouchableOpacity>
+                    <DropDownTextAreaBox
+                        type="select"
+                        placeholder={"Select document types..."}
+                        list={state?.documentList}
+                        value={null}
+                        isSearchable
+                        inputCustomStyle={{}}
+                        onSelected={(value) => {
+                            updateState({
+                                selectedDocs: state.selectedDocs.find(
+                                    (ids) => ids?.id == value?.id,
+                                )
+                                    ? state.selectedDocs
+                                    : [...state.selectedDocs, value],
+
+                                variantAttributes: [],
+                            });
+                        }}
+                        customStyle={{ marginBottom: 5, flex: 1 }}
+                    />
 
                     <Text style={styles.helper}>
                         Select document types above and click "Add selected" to
@@ -62,11 +63,10 @@ const Form4 = () => {
                     </Text>
                 </View>
 
-                {/* ✅ Selected Documents */}
-                {state.selectedDocs.length > 0 && (
+                {state?.selectedDocs?.length > 0 && (
                     <View style={styles.selectedBox}>
                         <Text style={styles.selectedTitle}>
-                            • SELECTED DOCUMENTS ({state.selectedDocs.length})
+                            • SELECTED DOCUMENTS ({state?.selectedDocs?.length})
                         </Text>
 
                         <ScrollView
@@ -74,9 +74,11 @@ const Form4 = () => {
                             showsHorizontalScrollIndicator={false}
                             contentContainerStyle={styles.tagContainer}
                         >
-                            {state.selectedDocs.map((doc, index) => (
+                            {state?.selectedDocs?.map((doc, index) => (
                                 <View key={index} style={styles.tag}>
-                                    <Text style={styles.tagText}>{doc}</Text>
+                                    <Text style={styles.tagText}>
+                                        {doc?.name}
+                                    </Text>
 
                                     <TouchableOpacity
                                         onPress={() => removeDoc(index)}
@@ -94,7 +96,6 @@ const Form4 = () => {
                 )}
             </View>
 
-            {/* Footer */}
             <View style={styles.footer}>
                 <Feather name="message-square" size={14} color="#9ca3af" />
                 <Text style={styles.footerText}>

@@ -123,12 +123,10 @@ const __getHsnCodeList = async (taxRate, search) => {
         });
 };
 const __getHsnSetList = async () => {
-    return __getApiData(
-        `/hsnSets/getAllHsnSets?page=1&limit=100&isActive=true&sortBy=createdAt&sortOrder=desc`,
-    )
+    return __getApiData(`/hsnSets/getAllHsnSetsForDropDown`)
         .then((res) => {
             if (res.success) {
-                return res?.data?.record?.map((item) => ({
+                return res?.data?.map((item) => ({
                     ...item,
                     id: item?._id,
                 }));
@@ -174,12 +172,10 @@ const __getShippingList = async () => {
         });
 };
 const __getShippingZoneList = async () => {
-    return __getApiData(
-        `/shippingZone/getAllShippingZones?page=1&limit=100&sortBy=createAt&sortOrder=asc`,
-    )
+    return __getApiData(`/shippingZone/getAllShippingZonesForDropDown`)
         .then((res) => {
             if (res.success) {
-                return res?.data?.shippingZones?.map((item) => ({
+                return res?.data?.map((item) => ({
                     ...item,
                     id: item?._id,
                     name: item?.zoneName,
@@ -208,12 +204,10 @@ const __getLedgersList = async () => {
         });
 };
 const __getAttributeSetList = async () => {
-    return __getApiData(
-        `/attributeSet/getAllAttributeSet?page=1&limit=100&sortBy=createdAt&sortOrder=asc`,
-    )
+    return __getApiData(`/attributeSet/getAllAttributeSetWithoutPagination`)
         .then((res) => {
             if (res.success) {
-                return res?.data?.records?.map((item) => ({
+                return res?.data?.map((item) => ({
                     ...item,
                     id: item?._id,
                 }));
