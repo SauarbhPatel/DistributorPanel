@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Alert, View, Text, TouchableOpacity } from "react-native";
-import { DropDownTextAreaBox, TextAreaBox } from "../../modules";
+import { DropDownTextAreaBox, TextAreaBox } from "../modules";
 import { AntDesign } from "@expo/vector-icons";
-import { Colors, Fonts } from "../../constants/styles";
-import { __generateRandomString } from "../../utils/funtion";
-import PageBox from "../common/PageBox";
+import { Colors, Fonts } from "../constants/styles";
+import { __generateRandomString } from "../utils/funtion";
+import PageBox from "../components/common/PageBox";
 const BankDetails = ({
     onClickContinue = () => {},
     onClickBack = () => {},

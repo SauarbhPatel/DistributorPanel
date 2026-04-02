@@ -22,6 +22,8 @@ import BottomPopup from "../../components/common/BottomPopup";
 import { Loader } from "../../modules";
 import CategorySearch from "../../components/masters/CategorySearch";
 import SlaHeader from "../../components/slaSettings/SlaHeader";
+import TablePagination from "../../components/marketing/TablePagination";
+import CategoryManagmentModel from "../../components/categoryManagment/CategoryManagmentModel";
 
 const CategoryManagment = ({ navigation }) => {
     const [search, setSearch] = useState("");
@@ -29,10 +31,17 @@ const CategoryManagment = ({ navigation }) => {
         loading: false,
         loading1: false,
         list: [],
+        stats: {
+            totalCategories: 0,
+            activeCategories: 0,
+            rootLevels: 0,
+        },
+        pagination: {},
         totalAttributes: 0,
         filterableAttributes: 0,
         variantAttributes: 0,
         isShowCreate: false,
+        dropDown1: null,
     });
 
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
@@ -45,20 +54,21 @@ const CategoryManagment = ({ navigation }) => {
         totalAttributes,
         filterableAttributes,
         variantAttributes,
+        stats,
+        dropDown1,
     } = state;
 
-    const __handleGetData = async (ser) => {
+    const __handleGetData = async (ser = "", page = 1, limit = 5) => {
         try {
             updateState({ loading1: true });
             const res = await __getApiData(
-                `/categories/getCategoryTree?search=${ser}&page=1&limit=10`,
+                `/categories/getCategoryTree?search=${ser}&page=${page}&limit=${limit}${dropDown1?.id ? `&status=${dropDown1?.id.trim()}` : ""}`,
             );
-            console.log(JSON.stringify(res));
-
             if (res?.success) {
                 updateState({
                     list: res.data?.records,
-                    // ...res?.data?.stats,
+                    stats: res?.data?.stats,
+                    pagination: res?.data?.pagination,
                 });
             }
         } catch (error) {
@@ -70,8 +80,11 @@ const CategoryManagment = ({ navigation }) => {
 
     useEffect(() => {
         __handleGetData(search);
-    }, [search]);
+    }, [search, dropDown1]);
 
+    const handlePageChange = (newPage) => {
+        __handleGetData(search, newPage);
+    };
     const __handleDelete = (id) => {
         Alert.alert(
             "Delete Category",
@@ -128,25 +141,45 @@ const CategoryManagment = ({ navigation }) => {
                         onPressButton={() => {
                             updateState({ isShowCreate: true });
                         }}
-                        totalCategory="10"
-                        active="9"
-                        leaf="0"
+                        totalCategory={stats?.totalCategories}
+                        active={stats?.activeCategories}
+                        leaf={stats?.rootLevels}
                     />
                 </View>
 
-                <CategorySearch />
-                <View style={{ position: "relative" }}>
-                    {/* {loading1 && (
-                        <ActivityIndicator
-                            style={{
-                                margin: 10,
-                            }}
+                <CategorySearch
+                    isLoading={loading1}
+                    search={search}
+                    onChange={updateState}
+                    dropDown1={dropDown1}
+                    dropDown1List={[
+                        { id: "", name: "All Status" },
+                        { id: "DRAFT", name: "DRAFT" },
+                        { id: "SUBMIT ", name: "SUBMIT" },
+                    ]}
+                    onExpandAll={() => {}}
+                    onCollapseAll={() => {}}
+                />
+                <View style={{ position: "relative" }}>{attributeCards()}</View>
+                {list?.length > 0 && (
+                    <View style={{ paddingHorizontal: 16 }}>
+                        <TablePagination
+                            pagination={state.pagination}
+                            onPageChange={handlePageChange}
                         />
-                    )} */}
-                    {attributeCards()}
-                </View>
+                    </View>
+                )}
             </ScrollView>
-            <BottomPopup
+            <CategoryManagmentModel
+                visible={isShowCreate}
+                onClose={(refresh) => {
+                    updateState({ isShowCreate: false });
+                    if (refresh) {
+                        __handleGetData(search, 1);
+                    }
+                }}
+            />
+            {/* <BottomPopup
                 isShow={isShowCreate}
                 title="Add Root Category"
                 onClose={() => updateState({ isShowCreate: false })}
@@ -158,66 +191,9 @@ const CategoryManagment = ({ navigation }) => {
                         }}
                     />
                 }
-            />
+            /> */}
         </SafeAreaView>
     );
-
-    function statsCards() {
-        return (
-            <FlatList
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                ListHeaderComponent={
-                    <>
-                        <View style={styles.statsRow}>
-                            <StatCard
-                                title="Total Categories"
-                                value={totalAttributes}
-                                colors={["#3B82F6", "#2563EB"]}
-                                icon="tag"
-                            />
-                            <StatCard
-                                title="Active"
-                                value={filterableAttributes}
-                                colors={["#10B981", "#059669"]}
-                                icon="filter"
-                            />
-                            <StatCard
-                                title="Root Levels"
-                                value={variantAttributes}
-                                colors={["#8B5CF6", "#7C3AED"]}
-                                icon="layers"
-                            />
-                        </View>
-                    </>
-                }
-            />
-        );
-    }
-
-    function searchAndAdd() {
-        return (
-            <View style={styles.searchRow}>
-                <View style={styles.searchBox}>
-                    <Feather name="search" size={18} color={Colors.grayColor} />
-                    <TextInput
-                        placeholder="Search categories..."
-                        style={styles.searchInput}
-                        value={search}
-                        onChangeText={setSearch}
-                    />
-                </View>
-
-                <TouchableOpacity
-                    style={styles.addBtn}
-                    onPress={() => updateState({ isShowCreate: true })}
-                >
-                    <Feather name="plus" size={18} color={Colors.whiteColor} />
-                    <Text style={styles.addText}>Add Category</Text>
-                </TouchableOpacity>
-            </View>
-        );
-    }
 
     function attributeCards() {
         return (
@@ -369,10 +345,40 @@ const CategoryCard = ({
                         color={Colors.primaryColor}
                         style={{ marginLeft: 6 }}
                     />
-
-                    <Text numberOfLines={1} style={styles.title}>
-                        {item.name}
-                    </Text>
+                    <View>
+                        <Text numberOfLines={1} style={{ fontSize: 12 }}>
+                            {item.name}
+                        </Text>
+                        <View style={{ flexDirection: "row", gap: 5 }}>
+                            <Text
+                                numberOfLines={1}
+                                style={{
+                                    fontSize: 8,
+                                    backgroundColor: "#e0e0e0",
+                                    alignSelf: "flex-start",
+                                    paddingHorizontal: 5,
+                                    paddingVertical: 1,
+                                    borderRadius: 2,
+                                }}
+                            >
+                                {item.code}
+                            </Text>
+                            <Text
+                                numberOfLines={1}
+                                style={{
+                                    fontSize: 8,
+                                    backgroundColor: "#d6ffd498",
+                                    alignSelf: "flex-start",
+                                    paddingHorizontal: 5,
+                                    paddingVertical: 1,
+                                    borderRadius: 2,
+                                    color: "#056c00",
+                                }}
+                            >
+                                {item.status}
+                            </Text>
+                        </View>
+                    </View>
                 </View>
 
                 {/* Right */}

@@ -21,7 +21,7 @@ import {
 import { __setLocalStorageData } from "../../utils/localStorage";
 import { __setLocalization, __setToken } from "../../utils/localization";
 import CommonHeader from "../../components/common/CommonHeader";
-import MainCards from "../../components/kyc/MainCards";
+import MainCards from "../../kyc/MainCards";
 import { __generateRandomString } from "../../utils/funtion";
 import MostUsed from "../../components/report/MostUsed";
 import Sales from "../../components/report/Sales";

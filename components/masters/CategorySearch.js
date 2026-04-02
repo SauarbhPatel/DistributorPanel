@@ -5,45 +5,56 @@ import {
     StyleSheet,
     TextInput,
     TouchableOpacity,
+    ActivityIndicator,
+    Dimensions,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { DropDownTextAreaBox } from "../../modules";
+const { width } = Dimensions.get("window");
 
 const CategorySearch = ({
+    isLoading,
+    search,
+    onChange = () => {},
+    dropDown1List = [],
+    dropDown1 = null,
     onExpandAll = () => {},
     onCollapseAll = () => {},
-    onSearchChange = () => {},
 }) => {
-    const [searchQuery, setSearchQuery] = useState("");
-
     return (
         <View style={styles.container}>
             <View style={styles.searchWrapper}>
                 <Feather
                     name="search"
-                    size={18}
-                    color="#64748b"
-                    style={styles.searchIcon}
+                    size={16}
+                    color="#9CA3AF"
+                    style={{ marginRight: 8 }}
                 />
                 <TextInput
+                    placeholder={"Search categories..."}
+                    placeholderTextColor="#9CA3AF"
                     style={styles.input}
-                    placeholder="Search categories..."
-                    placeholderTextColor="#94a3b8"
-                    value={searchQuery}
-                    onChangeText={(text) => {
-                        setSearchQuery(text);
-                        if (onSearchChange) onSearchChange(text);
-                    }}
+                    value={search}
+                    onChangeText={(text) => onChange({ search: text })}
                 />
+                {isLoading ? <ActivityIndicator /> : null}
             </View>
 
             <View style={{ flexDirection: "row", gap: 10 }}>
-                <TouchableOpacity
-                    style={styles.dropdownBtn}
-                    activeOpacity={0.7}
-                >
-                    <Text style={styles.dropdownText}>All Status</Text>
-                    <Feather name="chevron-down" size={16} color="#64748b" />
-                </TouchableOpacity>
+                <DropDownTextAreaBox
+                    type="select"
+                    placeholder={"All Status"}
+                    list={dropDown1List}
+                    value={dropDown1}
+                    isSearchable
+                    inputCustomStyle={{
+                        ...styles.dropdownBtn,
+                        width: (width - 65) / 3,
+                    }}
+                    onSelected={(value) => {
+                        onChange({ dropDown1: value });
+                    }}
+                />
                 <TouchableOpacity
                     style={styles.actionBtn}
                     onPress={onExpandAll}
@@ -65,6 +76,18 @@ const CategorySearch = ({
 };
 
 const styles = StyleSheet.create({
+    statusDropdown: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        backgroundColor: "#F9FAFB",
+        borderWidth: 1,
+        borderColor: "#E5E7EB",
+        borderRadius: 10,
+        paddingHorizontal: 12,
+        height: 44,
+        width: 110,
+    },
     container: {
         backgroundColor: "#fff",
         paddingVertical: 12,
@@ -106,7 +129,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#e2e8f0",
         borderRadius: 10,
-        paddingHorizontal: 12,
+        paddingHorizontal: 5,
         height: 44,
     },
     dropdownText: {

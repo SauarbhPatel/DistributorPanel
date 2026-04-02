@@ -1,6 +1,6 @@
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
-import { Colors, Fonts } from "../../constants/styles";
+import { Colors, Fonts } from "../constants/styles";
 import { Text } from "react-native";
 
 const MainCards = ({

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Alert, View, Text, TouchableOpacity } from "react-native";
-import { TextAreaBox } from "../../modules";
-import { Colors, Fonts } from "../../constants/styles";
-import { __generateRandomString } from "../../utils/funtion";
+import { TextAreaBox } from "../modules";
+import { Colors, Fonts } from "../constants/styles";
+import { __generateRandomString } from "../utils/funtion";
 const PersonalDetailsForm = ({
     onClickContinue = () => {},
     onClickBack = () => {},

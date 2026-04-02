@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { Alert, View, Text, TouchableOpacity } from "react-native";
-import { DropDownTextAreaBox, Loader, TextAreaBox } from "../../modules";
+import { DropDownTextAreaBox, Loader, TextAreaBox } from "../modules";
 import { AntDesign } from "@expo/vector-icons";
-import { Colors, Fonts } from "../../constants/styles";
+import { Colors, Fonts } from "../constants/styles";
 import {
     __generateRandomString,
     isValidAadhaar,
     isValidPAN,
-} from "../../utils/funtion";
-import PageBox from "../common/PageBox";
-import { __verifyPANno } from "../../utils/api/commonApi";
+} from "../utils/funtion";
+import PageBox from "../components/common/PageBox";
+import { __verifyPANno } from "../utils/api/commonApi";
 const WpcDetails = ({ onClickContinue = () => {}, onClickBack = () => {} }) => {
     const [state, setState] = useState({
         panNumber: "ABCDE1234F",

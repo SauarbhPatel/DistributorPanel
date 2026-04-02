@@ -304,12 +304,15 @@ const __getBrandList = async () => {
         });
 };
 const __getProductCategoryList = async () => {
-    return __getApiData(`/categories/getCategoryTree?page=1&limit=100`)
+    return __getApiData(`/categories/getCategoryTreeDropdown`)
         .then((res) => {
-            // console.log(JSON.stringify(res));
+            console.log(JSON.stringify(res));
             if (res.success) {
-                // return createCategoryList(res?.data?.nestedData);
-                return createCategoryList(res?.data?.records);
+                return res?.data?.map((item) => ({
+                    ...item,
+                    id: item?.value,
+                    name: item?.label,
+                }));
             }
             return [];
         })

@@ -434,7 +434,7 @@ const CreateCategoryManagment = ({
 
     return (
         <>
-            <Loader isShow={loading} />
+            {/* <Loader isShow={loading} /> */}
 
             <View
                 style={{

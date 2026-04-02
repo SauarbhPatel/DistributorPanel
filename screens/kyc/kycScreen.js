@@ -22,13 +22,13 @@ import {
 import { __setLocalStorageData } from "../../utils/localStorage";
 import { __setLocalization, __setToken } from "../../utils/localization";
 import CommonHeader from "../../components/common/CommonHeader";
-import MainCards from "../../components/kyc/MainCards";
+import MainCards from "../../kyc/MainCards";
 import { __generateRandomString } from "../../utils/funtion";
-import IdentityVerificationForm from "../../components/kyc/IdentityVerificationForm";
-import PersonalDetailsForm from "../../components/kyc/PersonalDetailsForm";
-import GstForm from "../../components/kyc/GstForm";
-import WpcDetails from "../../components/kyc/WpcDetails";
-import BankDetails from "../../components/kyc/BankDetails";
+import IdentityVerificationForm from "../../kyc/IdentityVerificationForm";
+import PersonalDetailsForm from "../../kyc/PersonalDetailsForm";
+import GstForm from "../../kyc/GstForm";
+import WpcDetails from "../../kyc/WpcDetails";
+import BankDetails from "../../kyc/BankDetails";
 import { Loader } from "../../modules";
 
 const KycScreen = ({ navigation }) => {
