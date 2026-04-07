@@ -297,6 +297,38 @@ const __getBrandList = async () => {
             return [];
         });
 };
+const __getBrandByCategoryIdList = async (categoryId) => {
+    return __getApiData(`/brands/getBrandByCategoryId/${categoryId}`)
+        .then((res) => {
+            console.log(res);
+            if (res.success) {
+                return res?.data?.map((item) => ({
+                    ...item,
+                    id: item?._id,
+                }));
+            }
+            return [];
+        })
+        .catch((error) => {
+            return [];
+        });
+};
+const __getHSNByCategoryIdList = async (categoryId) => {
+    return __getApiData(`/categories/getHsnCodesByCategoryId/${categoryId}`)
+        .then((res) => {
+            console.log(res);
+            if (res.success) {
+                return res?.data?.map((item) => ({
+                    ...item,
+                    id: item?._id,
+                }));
+            }
+            return [];
+        })
+        .catch((error) => {
+            return [];
+        });
+};
 const __getProductCategoryList = async () => {
     return __getApiData(`/categories/getCategoryTreeDropdown`)
         .then((res) => {
@@ -376,4 +408,6 @@ export {
     __getShippingList,
     __getShippingZoneList,
     __getTaxKindList,
+    __getBrandByCategoryIdList,
+    __getHSNByCategoryIdList,
 };

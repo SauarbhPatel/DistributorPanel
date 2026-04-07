@@ -137,7 +137,6 @@ const TextAreaBox = React.memo(
                     <Text
                         style={{
                             ...inputTitleDefaultStyle,
-                            ...inputTitleDynamicStyle,
                             ...titleCustomStyle,
                         }}
                         {...customTitleProps}

@@ -11,6 +11,8 @@ import * as ImagePicker from "expo-image-picker";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { Colors } from "../../../constants/styles";
 import { __uploadImage } from "../../../utils/api/commonApi";
+import CommonBox from "./CommonBox";
+import InfoBox from "./InfoBox";
 
 const MediaUploadComponent = ({
     value,
@@ -68,95 +70,121 @@ const MediaUploadComponent = ({
     };
 
     return (
-        <View style={styles.container}>
-            {/* Header */}
-            <Text style={styles.sectionTitle}>Media Upload</Text>
-            <Text style={styles.sectionSubTitle}>
-                Main image (mandatory), gallery (up to 10). Min 1200×1200px
-                recommended.
-            </Text>
-
-            {/* Short Video */}
-            <Text style={styles.label}>Short Video</Text>
-            <View style={{ flexDirection: "row", gap: 10 }}>
-                <TouchableOpacity style={styles.videoBtn} onPress={pickVideo}>
-                    <Ionicons
-                        name="cloud-upload-outline"
-                        size={18}
-                        color={Colors.primaryColor}
-                    />
-                    <Text style={styles.videoBtnText}>
-                        {value?.shortVideoUrl ? "Change Video" : "Upload Video"}
-                    </Text>
-                </TouchableOpacity>
-                {value?.shortVideoUrl && (
-                    <TouchableOpacity
-                        style={styles.videoBtn}
-                        onPress={() => Linking.openURL(value?.shortVideoUrl)}
-                    >
-                        <Ionicons
-                            name="cloud-upload-outline"
-                            size={18}
-                            color={Colors.primaryColor}
-                        />
-                        <Text style={styles.videoBtnText}>View</Text>
-                    </TouchableOpacity>
-                )}
-            </View>
-
-            {/* Main Image */}
-            <Text style={styles.label}>
-                Main Image <Text style={{ color: Colors.redColor }}>*</Text>
-            </Text>
-            <TouchableOpacity
-                style={styles.dropBox}
-                onPress={() => pickImage("main")}
-            >
-                {value?.mainImageUrl ? (
-                    <Image
-                        source={{ uri: value?.mainImageUrl }}
-                        style={styles.mainImage}
-                    />
-                ) : (
+        <View style={{}}>
+            <InfoBox
+                title="Media Upload"
+                subtitle="Showcase your product with high-quality images and video."
+                infoTitle="Select a category in Step 1 to load category-specific attributes."
+                infoSub="(For this demo, generic description fields are shown)"
+            />
+            <CommonBox
+                title="Main Image "
+                subtitle="Primary product photo displayed in search results and listings"
+                body={
                     <>
-                        <Ionicons
-                            name="image-outline"
-                            size={40}
-                            color={Colors.grayColor}
-                        />
-                        <Text style={styles.dropText}>
-                            Tap here to add the main image
+                        <TouchableOpacity
+                            style={styles.dropBox}
+                            onPress={() => pickImage("main")}
+                        >
+                            {value?.mainImageUrl ? (
+                                <Image
+                                    source={{ uri: value?.mainImageUrl }}
+                                    style={styles.mainImage}
+                                />
+                            ) : (
+                                <>
+                                    <Ionicons
+                                        name="image-outline"
+                                        size={40}
+                                        color={Colors.grayColor}
+                                    />
+                                    <Text style={styles.dropText}>
+                                        Tap here to add the main image
+                                    </Text>
+                                </>
+                            )}
+                        </TouchableOpacity>
+                    </>
+                }
+            />
+            <CommonBox
+                title="Gallery Images"
+                subtitle="Up to 10 additional product photos. Drag to reorder."
+                body={
+                    <>
+                        <TouchableOpacity
+                            style={styles.galleryBox}
+                            onPress={() => pickImage("gallery")}
+                        >
+                            <Ionicons
+                                name="cloud-upload-outline"
+                                size={24}
+                                color={Colors.primaryColor}
+                            />
+                        </TouchableOpacity>
+
+                        {value?.galleryImageUrls?.length > 0 && (
+                            <View style={styles.galleryPreview}>
+                                {value?.galleryImageUrls?.map((item, index) => (
+                                    <Image
+                                        key={index}
+                                        source={{ uri: item }}
+                                        style={styles.galleryImage}
+                                        resizeMode="cover"
+                                    />
+                                ))}
+                            </View>
+                        )}
+
+                        <Text style={styles.helperText}>
+                            Min 1200×1200px recommended.
                         </Text>
                     </>
-                )}
-            </TouchableOpacity>
+                }
+            />
 
-            {/* Gallery */}
-            <Text style={styles.label}>Gallery Images (up to 10)</Text>
-            <TouchableOpacity
-                style={styles.galleryBox}
-                onPress={() => pickImage("gallery")}
-            >
-                <Ionicons
-                    name="cloud-upload-outline"
-                    size={24}
-                    color={Colors.primaryColor}
-                />
-            </TouchableOpacity>
-
-            {value?.galleryImageUrls?.length > 0 && (
-                <View style={styles.galleryPreview}>
-                    {value?.galleryImageUrls?.map((item, index) => (
-                        <Image
-                            key={index}
-                            source={{ uri: item }}
-                            style={styles.galleryImage}
-                        />
-                    ))}
-                </View>
-            )}
-
-            <Text style={styles.helperText}>Min 1200×1200px recommended.</Text>
+            <CommonBox
+                title="Product Video"
+                subtitle="Short video showcasing your product in action"
+                body={
+                    <>
+                        <View style={{ flexDirection: "row", gap: 10 }}>
+                            <TouchableOpacity
+                                style={styles.videoBtn}
+                                onPress={pickVideo}
+                            >
+                                <Ionicons
+                                    name="cloud-upload-outline"
+                                    size={18}
+                                    color={Colors.primaryColor}
+                                />
+                                <Text style={styles.videoBtnText}>
+                                    {value?.shortVideoUrl
+                                        ? "Change Video"
+                                        : "Upload Video"}
+                                </Text>
+                            </TouchableOpacity>
+                            {value?.shortVideoUrl && (
+                                <TouchableOpacity
+                                    style={styles.videoBtn}
+                                    onPress={() =>
+                                        Linking.openURL(value?.shortVideoUrl)
+                                    }
+                                >
+                                    <Ionicons
+                                        name="cloud-upload-outline"
+                                        size={18}
+                                        color={Colors.primaryColor}
+                                    />
+                                    <Text style={styles.videoBtnText}>
+                                        View
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                    </>
+                }
+            />
         </View>
     );
 };
@@ -247,6 +275,9 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 6,
+        overflow: "hidden",
+        borderColor: "#ebebeb",
+        borderWidth: 1,
     },
     helperText: {
         fontSize: 11,

@@ -5,120 +5,116 @@ import {
     ScrollView,
     StyleSheet,
 } from "react-native";
-import { Colors } from "../../../constants/styles";
 
-const MobileTabs = ({ activeStep, onChange, STEPS = [] }) => {
-    const activeIndex = STEPS.findIndex((s) => s.key === activeStep);
-
+const MobileTabs = ({ activeStep, setActiveStep, STEPS = [] }) => {
     return (
-        <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.stepContainer}
-        >
-            {STEPS.map((step, index) => {
-                const isActive = index === activeIndex;
-                const isDone = index < activeIndex;
+        <View style={styles.container}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {STEPS.map((step, index) => {
+                    const isActive = activeStep >= index + 1;
 
-                return (
-                    <TouchableOpacity
-                        key={step.key}
-                        // onPress={() => onChange(step.key)}
-                        activeOpacity={0.85}
-                        style={[
-                            styles.stepCard,
-                            isActive && styles.stepActive,
-                            isDone && styles.stepDone,
-                        ]}
-                    >
-                        <View
-                            style={[
-                                styles.stepCircle,
-                                isActive && styles.circleActive,
-                                isDone && styles.circleDone,
-                            ]}
+                    return (
+                        <TouchableOpacity
+                            key={step.key}
+                            style={styles.stepContainer}
+                            onPress={() => isActive && setActiveStep(index)}
                         >
-                            <Text style={styles.stepNumber}>{index + 1}</Text>
-                        </View>
-
-                        <Text
-                            numberOfLines={1}
-                            style={[
-                                styles.stepText,
-                                isActive && styles.textActive,
-                                isDone && styles.textDone,
-                            ]}
-                        >
-                            {step.label}
-                        </Text>
-                    </TouchableOpacity>
-                );
-            })}
-        </ScrollView>
+                            {/* Circle */}
+                            <View
+                                style={[
+                                    styles.circle,
+                                    isActive && styles.activeCircle,
+                                ]}
+                            >
+                                <Text
+                                    style={[
+                                        styles.circleText,
+                                        isActive && styles.activeCircleText,
+                                    ]}
+                                >
+                                    {index + 1}
+                                </Text>
+                            </View>
+                            {/* Text */}
+                            <View style={styles.textContainer}>
+                                <Text
+                                    style={[
+                                        styles.title,
+                                        isActive && styles.activeTitle,
+                                    ]}
+                                    numberOfLines={1}
+                                >
+                                    {step.label}
+                                </Text>
+                                <Text style={styles.subtitle}>
+                                    {step.subTitle}
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
+                    );
+                })}
+            </ScrollView>
+        </View>
     );
 };
 
 export default MobileTabs;
 
 const styles = StyleSheet.create({
-    stepContainer: {
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-        gap: 10,
+    container: {
+        paddingVertical: 15,
+        backgroundColor: "#fff",
     },
 
-    stepCard: {
+    stepContainer: {
         flexDirection: "row",
         alignItems: "center",
-        paddingHorizontal: 14,
-        paddingVertical: 10,
-        borderRadius: 14,
-        backgroundColor: "#F3F4F6",
-        gap: 8,
+        marginHorizontal: 10,
     },
 
-    stepActive: {
-        backgroundColor: "#EEF2FF",
-    },
-
-    stepDone: {
-        backgroundColor: "#ECFDF5",
-    },
-
-    stepCircle: {
-        width: 26,
-        height: 26,
-        borderRadius: 13,
-        backgroundColor: "#D1D5DB",
+    circle: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: "#ccc",
         justifyContent: "center",
         alignItems: "center",
+        marginRight: 8,
+        backgroundColor: "#f2f2f2",
     },
 
-    circleActive: {
-        backgroundColor: Colors.primaryColor,
+    activeCircle: {
+        backgroundColor: "#16a34a",
+        borderColor: "#16a34a",
     },
 
-    circleDone: {
-        backgroundColor: "#10B981",
-    },
-
-    stepNumber: {
-        color: "#FFFFFF",
-        fontWeight: "700",
-        fontSize: 13,
-    },
-
-    stepText: {
+    circleText: {
         fontSize: 14,
+        color: "#555",
+    },
+
+    activeCircleText: {
+        color: "#fff",
+        fontWeight: "bold",
+    },
+
+    textContainer: {
+        maxWidth: 140,
+    },
+
+    title: {
+        fontSize: 13,
         fontWeight: "600",
-        color: "#6B7280",
+        color: "#333",
     },
 
-    textActive: {
-        color: Colors.primaryColor,
+    activeTitle: {
+        color: "#16a34a",
     },
 
-    textDone: {
-        color: "#047857",
+    subtitle: {
+        fontSize: 11,
+        color: "#777",
     },
 });

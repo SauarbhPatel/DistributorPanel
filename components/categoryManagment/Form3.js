@@ -17,15 +17,17 @@ const Form3 = ({ state, updateState }) => {
     }, [selectedSets]);
 
     const selectedIds = useMemo(() => {
-        return new Set(selectedVariantAttributes.map((item) => item._id));
+        return new Set(
+            selectedVariantAttributes.map((item) => item.attributeId),
+        );
     }, [selectedVariantAttributes]);
 
     const toggleAttribute = (item) => {
         let updated;
 
-        if (selectedIds.has(item._id)) {
+        if (selectedIds.has(item.attributeId)) {
             updated = selectedVariantAttributes.filter(
-                (i) => i._id !== item._id,
+                (i) => i.attributeId !== item.attributeId,
             );
         } else {
             updated = [...selectedVariantAttributes, item];
@@ -50,11 +52,11 @@ const Form3 = ({ state, updateState }) => {
 
             <View style={styles.body}>
                 {allVariantAttributes.map((item) => {
-                    const isSelected = selectedIds.has(item._id);
+                    const isSelected = selectedIds.has(item.attributeId);
 
                     return (
                         <TouchableOpacity
-                            key={item._id}
+                            key={item.attributeId}
                             style={styles.card}
                             activeOpacity={0.8}
                             onPress={() => toggleAttribute(item)}

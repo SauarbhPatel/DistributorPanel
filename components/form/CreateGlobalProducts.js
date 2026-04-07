@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TouchableOpacity, Alert, ScrollView } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
 import { DropDownTextAreaBox, Loader } from "../../modules";
 import { __postApiData } from "../../utils/api";
 import {
     __getAllComplianceDocumentList,
     __getAttributeSetById,
+    __getBrandByCategoryIdList,
     __getBrandList,
+    __getHSNByCategoryIdList,
     __getHsnCodeList,
     __getProductCategoryList,
 } from "../../utils/api/commonApi";
@@ -19,19 +21,48 @@ import TaxComplianceComponent from "./com/TaxComplianceComponent";
 import ProductDescriptionComponent from "./com/ProductDescriptionComponent";
 import { productValidateForm } from "./functions";
 import VariationAttributes from "./com/VariationAttributes";
+import CategoryAndBrand from "./com/CategoryAndBrand";
+import { Feather } from "@expo/vector-icons";
+import ReviewAndSumbit from "./com/ReviewAndSumbit";
 
 const STEPS = [
-    { key: "1", label: "Category & Brand" },
-    { key: "2", label: "Basic Info" },
-    { key: "3", label: "Description" },
-    { key: "4", label: "Media Upload" },
-    { key: "5", label: "Tax & Compliance" },
-    { key: "6", label: "Package & Manufacturing" },
+    { key: "1", label: "Category & Brand", subTitle: "Select product type" },
+    {
+        key: "2",
+        label: "Basic Info & Pricing",
+        subTitle: "Price and SKU",
+    },
+    { key: "3", label: "Description", subTitle: "Detailed info" },
+    { key: "4", label: "Media Upload", subTitle: "Images & Video" },
+    {
+        key: "5",
+        label: "Tax & Compliance",
+        subTitle: "HSN & Origin",
+    },
+    {
+        key: "6",
+        label: "Package & Manufacturing",
+        subTitle: "Dimensions",
+    },
+    {
+        key: "7",
+        label: "Review & Submit",
+        subTitle: "Final check",
+    },
 ];
 const VariantSTEPS = [
-    { key: "1", label: "Category & Brand" },
-    { key: "2", label: "Basic Info" },
-    { key: "3", label: "Variation Attributes" },
+    { key: "1", label: "Category & Brand", subTitle: "Select product type" },
+    { key: "2", label: "Basic Info", subTitle: "Price and SKU" },
+    {
+        key: "3",
+        label: "Variation Attributes",
+        subTitle: "Define variations",
+    },
+    {
+        key: "4",
+        label: "Review & Submit",
+        subTitle: "Final check",
+    },
 ];
 const initalState = {
     activeTab: "1",
@@ -255,21 +286,17 @@ const CreateGlobalProducts = ({
     const __handleGetData = async () => {
         try {
             updateState({
-                loading: true,
+                categoryLoading: true,
             });
-            const [categories, brands, hsn, compliance] = await Promise.all([
+            const [categories, compliance] = await Promise.all([
                 __getProductCategoryList(),
-                __getBrandList(),
-                __getHsnCodeList(),
                 __getAllComplianceDocumentList(),
             ]);
 
             updateState({
                 categoryList: categories || [],
-                brandList: brands || [],
-                hsnCodeList: hsn || [],
                 complianceDocumentList: compliance || [],
-                loading: false,
+                categoryLoading: false,
             });
         } catch {}
     };
@@ -278,221 +305,354 @@ const CreateGlobalProducts = ({
         __handleGetData();
     }, []);
 
+    const __handleGetOtherData = async () => {
+        try {
+            updateState({
+                brandLoading: true,
+            });
+            const [brands, hsn] = await Promise.all([
+                __getBrandByCategoryIdList(state?.categoryId?.id),
+                __getHSNByCategoryIdList(state?.categoryId?.id),
+            ]);
+
+            updateState({
+                brandList: brands || [],
+                hsnCodeList: hsn || [],
+                brandLoading: false,
+            });
+        } catch {}
+    };
+
+    useEffect(() => {
+        state?.categoryId?.id && __handleGetOtherData();
+    }, [state?.categoryId?.id]);
+
     return (
-        <View style={{ marginTop: 10, backgroundColor: Colors.whiteColor }}>
+        <View
+            style={{
+                backgroundColor: Colors.whiteColor,
+                flex: 1,
+            }}
+        >
             <Loader isShow={loading} />
+            <ScrollView
+                contentContainerStyle={{
+                    paddingBottom: 20,
+                    paddingTop: 0,
+                }}
+            >
+                <MobileTabs
+                    activeStep={activeTab}
+                    onChange={(id) => updateState({ activeTab: id })}
+                    STEPS={state?.isVariableProduct ? VariantSTEPS : STEPS}
+                />
 
-            <MobileTabs
-                activeStep={activeTab}
-                onChange={(id) => updateState({ activeTab: id })}
-                STEPS={state?.isVariableProduct ? VariantSTEPS : STEPS}
-            />
+                <View style={containerStyle}>
+                    {activeTab === "1" && (
+                        <CategoryAndBrand
+                            state={state}
+                            updateState={updateState}
+                        />
+                    )}
 
-            <View style={containerStyle}>
-                {activeTab === "1" && (
-                    <View style={boxStyle}>
-                        <DropDownTextAreaBox
-                            type="select"
-                            title="Category"
-                            placeholder="Select Category"
-                            required
-                            list={categoryList}
-                            value={state?.categoryId}
-                            isSearchable
-                            inputCustomStyle={inputStyle}
-                            onSelected={async (value) => {
-                                console.log(value);
-                                updateState({ categoryId: value });
+                    {/* Product Name */}
+                    {/* {activeTab === "1" && (
+                        <View style={boxStyle}>
+                            <DropDownTextAreaBox
+                                type="select"
+                                title="Category"
+                                placeholder="Select Category"
+                                required
+                                list={categoryList}
+                                value={state?.categoryId}
+                                isSearchable
+                                inputCustomStyle={inputStyle}
+                                onSelected={async (value) => {
+                                    console.log(value);
+                                    updateState({ categoryId: value });
 
-                                if (value?.attributeSets?.length) {
-                                    updateState({ loading: true });
-                                    const responses = await Promise.all(
-                                        value.attributeSets.map((id) =>
-                                            __getAttributeSetById(
-                                                id?.attributeSetId,
+                                    if (value?.attributeSets?.length) {
+                                        updateState({ loading: true });
+                                        const responses = await Promise.all(
+                                            value.attributeSets.map((id) =>
+                                                __getAttributeSetById(
+                                                    id?.attributeSetId,
+                                                ),
                                             ),
-                                        ),
-                                    );
-                                    // Merge all regular attributes
-                                    const regularAttributes = responses
-                                        .flatMap(
-                                            (res) =>
-                                                res?.regularAttributes || [],
-                                        )
-                                        .map((item) => ({
-                                            ...item,
-                                            values: [],
-                                        }));
+                                        );
+                                        // Merge all regular attributes
+                                        const regularAttributes = responses
+                                            .flatMap(
+                                                (res) =>
+                                                    res?.regularAttributes ||
+                                                    [],
+                                            )
+                                            .map((item) => ({
+                                                ...item,
+                                                values: [],
+                                            }));
 
-                                    // Merge all variant attributes
-                                    const variantAttributes = responses
-                                        .flatMap(
-                                            (res) =>
-                                                res?.variantAttributes || [],
-                                        )
-                                        .map((item) => ({
-                                            ...item,
-                                            values: [],
-                                        }));
+                                        // Merge all variant attributes
+                                        const variantAttributes = responses
+                                            .flatMap(
+                                                (res) =>
+                                                    res?.variantAttributes ||
+                                                    [],
+                                            )
+                                            .map((item) => ({
+                                                ...item,
+                                                values: [],
+                                            }));
 
-                                    updateState({
-                                        regularAttributes,
-                                        variantAttributes,
-                                        loading: false,
-                                    });
+                                        updateState({
+                                            regularAttributes,
+                                            variantAttributes,
+                                            loading: false,
+                                        });
+                                    }
+                                }}
+                                // editable={!isEdit}
+                                titleCustomStyle={{
+                                    marginHorizontal: 0,
+                                    marginTop: 0,
+                                }}
+                            />
+
+                            <DropDownTextAreaBox
+                                type="select"
+                                title="Brand"
+                                placeholder="Select Brand"
+                                required
+                                list={brandList}
+                                value={state?.brandId}
+                                isSearchable
+                                inputCustomStyle={inputStyle}
+                                onSelected={(value) =>
+                                    updateState({ brandId: value })
                                 }
-                            }}
-                            // editable={!isEdit}
-                            titleCustomStyle={{
-                                marginHorizontal: 0,
-                                marginTop: 0,
-                            }}
+                                editable={!isEdit}
+                                titleCustomStyle={{
+                                    marginHorizontal: 0,
+                                    marginTop: 10,
+                                }}
+                            />
+                        </View>
+                    )} */}
+
+                    {activeTab === "2" && (
+                        <BasicInfoPricingForm
+                            value={state}
+                            onChange={(data) => updateState(data)}
                         />
-
-                        <DropDownTextAreaBox
-                            type="select"
-                            title="Brand"
-                            placeholder="Select Brand"
-                            required
-                            list={brandList}
-                            value={state?.brandId}
-                            isSearchable
-                            inputCustomStyle={inputStyle}
-                            onSelected={(value) =>
-                                updateState({ brandId: value })
-                            }
-                            editable={!isEdit}
-                            titleCustomStyle={{
-                                marginHorizontal: 0,
-                                marginTop: 10,
-                            }}
-                        />
-                    </View>
-                )}
-
-                {activeTab === "2" && (
-                    <BasicInfoPricingForm
-                        value={state}
-                        onChange={(data) => updateState(data)}
-                    />
-                )}
-
-                {state?.isVariableProduct ? (
-                    <>
-                        {activeTab === "3" && (
-                            <VariationAttributes
-                                value={state}
-                                onChange={(data) => updateState(data)}
-                            />
-                        )}
-                    </>
-                ) : (
-                    <>
-                        {activeTab === "3" && (
-                            <ProductDescriptionComponent
-                                value={state}
-                                onChange={(data) => updateState(data)}
-                            />
-                        )}
-
-                        {activeTab === "4" && (
-                            <MediaUploadComponent
-                                value={state}
-                                onChange={updateState}
-                            />
-                        )}
-                        {activeTab === "5" && (
-                            <TaxComplianceComponent
-                                value={state}
-                                onChange={updateState}
-                            />
-                        )}
-                        {activeTab === "6" && (
-                            <PackageManufacturingForm
-                                value={state}
-                                onChange={updateState}
-                            />
-                        )}
-                    </>
-                )}
-
-                <View style={styles.footer}>
-                    <TouchableOpacity
-                        style={styles.cancelBtn}
-                        onPress={onClose}
-                    >
-                        <Text style={Fonts.blackColor14Medium}>Cancel</Text>
-                    </TouchableOpacity>
-
-                    {activeTab !== "1" && (
-                        <TouchableOpacity
-                            style={styles.createBtn}
-                            onPress={() =>
-                                updateState({
-                                    activeTab: state?.isVariableProduct
-                                        ? VariantSTEPS[
-                                              VariantSTEPS.findIndex(
-                                                  (s) => s.key === activeTab,
-                                              ) - 1
-                                          ].key
-                                        : STEPS[
-                                              STEPS.findIndex(
-                                                  (s) => s.key === activeTab,
-                                              ) - 1
-                                          ].key,
-                                })
-                            }
-                        >
-                            <Text style={styles.createText}>Back</Text>
-                        </TouchableOpacity>
                     )}
 
-                    {activeTab !== (state?.isVariableProduct ? "3" : "6") ? (
-                        <TouchableOpacity
-                            style={styles.createBtn}
-                            onPress={() => {
-                                if (
-                                    !productValidateForm(
-                                        Number(activeTab),
-                                        state,
-                                    )
-                                )
-                                    return;
-                                updateState({
-                                    activeTab: state?.isVariableProduct
-                                        ? VariantSTEPS[
-                                              VariantSTEPS.findIndex(
-                                                  (s) => s.key === activeTab,
-                                              ) + 1
-                                          ].key
-                                        : STEPS[
-                                              STEPS.findIndex(
-                                                  (s) => s.key === activeTab,
-                                              ) + 1
-                                          ].key,
-                                });
-                            }}
-                        >
-                            <Text style={styles.createText}>Next</Text>
-                        </TouchableOpacity>
+                    {state?.isVariableProduct ? (
+                        <>
+                            {activeTab === "3" && (
+                                <VariationAttributes
+                                    value={state}
+                                    onChange={(data) => updateState(data)}
+                                />
+                            )}
+                        </>
                     ) : (
-                        <TouchableOpacity
-                            style={styles.createBtn}
-                            onPress={() => {
-                                if (
-                                    !productValidateForm(
-                                        Number(activeTab),
-                                        state,
-                                    )
-                                )
-                                    return;
-                                __handleSave("SUBMIT");
-                            }}
-                        >
-                            <Text style={styles.createText}>Create</Text>
-                        </TouchableOpacity>
+                        <>
+                            {activeTab === "3" && (
+                                <ProductDescriptionComponent
+                                    value={state}
+                                    onChange={(data) => updateState(data)}
+                                />
+                            )}
+
+                            {activeTab === "4" && (
+                                <MediaUploadComponent
+                                    value={state}
+                                    onChange={updateState}
+                                />
+                            )}
+                            {activeTab === "5" && (
+                                <TaxComplianceComponent
+                                    value={state}
+                                    onChange={updateState}
+                                />
+                            )}
+                            {activeTab === "6" && (
+                                <PackageManufacturingForm
+                                    value={state}
+                                    onChange={updateState}
+                                />
+                            )}
+                            {activeTab === "7" && (
+                                <ReviewAndSumbit
+                                    value={state}
+                                    onChange={updateState}
+                                />
+                            )}
+                        </>
                     )}
+
+                    {/* <View style={styles.footer}>
+                        <TouchableOpacity
+                            style={styles.cancelBtn}
+                            onPress={onClose}
+                        >
+                            <Text style={Fonts.blackColor14Medium}>Cancel</Text>
+                        </TouchableOpacity>
+
+                        {activeTab !== "1" && (
+                            <TouchableOpacity
+                                style={styles.createBtn}
+                                onPress={() =>
+                                    updateState({
+                                        activeTab: state?.isVariableProduct
+                                            ? VariantSTEPS[
+                                                  VariantSTEPS.findIndex(
+                                                      (s) =>
+                                                          s.key === activeTab,
+                                                  ) - 1
+                                              ].key
+                                            : STEPS[
+                                                  STEPS.findIndex(
+                                                      (s) =>
+                                                          s.key === activeTab,
+                                                  ) - 1
+                                              ].key,
+                                    })
+                                }
+                            >
+                                <Text style={styles.createText}>Back</Text>
+                            </TouchableOpacity>
+                        )}
+
+                        {activeTab !==
+                        (state?.isVariableProduct ? "3" : "6") ? (
+                            <TouchableOpacity
+                                style={styles.createBtn}
+                                onPress={() => {
+                                    if (
+                                        !productValidateForm(
+                                            Number(activeTab),
+                                            state,
+                                        )
+                                    )
+                                        return;
+                                    updateState({
+                                        activeTab: state?.isVariableProduct
+                                            ? VariantSTEPS[
+                                                  VariantSTEPS.findIndex(
+                                                      (s) =>
+                                                          s.key === activeTab,
+                                                  ) + 1
+                                              ].key
+                                            : STEPS[
+                                                  STEPS.findIndex(
+                                                      (s) =>
+                                                          s.key === activeTab,
+                                                  ) + 1
+                                              ].key,
+                                    });
+                                }}
+                            >
+                                <Text style={styles.createText}>Next</Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity
+                                style={styles.createBtn}
+                                onPress={() => {
+                                    if (
+                                        !productValidateForm(
+                                            Number(activeTab),
+                                            state,
+                                        )
+                                    )
+                                        return;
+                                    __handleSave("SUBMIT");
+                                }}
+                            >
+                                <Text style={styles.createText}>Create</Text>
+                            </TouchableOpacity>
+                        )}
+                    </View> */}
                 </View>
+            </ScrollView>
+            <View style={styles.footer}>
+                <TouchableOpacity
+                    onPress={() =>
+                        updateState({
+                            activeTab: state?.isVariableProduct
+                                ? VariantSTEPS[
+                                      VariantSTEPS.findIndex(
+                                          (s) => s.key === activeTab,
+                                      ) - 1
+                                  ].key
+                                : STEPS[
+                                      STEPS.findIndex(
+                                          (s) => s.key === activeTab,
+                                      ) - 1
+                                  ].key,
+                        })
+                    }
+                    disabled={activeTab === "1"}
+                    style={{
+                        ...styles.cancelBtn,
+                        padding: 7,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        borderRadius: 5,
+                    }}
+                >
+                    <Feather name="chevron-left" size={18} color="#64748b" />
+                    <Text style={styles.cancelText}>Previous</Text>
+                </TouchableOpacity>
+                {/* {!isLastStep && ( */}
+                <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => {
+                        if (
+                            activeTab !== (state?.isVariableProduct ? "3" : "7")
+                        ) {
+                            // if (!productValidateForm(Number(activeTab), state))
+                            //     return;
+                            updateState({
+                                activeTab: state?.isVariableProduct
+                                    ? VariantSTEPS[
+                                          VariantSTEPS.findIndex(
+                                              (s) => s.key === activeTab,
+                                          ) + 1
+                                      ].key
+                                    : STEPS[
+                                          STEPS.findIndex(
+                                              (s) => s.key === activeTab,
+                                          ) + 1
+                                      ].key,
+                            });
+                        } else {
+                            if (!productValidateForm(Number(activeTab), state))
+                                return;
+                            __handleSave("SUBMIT");
+                        }
+                    }}
+                    style={{
+                        ...styles.cancelBtn,
+                        backgroundColor: Colors.primaryColor,
+                        padding: 7,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        borderRadius: 5,
+                    }}
+                >
+                    <Text style={styles.saveBtnText}>
+                        {activeTab !== (state?.isVariableProduct ? "3" : "7")
+                            ? "Next Step"
+                            : "Save Product"}
+                    </Text>
+                    <Feather
+                        name="chevron-right"
+                        size={18}
+                        color={Colors.whiteColor}
+                    />
+                </TouchableOpacity>
+                {/* )} */}
             </View>
         </View>
     );
@@ -526,218 +686,25 @@ const boxStyle = {
 const styles = {
     footer: {
         flexDirection: "row",
-        justifyContent: "flex-end",
-        gap: 12,
-        marginTop: 20,
+        justifyContent: "space-between",
+        padding: 15,
+        backgroundColor: "#fff",
+        borderTopWidth: 1,
+        borderTopColor: "#e9ecef",
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
     },
-    cancelBtn: {
-        borderWidth: 1,
-        borderColor: "#e5e7eb",
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderRadius: 8,
+    cancelBtn: { flexDirection: "row", alignItems: "center", gap: 5 },
+    cancelText: { color: "#868e96", fontWeight: "700", fontSize: 15 },
+    saveBtn: {
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: 25,
+        paddingVertical: 12,
+        borderRadius: 10,
+        gap: 8,
     },
-    createBtn: {
-        backgroundColor: Colors.primaryColor,
-        paddingHorizontal: 22,
-        paddingVertical: 10,
-        borderRadius: 8,
-    },
-    createText: {
-        color: Colors.whiteColor,
-        ...Fonts.blackColor14Bold,
-    },
+    saveBtnText: { color: "#fff", fontWeight: "700", fontSize: 15 },
 };
-
-// {
-//   // "title": "Samsung Galaxy S21",
-//   // "modelName": "SM-G991B",
-//   // "sku": "SAM-ELEC-S21",
-//   // "categoryId": "699869bb718d1b48b749715a",
-//   // "brandId": "699991cb76d28be87c1ec652",
-//   "productType": "SINGLE",
-//   "variantAttributes": [
-//     {
-//       "attributeId": "65f2ab12cd34ef6789012345",
-//       "name": "Color",
-//       "values": [
-//         "Red",
-//         "Blue",
-//         "Green"
-//       ],
-//       "type": "SELECT",
-//       "isVariant": true
-//     }
-//   ],
-//   "variants": [
-//     {
-//       "variantHash": {
-//         "Color": "Red",
-//         "Size": "M"
-//       },
-//       "sku": "SKU-RED-M",
-//       "ean": "1234567890123",
-//       "hsn": {
-//         "hsnCodeId": "65f2ab12cd34ef6789012345",
-//         "code": "8517",
-//         "taxRate": 18
-//       },
-//       "pricing": {
-//         "quantityPerBox": 100,
-//         "boxMrp": 10000,
-//         "boxSellingPrice": 8000,
-//         "discountType": "PERCENTAGE",
-//         "discountValue": 20,
-//         "minOrderQuantity": 10,
-//         "stock": 500
-//       },
-//       "shipping": {
-//         "shippingCharge": 50,
-//         "freeShipping": false,
-//         "shippingRuleId": "65f2ab12cd34ef6789012345",
-//         "fulfilledBy": "SELLER"
-//       },
-//       "regularAttributes": [
-//         {
-//           "attributeId": "65f2ab12cd34ef6789012345",
-//           "name": "Color",
-//           "values": [
-//             "Red",
-//             "Blue",
-//             "Green"
-//           ],
-//           "type": "SELECT",
-//           "isVariant": true
-//         }
-//       ],
-//       "complianceDocuments": [
-//         {
-//           "complianceId": "65f2ab12cd34ef6789012345",
-//           "documentName": "FSSAI Certificate",
-//           "isMandatory": true,
-//           "url": "https://example.com/certificate.pdf",
-//           "issueDate": "2024-01-01",
-//           "expiryDate": "2025-01-01"
-//         }
-//       ],
-//       "productDimension": {
-//         "length": 10,
-//         "width": 5,
-//         "height": 15,
-//         "weight": 2,
-//         "lengthUnit": "cm",
-//         "weightUnit": "kg"
-//       },
-//       "packageDimension": {
-//         "length": 10,
-//         "width": 5,
-//         "height": 15,
-//         "weight": 2,
-//         "lengthUnit": "cm",
-//         "weightUnit": "kg"
-//       },
-//       "dynamicSection": [
-//         {
-//           "sectionTitle": "Warranty",
-//           "content": "1 year manufacturer warranty"
-//         }
-//       ],
-//       "description": "string",
-//       "metaTitle": "string",
-//       "metaDescription": "string",
-//       "shortVideoUrl": "https://example.com/short-video.mp4",
-//       "mainImageUrl": "https://example.com/main-image.jpg",
-//       "galleryImageUrls": [
-//         "https://example.com/image1.jpg"
-//       ],
-//       "listingStatus": "DRAFT",
-//       "productStatus": "DRAFT",
-//       "isActive": true
-//     }
-//   ],
-//   "singleProductData": {
-//     "variantHash": {
-//       "Color": "Red",
-//       "Size": "M"
-//     },
-//     "sku": "SKU-RED-M",
-//     // "ean": "1234567890123",
-//     // "hsn": {
-//     //   "hsnCodeId": "65f2ab12cd34ef6789012345",
-//     //   "code": "8517",
-//     //   "taxRate": 18
-//     // },
-//     // "pricing": {
-//     //   "quantityPerBox": 100,
-//     //   "boxMrp": 10000,
-//     //   "boxSellingPrice": 8000,
-//     //   "discountType": "PERCENTAGE",
-//     //   "discountValue": 20,
-//     //   "minOrderQuantity": 10,
-//     //   "stock": 500
-//     // },
-//     "shipping": {
-//       "shippingCharge": 50,
-//       "freeShipping": false,
-//       "shippingRuleId": "65f2ab12cd34ef6789012345",
-//       // "fulfilledBy": "SELLER"
-//     },
-//     // "regularAttributes": [
-//     //   {
-//     //     "attributeId": "65f2ab12cd34ef6789012345",
-//     //     "name": "Color",
-//     //     "values": [
-//     //       "Red",
-//     //       "Blue",
-//     //       "Green"
-//     //     ],
-//     //     "type": "SELECT",
-//     //     "isVariant": true
-//     //   }
-//     // ],
-//     // "complianceDocuments": [
-//     //   {
-//     //     "complianceId": "65f2ab12cd34ef6789012345",
-//     //     "documentName": "FSSAI Certificate",
-//     //     "isMandatory": true,
-//     //     "url": "https://example.com/certificate.pdf",
-//     //     "issueDate": "2024-01-01",
-//     //     "expiryDate": "2025-01-01"
-//     //   }
-//     // ],
-//     // "productDimension": {
-//     //   "length": 10,
-//     //   "width": 5,
-//     //   "height": 15,
-//     //   "weight": 2,
-//     //   "lengthUnit": "cm",
-//     //   "weightUnit": "kg"
-//     // },
-//     // "packageDimension": {
-//     //   "length": 10,
-//     //   "width": 5,
-//     //   "height": 15,
-//     //   "weight": 2,
-//     //   "lengthUnit": "cm",
-//     //   "weightUnit": "kg"
-//     // },
-//     // "dynamicSection": [
-//     //   {
-//     //     "sectionTitle": "Warranty",
-//     //     "content": "1 year manufacturer warranty"
-//     //   }
-//     // ],
-//     // "description": "string",
-//     "metaTitle": "string",
-//     "metaDescription": "string",
-//     // "shortVideoUrl": "https://example.com/short-video.mp4",
-//     // "mainImageUrl": "https://example.com/main-image.jpg",
-//     // "galleryImageUrls": [
-//     //   "https://example.com/image1.jpg"
-//     // ],
-//     "listingStatus": "DRAFT",
-//     "productStatus": "DRAFT",
-//     "isActive": true
-//   },
-//   "isActive": true
-// }

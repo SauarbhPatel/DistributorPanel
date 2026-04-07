@@ -289,21 +289,18 @@ const CategoryCard = ({
                 },
             ]}
         >
-            <BottomPopup
-                isShow={isShowAdd}
-                title="Add Sub-Category"
-                onClose={() => updateState({ isShowAdd: false })}
-                component={
-                    <CreateCategoryManagment
-                        onClose={() => {
-                            updateState({ isShowAdd: false });
-                            onDone();
-                        }}
-                        parentId={item?._id || null}
-                    />
-                }
+            <CategoryManagmentModel
+                visible={isShowCreate}
+                onClose={(refresh) => {
+                    updateState({ isShowCreate: false });
+                    if (refresh) {
+                        onDone();
+                    }
+                }}
+                isEdit
+                item={item}
             />
-            <BottomPopup
+            {/* <BottomPopup
                 isShow={isShowCreate}
                 title="Edit Category"
                 onClose={() => updateState({ isShowCreate: false })}
@@ -318,7 +315,7 @@ const CategoryCard = ({
                         parentId={item?.parentId || null}
                     />
                 }
-            />
+            /> */}
             {/* Row */}
             <View style={{ ...styles.row, marginBottom: expanded ? 10 : 0 }}>
                 {/* Left */}
@@ -388,12 +385,6 @@ const CategoryCard = ({
                             <Text style={styles.activeText}>Active</Text>
                         </View>
                     )}
-
-                    <TouchableOpacity
-                        onPress={() => updateState({ isShowAdd: true })}
-                    >
-                        <Feather name="plus" size={18} color="#10B981" />
-                    </TouchableOpacity>
 
                     <TouchableOpacity
                         onPress={() => updateState({ isShowCreate: true })}

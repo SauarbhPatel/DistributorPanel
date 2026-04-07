@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { TextAreaBox } from "../../../modules";
 import { Colors } from "../../../constants/styles";
 import DynamicAttributeForm from "./DynamicAttributeForm";
+import CommonBox from "./CommonBox";
+import InfoBox from "./InfoBox";
 
 const MAX_CHAR = 1500;
 
@@ -84,128 +86,128 @@ const ProductDescriptionComponent = React.memo(
         };
 
         return (
-            <View style={containerStyle}>
-                <Text style={sectionTitle}>Description</Text>
-
-                {/* INFO BOX */}
-                {/* <View style={infoBox}>
-                    <Text style={infoText}>
-                        Select Mobile Phones or Electronics in Step 1 to load
-                        attribute mapping.
-                    </Text>
-                </View> */}
-                <DynamicAttributeForm
-                    data={value?.regularAttributes || []}
-                    onChange={(updatedData) => {
-                        onChange({
-                            regularAttributes: updatedData,
-                        });
-                    }}
+            <View style={{}}>
+                <InfoBox
+                    title="Item Description"
+                    subtitle="Craft compelling product descriptions that convert browsers into buyers."
+                    infoTitle="Select a category in Step 1 to load category-specific attributes."
+                    infoSub="(For this demo, generic description fields are shown)"
                 />
+                {value?.regularAttributes?.length > 0 ? (
+                    <DynamicAttributeForm
+                        data={value?.regularAttributes || []}
+                        onChange={(updatedData) => {
+                            onChange({
+                                regularAttributes: updatedData,
+                            });
+                        }}
+                    />
+                ) : null}
 
-                {/* <Text style={subTitle}>DESCRIPTION</Text> */}
-
-                <Text style={helperText}>
-                    Short description bullets (~200 words each), full HTML
-                    description with formatting, and optional custom sections
-                    (e.g., Warranty, Technical Details).
-                </Text>
-
-                <Text style={label}>
-                    Short Description (5 bullet points){" "}
-                    <Text style={{ color: "red" }}>*</Text>
-                </Text>
-
-                {Object.keys(bullets).map((key, index) => (
-                    <View key={key} style={{ marginBottom: 14 }}>
-                        <TextAreaBox
-                            placeholder={`Bullet ${index + 1}`}
-                            value={bullets[key]}
-                            valuekey="text"
-                            onChangeText={(value) =>
-                                updateBullet(key, value?.text)
-                            }
-                            inputCustomStyle={inputStyle}
-                            // editable={false}
-                            // customStyle={{ flex: 1, opacity: 0.6 }}
-                        />
-                        <Text style={counterText}>
-                            {bullets[key].length} / {MAX_CHAR}
-                        </Text>
-                    </View>
-                ))}
-
-                <Text style={[label, { marginTop: 10 }]}>
-                    Full Description (HTML)
-                </Text>
-
-                <TextAreaBox
-                    placeholder="Enter HTML content. Use the toolbar above for bold, italic, lists, and links."
-                    value={value?.fullDescriptionHtmlContent}
-                    valuekey="fullDescriptionHtmlContent"
-                    onChangeText={onChange}
-                    multiline
-                    inputCustomStyle={inputStyle}
-                    numberOfLines={10}
+                <CommonBox
+                    title="Key Features"
+                    subtitle="5 bullet points highlighting your product's best features (~200 words each)"
+                    body={
+                        <>
+                            {Object.keys(bullets).map((key, index) => (
+                                <View key={key} style={{ marginBottom: 14 }}>
+                                    <TextAreaBox
+                                        placeholder={`Bullet ${index + 1}`}
+                                        value={bullets[key]}
+                                        valuekey="text"
+                                        onChangeText={(value) =>
+                                            updateBullet(key, value?.text)
+                                        }
+                                        inputCustomStyle={inputStyle}
+                                        multiline
+                                        // editable={false}
+                                        // customStyle={{ flex: 1, opacity: 0.6 }}
+                                    />
+                                    <Text style={counterText}>
+                                        {bullets[key].length} / {MAX_CHAR}
+                                    </Text>
+                                </View>
+                            ))}
+                        </>
+                    }
                 />
-
-                <View style={{ marginTop: 20 }}>
-                    <View style={dynamicHeader}>
-                        <Text style={label}>Dynamic Sections (optional)</Text>
-
-                        <TouchableOpacity
-                            onPress={addSection}
-                            style={addSectionBtn}
-                        >
-                            <Text style={addSectionText}>+ Add Section</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <Text style={helperText}>
-                        Add custom sections like Warranty, Technical Details, or
-                        Legal.
-                    </Text>
-
-                    {value?.dynamicSection?.map((section, index) => (
-                        <View
-                            key={index + "dynamicSection"}
-                            style={sectionCard}
-                        >
+                <CommonBox
+                    title="Full Description"
+                    subtitle="Detailed HTML description with formatting support"
+                    body={
+                        <>
                             <TextAreaBox
-                                placeholder="Section title (e.g. Warranty)"
-                                value={section.sectionTitle}
-                                valuekey="text"
-                                onChangeText={(value) =>
-                                    updateSection(
-                                        index,
-                                        "sectionTitle",
-                                        value?.text,
-                                    )
-                                }
-                                inputCustomStyle={inputStyle}
-                            />
-
-                            <TextAreaBox
-                                placeholder="Section content"
-                                value={section.content}
-                                valuekey="text"
-                                onChangeText={(value) =>
-                                    updateSection(index, "content", value?.text)
-                                }
+                                placeholder="Describe your product in detail..."
+                                value={value?.fullDescriptionHtmlContent}
+                                valuekey="fullDescriptionHtmlContent"
+                                onChangeText={onChange}
                                 multiline
                                 inputCustomStyle={inputStyle}
                             />
-
+                        </>
+                    }
+                />
+                <CommonBox
+                    title="Dynamic Sections (optional)"
+                    subtitle="Add custom sections like Warranty, Technical Details, or Legal."
+                    body={
+                        <>
                             <TouchableOpacity
-                                onPress={() => removeSection(index)}
+                                onPress={addSection}
+                                style={addSectionBtn}
                             >
-                                <Text style={{ color: Colors.redColor }}>
-                                    Delete
+                                <Text style={addSectionText}>
+                                    + Add Section
                                 </Text>
                             </TouchableOpacity>
-                        </View>
-                    ))}
-                </View>
+                            {value?.dynamicSection?.map((section, index) => (
+                                <View
+                                    key={index + "dynamicSection"}
+                                    style={sectionCard}
+                                >
+                                    <TextAreaBox
+                                        placeholder="Section title (e.g. Warranty)"
+                                        value={section.sectionTitle}
+                                        valuekey="text"
+                                        onChangeText={(value) =>
+                                            updateSection(
+                                                index,
+                                                "sectionTitle",
+                                                value?.text,
+                                            )
+                                        }
+                                        inputCustomStyle={inputStyle}
+                                    />
+
+                                    <TextAreaBox
+                                        placeholder="Section content"
+                                        value={section.content}
+                                        valuekey="text"
+                                        onChangeText={(value) =>
+                                            updateSection(
+                                                index,
+                                                "content",
+                                                value?.text,
+                                            )
+                                        }
+                                        multiline
+                                        inputCustomStyle={inputStyle}
+                                    />
+
+                                    <TouchableOpacity
+                                        onPress={() => removeSection(index)}
+                                    >
+                                        <Text
+                                            style={{ color: Colors.redColor }}
+                                        >
+                                            Delete
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            ))}
+                        </>
+                    }
+                />
             </View>
         );
     },
@@ -303,6 +305,7 @@ const addSectionText = {
     color: "#2563EB",
     fontWeight: "500",
     fontSize: 12,
+    textAlign: "center",
 };
 
 const sectionCard = {

@@ -9,9 +9,9 @@ import {
 } from "react-native";
 import { Feather, AntDesign } from "@expo/vector-icons";
 import { Colors } from "../../constants/styles";
-import { __postApiData } from "../../utils/api";
+import { __patchApiData, __postApiData } from "../../utils/api";
 
-const Final = ({ state }) => {
+const Final = ({ state, onClose = () => {}, updateState, isEdit, item }) => {
     const [checks, setChecks] = useState(
         state?.parentCategory?.id
             ? [
@@ -50,62 +50,89 @@ const Final = ({ state }) => {
 
     const passed = checks.filter((c) => c.status).length;
 
-    const __handleSave = () => {
-        const payload = {
-            // name: categoryName,
-            // code: code,
-            // slug: slug,
-            // ...(parentId && { parentId: parentId }),
-            // status: statusId?.id,
-            // displayOrder: Number(displayOrder),
-            // isActive: isActive,
-            // visibleForConsumer: visibleForConsumer,
-            // //
-            // attributeSetIds: attributeSetId?.map((ite) => ite.id),
-            // variantAttributes: variantAttributes.map((ids) => {
-            //     const cloneData = ids;
-            //     delete cloneData?._id;
-            //     delete cloneData?.isMandatory;
-            //     return {
-            //         ...cloneData,
-            //     };
-            // }),
-            // //
-            // complianceDocuments: complianceDocuments.map((ids) => ({
-            //     complianceId: ids?.id,
-            //     documentName: ids?.name,
-            // })),
-            // hsnSetIds: hsnsetId?.map((ite) => ite.id),
-            // commissionPercentage: Number(commissionPercentage),
-            // closingFees: Number(closingFees),
-            // sellerTierOverrides: sellerTierOverrides?.map((ids) => ({
-            //     sellerTier: ids?.sellerTier,
-            //     commissionPercentage: Number(ids?.commissionPercentage),
-            // })),
-            // shippingZoneIds: shippingRuleId?.map((item) => item?.id),
-            // metaTitle: metaTitle,
-            // metaDescription: metaDescription,
-            // canonicalUrl: canonicalUrl?.trim(),
-            // priorityScore: Number(priorityScore),
-        };
-        console.log(JSON.stringify(payload));
-        updateState({ loading: true });
+    const payload = {
+        name: state?.categoryName,
+        code: state?.categoryCode,
+        slug: state?.slug,
+        ...(state?.parentCategory?.id && {
+            parentId: state?.parentCategory?.id,
+        }),
 
-        __postApiData("/categories/createCategory", payload)
+        attributeSetIds: state?.selectedSets?.map((ite) => ite.id),
+        variantAttributes: state?.variantAttributes?.map((ids) => {
+            const cloneData = ids;
+            delete cloneData?._id;
+            delete cloneData?.isMandatory;
+            return {
+                ...cloneData,
+            };
+        }),
+
+        complianceDocuments: state?.selectedDocs.map((ids) => ({
+            complianceId: ids?.id,
+            documentName: ids?.name,
+            isMandatory: ids?.isMandatory,
+            applicableOn: ids?.applicableOn,
+        })),
+        hsnSetIds: state?.hsnSetIds?.map((ite) => ite.id),
+        shippingZoneIds: state?.shippingZoneIds?.map((item) => item?.id),
+        commissionPercentage: Number(state?.commissionPercentage),
+        closingFees: Number(state?.closingFees),
+
+        sellerTierOverrides: state?.sellerTierOverrides?.map((ids) => ({
+            sellerTier: ids?.sellerTier,
+            commissionPercentage: Number(ids?.commissionPercentage),
+        })),
+        icon: state?.icon,
+        image: state?.image,
+        metaTitle: state?.metaTitle,
+        metaDescription: state?.metaDescription,
+        canonicalUrl: state?.canonicalUrl?.trim(),
+        priorityScore: Number(state?.priorityScore),
+        displayOrder: Number(state?.displayOrder),
+        isActive: state?.isActive,
+        visibleForConsumer: state?.visibleForConsumer,
+    };
+    const __handleSave = (status) => {
+        console.log(JSON.stringify("payload"));
+        updateState({ isLoading: true });
+
+        __postApiData("/categories/createCategory", {
+            ...payload,
+            status: status,
+        })
             .then((res) => {
                 console.log(JSON.stringify(res));
                 if (res?.success) {
-                    // setError(res.message);
                     Alert.alert("", res.message);
-                    // onClose();
+                    onClose();
                 } else {
                     Alert.alert("", res.message);
                 }
-                updateState({ loading: false });
+                updateState({ isLoading: false });
             })
             .catch((error) => {
                 Alert.alert("", "Failed");
-                updateState({ loading: false });
+                updateState({ isLoading: false });
+            });
+    };
+    const __handleEdit = () => {
+        updateState({ isLoading: true });
+
+        __patchApiData(`/categories/updateCategoryById/${item._id}`, payload)
+            .then((res) => {
+                console.log(JSON.stringify(res));
+                if (res?.success) {
+                    Alert.alert("", res.message);
+                    onClose();
+                } else {
+                    Alert.alert("", res.message);
+                }
+                updateState({ isLoading: false });
+            })
+            .catch((error) => {
+                Alert.alert("", "Failed");
+                updateState({ isLoading: false });
             });
     };
 
@@ -234,9 +261,14 @@ const Final = ({ state }) => {
                         </Text>
                     </View>
 
-                    <TouchableOpacity style={styles.draftBtn}>
-                        <Text style={styles.draftText}>Save as Draft</Text>
-                    </TouchableOpacity>
+                    {!isEdit && (
+                        <TouchableOpacity
+                            style={styles.draftBtn}
+                            onPress={() => __handleSave("DRAFT")}
+                        >
+                            <Text style={styles.draftText}>Save as Draft</Text>
+                        </TouchableOpacity>
+                    )}
 
                     <TouchableOpacity
                         style={[
@@ -246,6 +278,9 @@ const Final = ({ state }) => {
                             },
                         ]}
                         disabled={passed !== checks.length}
+                        onPress={() =>
+                            isEdit ? __handleEdit() : __handleSave("SUBMIT")
+                        }
                     >
                         <Text style={styles.publishBtnText}>
                             Publish Category

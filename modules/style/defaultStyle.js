@@ -30,11 +30,11 @@ export const Sizes = {
 
 export const inputTitleDefaultStyle = {
     marginHorizontal: Sizes.fixPadding * 2.0,
-    marginBottom: Sizes.fixPadding - 5.0,
     marginTop: Sizes.fixPadding * 2.0,
-    color: Colors.blackColor,
-    fontSize: 12,
-    fontFamily: "Roboto_Medium",
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#374151",
+    marginBottom: 6,
 };
 export const inputBoxDefaultStyle = {
     paddingVertical: 3,

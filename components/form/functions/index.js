@@ -22,6 +22,7 @@ export const productValidateForm = (
         // Tab 2 – Basic Info
         title,
         modelName,
+        slug,
         sku,
         ean,
 
@@ -158,16 +159,16 @@ export const productValidateForm = (
                     "Validation Error",
                     "Stock cannot be negative",
                 );
-            if (!metaTitle?.trim())
-                return Alert.alert(
-                    "Validation Error",
-                    "Meta Title is Required",
-                );
-            if (!metaDescription?.trim())
-                return Alert.alert(
-                    "Validation Error",
-                    "meta Description is Required",
-                );
+            // if (!metaTitle?.trim())
+            //     return Alert.alert(
+            //         "Validation Error",
+            //         "Meta Title is Required",
+            //     );
+            // if (!metaDescription?.trim())
+            //     return Alert.alert(
+            //         "Validation Error",
+            //         "meta Description is Required",
+            //     );
         }
 
         /* ---------- Listing Status ---------- */

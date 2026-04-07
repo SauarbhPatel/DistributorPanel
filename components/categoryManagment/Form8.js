@@ -20,9 +20,9 @@ const Form8 = ({ state, updateState }) => {
             );
 
             if (type === "main") {
-                updateState({ image: uri });
+                updateState({ image: image });
             } else {
-                updateState({ icon: uri });
+                updateState({ icon: image });
             }
         }
     };
