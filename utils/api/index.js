@@ -40,7 +40,7 @@ export const __getApiData = (endpoint) => {
 };
 
 export const __postApiData = (endpoint, data, type) => {
-    console.log(JSON.stringify(data));
+    console.log(JSON.stringify(__apiHeaderNew()));
     return axios
         .post(
             `${_HOST}${endpoint}`,

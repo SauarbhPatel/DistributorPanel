@@ -46,7 +46,18 @@ const PRODUCT_MENU = [
     { title: "Tax Master", icon: "receipt-long", screen: "TaxMaster" },
     { title: "Tax Type", icon: "percent", screen: "TaxTypes" },
     { title: "Document Master", icon: "view-list", screen: "DocumentMaster" },
-    { title: "Products", icon: "public", screen: "GlobalProducts" },
+    {
+        title: "Single Products",
+        icon: "public",
+        screen: "GlobalProducts",
+        params: { isVariant: false },
+    },
+    {
+        title: "Variants Products",
+        icon: "public",
+        screen: "GlobalProducts",
+        params: { isVariant: true },
+    },
     { title: "Generic Products", icon: "inventory", screen: "GenericProducts" },
     { title: "Product Listing", icon: "view-list", screen: "ProductListings" },
 ];
@@ -72,7 +83,12 @@ const ProductManagement = ({ navigation }) => {
                                 key={__generateRandomString(8)}
                                 activeOpacity={0.8}
                                 style={styles.card}
-                                onPress={() => navigation.navigate(item.screen)}
+                                onPress={() =>
+                                    navigation.navigate(
+                                        item.screen,
+                                        item?.params || {},
+                                    )
+                                }
                             >
                                 <MaterialIcons
                                     name={item.icon}

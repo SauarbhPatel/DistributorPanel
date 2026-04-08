@@ -54,19 +54,21 @@ const BasicInfoPricingForm = ({ value = {}, onChange = () => {} }) => {
                             }}
                         />
 
-                        <TextAreaBox
-                            title="SKU"
-                            placeholder="e.g. SAM-ELEC-S21"
-                            required
-                            value={value.sku}
-                            valuekey="sku"
-                            onChangeText={updateState}
-                            inputCustomStyle={inputStyle}
-                            titleCustomStyle={{
-                                marginHorizontal: 0,
-                                marginTop: 0,
-                            }}
-                        />
+                        {!value?.isVariableProduct && (
+                            <TextAreaBox
+                                title="SKU"
+                                placeholder="e.g. SAM-ELEC-S21"
+                                required
+                                value={value.sku}
+                                valuekey="sku"
+                                onChangeText={updateState}
+                                inputCustomStyle={inputStyle}
+                                titleCustomStyle={{
+                                    marginHorizontal: 0,
+                                    marginTop: 0,
+                                }}
+                            />
+                        )}
                         <TextAreaBox
                             title="Slug"
                             placeholder="e.g. SAM-ELEC-2026"
@@ -108,6 +110,7 @@ const BasicInfoPricingForm = ({ value = {}, onChange = () => {} }) => {
                                         marginTop: 0,
                                     }}
                                     customStyle={{ flex: 1 }}
+                                    keyboardType="number-pad"
                                 />
                                 <TextAreaBox
                                     title="GTIN"
@@ -352,14 +355,17 @@ const BasicInfoPricingForm = ({ value = {}, onChange = () => {} }) => {
                                 type="select"
                                 title="Listing Status"
                                 list={[
-                                    { id: "DRAFT", name: "DRAFT" },
                                     { id: "ACTIVE", name: "ACTIVE" },
                                     { id: "INACTIVE", name: "INACTIVE" },
-                                    // { id: "BLOCKED", name: "BLOCKED" },
-                                    // {
-                                    //     id: "OUT_OF_STOCK",
-                                    //     name: "OUT_OF_STOCK",
-                                    // },
+                                    { id: "BLOCKED", name: "BLOCKED" },
+                                    {
+                                        id: "ARCHIVED",
+                                        name: "ARCHIVED",
+                                    },
+                                    {
+                                        id: "READY_FOR_ACTIVATE",
+                                        name: "READY_FOR_ACTIVATE",
+                                    },
                                 ]}
                                 value={
                                     value.listingStatus
@@ -380,7 +386,7 @@ const BasicInfoPricingForm = ({ value = {}, onChange = () => {} }) => {
                                 isSearchable
                             />
 
-                            <TextAreaBox
+                            {/* <TextAreaBox
                                 title="Stock Quantity"
                                 required
                                 value={value.stock}
@@ -406,7 +412,7 @@ const BasicInfoPricingForm = ({ value = {}, onChange = () => {} }) => {
                                     marginHorizontal: 0,
                                     marginTop: 10,
                                 }}
-                            />
+                            /> */}
 
                             <DropDownTextAreaBox
                                 type="select"
@@ -433,8 +439,62 @@ const BasicInfoPricingForm = ({ value = {}, onChange = () => {} }) => {
                                 }}
                                 isSearchable
                             />
+                            <Text
+                                style={{
+                                    fontWeight: "bold",
+                                    fontSize: 14,
+                                    marginTop: 10,
+                                }}
+                            >
+                                Inventory by hub
+                            </Text>
+                            <Text style={{ fontSize: 12, color: "#555" }}>
+                                Enter quantity available at each location
+                                (inventory hub).
+                            </Text>
+                            {value?.pickupPointsList?.map((item, index) => (
+                                <TextAreaBox
+                                    key={item?._id}
+                                    title={item?.label}
+                                    required
+                                    value={item?.quantity?.toString() || "0"}
+                                    valuekey="stock"
+                                    keyboardType="number-pad"
+                                    onChangeText={(text) => {
+                                        // 1. Remove non-numeric characters
+                                        let newvalue = text?.stock?.replace(
+                                            /[^0-9]/g,
+                                            "",
+                                        );
 
-                            {/* <TextAreaBox
+                                        // 2. Remove leading zeros
+                                        newvalue = newvalue.replace(
+                                            /^0+(?=\d)/,
+                                            "",
+                                        );
+
+                                        // 3. Update specific index
+                                        const updatedList = [
+                                            ...value.pickupPointsList,
+                                        ];
+                                        updatedList[index] = {
+                                            ...updatedList[index],
+                                            quantity: newvalue,
+                                        };
+
+                                        updateState({
+                                            pickupPointsList: updatedList,
+                                        });
+                                    }}
+                                    inputCustomStyle={inputStyle}
+                                    titleCustomStyle={{
+                                        marginHorizontal: 0,
+                                        marginTop: 10,
+                                    }}
+                                />
+                            ))}
+
+                            <TextAreaBox
                                 title="Meta Title"
                                 value={value.metaTitle}
                                 valuekey="metaTitle"
@@ -458,7 +518,7 @@ const BasicInfoPricingForm = ({ value = {}, onChange = () => {} }) => {
                                     marginTop: 10,
                                 }}
                                 multiline
-                            /> */}
+                            />
                         </View>
                     }
                 />

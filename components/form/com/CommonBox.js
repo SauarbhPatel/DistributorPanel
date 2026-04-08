@@ -8,7 +8,9 @@ const CommonBox = ({ title, subtitle, footerNote, body = <></> }) => {
             <View style={styles.header}>
                 <View style={{ flex: 1 }}>
                     <Text style={styles.title}>{title}</Text>
-                    <Text style={styles.subtitle}>{subtitle}</Text>
+                    {subtitle && (
+                        <Text style={styles.subtitle}>{subtitle}</Text>
+                    )}
                 </View>
                 <Feather name="info" size={18} color="#3b82f6" />
             </View>

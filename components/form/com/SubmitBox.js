@@ -3,15 +3,15 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Colors } from "../../../constants/styles";
 
-const SubmitBox = () => {
+const SubmitBox = ({ onPress }) => {
     return (
         <View style={styles.container}>
             <TouchableOpacity
+                onPress={onPress}
                 style={{
                     ...styles.button,
                     backgroundColor: Colors.primaryColor,
                 }}
-                disabled
             >
                 <Feather name="send" size={16} color="#ffffff" />
                 <Text style={styles.btnText}>Submit for Approval</Text>

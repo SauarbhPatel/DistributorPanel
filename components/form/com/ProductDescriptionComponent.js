@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { TextAreaBox } from "../../../modules";
 import { Colors } from "../../../constants/styles";
-import DynamicAttributeForm from "./DynamicAttributeForm";
 import CommonBox from "./CommonBox";
 import InfoBox from "./InfoBox";
 
@@ -93,16 +92,6 @@ const ProductDescriptionComponent = React.memo(
                     infoTitle="Select a category in Step 1 to load category-specific attributes."
                     infoSub="(For this demo, generic description fields are shown)"
                 />
-                {value?.regularAttributes?.length > 0 ? (
-                    <DynamicAttributeForm
-                        data={value?.regularAttributes || []}
-                        onChange={(updatedData) => {
-                            onChange({
-                                regularAttributes: updatedData,
-                            });
-                        }}
-                    />
-                ) : null}
 
                 <CommonBox
                     title="Key Features"

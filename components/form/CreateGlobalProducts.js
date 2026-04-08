@@ -8,9 +8,12 @@ import {
     __getAttributeSetById,
     __getBrandByCategoryIdList,
     __getBrandList,
+    __getDistributorPickupPointsList,
     __getHSNByCategoryIdList,
     __getHsnCodeList,
     __getProductCategoryList,
+    __getRegularAttributeByAttributeSetList,
+    __getSelectedVarinetAttributesList,
 } from "../../utils/api/commonApi";
 
 import MobileTabs from "./com/MobileTabs";
@@ -24,6 +27,7 @@ import VariationAttributes from "./com/VariationAttributes";
 import CategoryAndBrand from "./com/CategoryAndBrand";
 import { Feather } from "@expo/vector-icons";
 import ReviewAndSumbit from "./com/ReviewAndSumbit";
+import AttributeForm from "./com/AttributeForm";
 
 const STEPS = [
     { key: "1", label: "Category & Brand", subTitle: "Select product type" },
@@ -32,20 +36,21 @@ const STEPS = [
         label: "Basic Info & Pricing",
         subTitle: "Price and SKU",
     },
-    { key: "3", label: "Description", subTitle: "Detailed info" },
-    { key: "4", label: "Media Upload", subTitle: "Images & Video" },
+    { key: "3", label: "Attribute Mapping", subTitle: "Category attributes" },
+    { key: "4", label: "Description", subTitle: "Detailed info" },
+    { key: "5", label: "Media Upload", subTitle: "Images & Video" },
     {
-        key: "5",
+        key: "6",
         label: "Tax & Compliance",
         subTitle: "HSN & Origin",
     },
     {
-        key: "6",
+        key: "7",
         label: "Package & Manufacturing",
         subTitle: "Dimensions",
     },
     {
-        key: "7",
+        key: "8",
         label: "Review & Submit",
         subTitle: "Final check",
     },
@@ -94,7 +99,7 @@ const initalState = {
     discountValue: "0",
     minOrderQuantity: "1",
     stock: "0",
-    listingStatus: "DRAFT",
+    listingStatus: "ACTIVE",
     fulfilledBy: "SELLER",
     // tab 3
     regularAttributes: [],
@@ -138,6 +143,8 @@ const initalState = {
     brandList: [],
     hsnCodeList: [],
     complianceDocumentList: [],
+    pickupPointsList: [],
+    regularAttributesList: null,
     isVariableProduct: false,
 };
 
@@ -146,29 +153,19 @@ const CreateGlobalProducts = ({
     isEdit = false,
     item = null,
     parentId = null,
+    isVariant = false,
 }) => {
     const [state, setState] = useState({
         ...initalState,
+        isVariableProduct: isVariant,
     });
 
     const updateState = (data) => setState((prev) => ({ ...prev, ...data }));
 
-    const {
-        activeTab,
-        loading,
-        productName,
-        code,
-        displayOrder,
-        isActive,
-        hsnsetId,
-        attributeSetId,
-        categoryList,
-        brandList,
-    } = state;
+    const { activeTab, loading } = state;
 
     const __handleSave = async (productStatus) => {
         try {
-            console.log("first");
             const singleProductData = {
                 sku: state?.sku,
                 ean: state?.ean,
@@ -179,21 +176,68 @@ const CreateGlobalProducts = ({
                     discountType: state?.discountType,
                     discountValue: Number(state?.discountValue),
                     minOrderQuantity: Number(state?.minOrderQuantity),
-                    stock: Number(state?.stock),
+                    // stock: Number(state?.stock),
                 },
+                inventoryByPickup: state?.pickupPointsList?.map((attr) => {
+                    return {
+                        pickupPointId: attr._id,
+                        quantity: Number(attr?.quantity || 0),
+                        pickupPointName: attr?.label,
+                    };
+                }),
                 listingStatus: state?.listingStatus,
                 fulfilledBy: state?.fulfilledBy,
                 metaTitle: state?.metaTitle,
                 metaDescription: state?.metaDescription,
                 // tab 3
-                regularAttributes: state?.regularAttributes.map((attr) => {
-                    delete attr._id;
-                    delete attr.isMandatory;
-                    return { ...attr };
-                }),
+                regularAttributeSet: [
+                    {
+                        order: 1,
+                        attributeSetId:
+                            state?.regularAttributesList?.attributeSetId,
+                        attributeSetName:
+                            state?.regularAttributesList?.attributeSetName,
+                        regularAttributes: state?.regularAttributes.map(
+                            (attr) => {
+                                let formattedValues =
+                                    attr?.newvalues || attr?.values || [];
+
+                                if (attr?.type === "UNIT_RANGE") {
+                                    formattedValues = formattedValues.flatMap(
+                                        (val) => {
+                                            const nums =
+                                                val.match(/\d+(\.\d+)?/g); // extract numbers
+
+                                            if (nums && nums.length >= 2) {
+                                                return [
+                                                    Number(nums[0]),
+                                                    Number(nums[1]),
+                                                ];
+                                            }
+
+                                            return []; // skip invalid
+                                        },
+                                    );
+                                }
+
+                                return {
+                                    attributeId: attr?.attributeId,
+                                    name: attr?.name,
+                                    values: formattedValues,
+                                    type: attr?.type,
+                                    isMandatory: attr?.isMandatory,
+                                    isVariant: attr?.isVariant,
+                                };
+                            },
+                        ),
+                    },
+                ],
+
+                //
                 dynamicSection: state?.dynamicSection,
                 description: state?.description,
                 fullDescriptionHtmlContent: state?.fullDescriptionHtmlContent,
+                bulletPoints: [],
                 // tab 4
                 shortVideoUrl: state?.shortVideoUrl,
                 mainImageUrl: state?.mainImageUrl,
@@ -203,7 +247,7 @@ const CreateGlobalProducts = ({
                     ? {
                           hsnCodeId: state?.hsn?._id,
                           code: state?.hsn?.code,
-                          taxRate: state?.hsn?.taxRate,
+                          taxRate: state?.hsn?.taxSlabs?.[0]?.taxRate,
                       }
                     : null,
                 complianceDocuments: state?.complianceDocuments?.map((ite) => ({
@@ -232,6 +276,12 @@ const CreateGlobalProducts = ({
                     lengthUnit: state?.packageDimension?.lengthUnit,
                     weightUnit: state?.packageDimension?.weightUnit,
                 },
+                manufacturingDetails: {
+                    country: state?.country,
+                    manufacturerName: state?.manufacturer,
+                    packerDetails: state?.packer,
+                    importerDetails: state?.importer,
+                },
 
                 productStatus: productStatus || "SUBMIT",
                 isActive: true,
@@ -243,8 +293,9 @@ const CreateGlobalProducts = ({
                 // tab 2
                 title: state?.title,
                 modelName: state?.modelName,
-                sku: state?.sku,
+                // sku: state?.sku,
                 slug: state?.slug,
+
                 ...(state?.isVariableProduct
                     ? {
                           productType: "VARIABLE",
@@ -275,7 +326,7 @@ const CreateGlobalProducts = ({
             );
 
             Alert.alert("", res?.message || "Success");
-            if (res?.success) onClose();
+            // if (res?.success) onClose();
         } catch {
             Alert.alert("", "Failed to create product");
         } finally {
@@ -288,14 +339,16 @@ const CreateGlobalProducts = ({
             updateState({
                 categoryLoading: true,
             });
-            const [categories, compliance] = await Promise.all([
+            const [categories, compliance, pickupPoints] = await Promise.all([
                 __getProductCategoryList(),
                 __getAllComplianceDocumentList(),
+                __getDistributorPickupPointsList(),
             ]);
 
             updateState({
                 categoryList: categories || [],
                 complianceDocumentList: compliance || [],
+                pickupPointsList: pickupPoints || [],
                 categoryLoading: false,
             });
         } catch {}
@@ -310,14 +363,26 @@ const CreateGlobalProducts = ({
             updateState({
                 brandLoading: true,
             });
-            const [brands, hsn] = await Promise.all([
-                __getBrandByCategoryIdList(state?.categoryId?.id),
-                __getHSNByCategoryIdList(state?.categoryId?.id),
-            ]);
-
+            const [brands, hsn, regularAttributes, variantList] =
+                await Promise.all([
+                    __getBrandByCategoryIdList(state?.categoryId?.id),
+                    __getHSNByCategoryIdList(state?.categoryId?.id),
+                    __getRegularAttributeByAttributeSetList(
+                        state?.categoryId?.id,
+                    ),
+                    __getSelectedVarinetAttributesList(state?.categoryId?.id),
+                ]);
             updateState({
                 brandList: brands || [],
                 hsnCodeList: hsn || [],
+                regularAttributesList: regularAttributes || [],
+                regularAttributes: regularAttributes?.regularAttributes || [],
+                variantAttributes:
+                    variantList?.map((item) => ({
+                        ...item,
+                        values: [],
+                        s_values: item?.values || [],
+                    })) || [],
                 brandLoading: false,
             });
         } catch {}
@@ -343,7 +408,7 @@ const CreateGlobalProducts = ({
             >
                 <MobileTabs
                     activeStep={activeTab}
-                    onChange={(id) => updateState({ activeTab: id })}
+                    setActiveStep={(id) => updateState({ activeTab: id })}
                     STEPS={state?.isVariableProduct ? VariantSTEPS : STEPS}
                 />
 
@@ -354,90 +419,6 @@ const CreateGlobalProducts = ({
                             updateState={updateState}
                         />
                     )}
-
-                    {/* Product Name */}
-                    {/* {activeTab === "1" && (
-                        <View style={boxStyle}>
-                            <DropDownTextAreaBox
-                                type="select"
-                                title="Category"
-                                placeholder="Select Category"
-                                required
-                                list={categoryList}
-                                value={state?.categoryId}
-                                isSearchable
-                                inputCustomStyle={inputStyle}
-                                onSelected={async (value) => {
-                                    console.log(value);
-                                    updateState({ categoryId: value });
-
-                                    if (value?.attributeSets?.length) {
-                                        updateState({ loading: true });
-                                        const responses = await Promise.all(
-                                            value.attributeSets.map((id) =>
-                                                __getAttributeSetById(
-                                                    id?.attributeSetId,
-                                                ),
-                                            ),
-                                        );
-                                        // Merge all regular attributes
-                                        const regularAttributes = responses
-                                            .flatMap(
-                                                (res) =>
-                                                    res?.regularAttributes ||
-                                                    [],
-                                            )
-                                            .map((item) => ({
-                                                ...item,
-                                                values: [],
-                                            }));
-
-                                        // Merge all variant attributes
-                                        const variantAttributes = responses
-                                            .flatMap(
-                                                (res) =>
-                                                    res?.variantAttributes ||
-                                                    [],
-                                            )
-                                            .map((item) => ({
-                                                ...item,
-                                                values: [],
-                                            }));
-
-                                        updateState({
-                                            regularAttributes,
-                                            variantAttributes,
-                                            loading: false,
-                                        });
-                                    }
-                                }}
-                                // editable={!isEdit}
-                                titleCustomStyle={{
-                                    marginHorizontal: 0,
-                                    marginTop: 0,
-                                }}
-                            />
-
-                            <DropDownTextAreaBox
-                                type="select"
-                                title="Brand"
-                                placeholder="Select Brand"
-                                required
-                                list={brandList}
-                                value={state?.brandId}
-                                isSearchable
-                                inputCustomStyle={inputStyle}
-                                onSelected={(value) =>
-                                    updateState({ brandId: value })
-                                }
-                                editable={!isEdit}
-                                titleCustomStyle={{
-                                    marginHorizontal: 0,
-                                    marginTop: 10,
-                                }}
-                            />
-                        </View>
-                    )} */}
 
                     {activeTab === "2" && (
                         <BasicInfoPricingForm
@@ -458,34 +439,41 @@ const CreateGlobalProducts = ({
                     ) : (
                         <>
                             {activeTab === "3" && (
+                                <AttributeForm
+                                    value={state}
+                                    updateFinal={(data) => updateState(data)}
+                                />
+                            )}
+                            {activeTab === "4" && (
                                 <ProductDescriptionComponent
                                     value={state}
                                     onChange={(data) => updateState(data)}
                                 />
                             )}
 
-                            {activeTab === "4" && (
+                            {activeTab === "5" && (
                                 <MediaUploadComponent
                                     value={state}
                                     onChange={updateState}
                                 />
                             )}
-                            {activeTab === "5" && (
+                            {activeTab === "6" && (
                                 <TaxComplianceComponent
                                     value={state}
                                     onChange={updateState}
                                 />
                             )}
-                            {activeTab === "6" && (
+                            {activeTab === "7" && (
                                 <PackageManufacturingForm
                                     value={state}
                                     onChange={updateState}
                                 />
                             )}
-                            {activeTab === "7" && (
+                            {activeTab === "8" && (
                                 <ReviewAndSumbit
                                     value={state}
                                     onChange={updateState}
+                                    onSubmit={() => __handleSave("SUBMIT")}
                                 />
                             )}
                         </>
@@ -609,7 +597,7 @@ const CreateGlobalProducts = ({
                     activeOpacity={0.8}
                     onPress={() => {
                         if (
-                            activeTab !== (state?.isVariableProduct ? "3" : "7")
+                            activeTab !== (state?.isVariableProduct ? "3" : "8")
                         ) {
                             // if (!productValidateForm(Number(activeTab), state))
                             //     return;
@@ -642,7 +630,7 @@ const CreateGlobalProducts = ({
                     }}
                 >
                     <Text style={styles.saveBtnText}>
-                        {activeTab !== (state?.isVariableProduct ? "3" : "7")
+                        {activeTab !== (state?.isVariableProduct ? "3" : "8")
                             ? "Next Step"
                             : "Save Product"}
                     </Text>

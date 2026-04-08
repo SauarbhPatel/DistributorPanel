@@ -17,7 +17,7 @@ const MobileTabs = ({ activeStep, setActiveStep, STEPS = [] }) => {
                         <TouchableOpacity
                             key={step.key}
                             style={styles.stepContainer}
-                            onPress={() => isActive && setActiveStep(index)}
+                            onPress={() => isActive && setActiveStep(step.key)}
                         >
                             {/* Circle */}
                             <View

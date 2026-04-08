@@ -1,9 +1,27 @@
 const STEPS = [
-    { key: "2", label: "Basic Info" },
-    { key: "3", label: "Description" },
-    { key: "4", label: "Media Upload" },
-    { key: "5", label: "Tax & Compliance" },
-    { key: "6", label: "Package & Manufacturing" },
+    {
+        key: "1",
+        label: "Basic Info & Pricing",
+        subTitle: "Price and SKU",
+    },
+    { key: "2", label: "Attribute Mapping", subTitle: "Category attributes" },
+    { key: "3", label: "Description", subTitle: "Detailed info" },
+    { key: "4", label: "Media Upload", subTitle: "Images & Video" },
+    {
+        key: "5",
+        label: "Tax & Compliance",
+        subTitle: "HSN & Origin",
+    },
+    {
+        key: "6",
+        label: "Package & Manufacturing",
+        subTitle: "Dimensions",
+    },
+    {
+        key: "7",
+        label: "Review & Submit",
+        subTitle: "Final check",
+    },
 ];
 
 import React, { useEffect, useState } from "react";
@@ -22,7 +40,7 @@ import {
 import { Loader } from "../../../modules";
 import { productValidateForm } from "../functions";
 const initalState = {
-    activeTab: "2",
+    activeTab: "1",
     productName: "",
     code: "",
     displayOrder: "1",
@@ -260,35 +278,35 @@ const VariantCard = ({
             <Loader isShow={loading} />
             <MobileTabs
                 activeStep={activeTab}
-                onChange={(id) => updateState({ activeTab: id })}
+                setActiveStep={(id) => updateState({ activeTab: id })}
                 STEPS={STEPS}
             />
             <View style={{ paddingHorizontal: 10, paddingBottom: 100 }}>
-                {activeTab === "2" && (
+                {activeTab === "1" && (
                     <VariantBasicInfoPricingForm
                         value={{ ...state, defaultSku }}
                         onChange={(data) => updateState(data)}
                     />
                 )}
-                {activeTab === "3" && (
+                {activeTab === "2" && (
                     <ProductDescriptionComponent
                         value={state}
                         onChange={(data) => updateState(data)}
                     />
                 )}
-                {activeTab === "4" && (
+                {activeTab === "3" && (
                     <MediaUploadComponent
                         value={state}
                         onChange={updateState}
                     />
                 )}
-                {activeTab === "5" && (
+                {activeTab === "4" && (
                     <TaxComplianceComponent
                         value={state}
                         onChange={updateState}
                     />
                 )}
-                {activeTab === "6" && (
+                {activeTab === "5" && (
                     <PackageManufacturingForm
                         value={state}
                         onChange={updateState}
@@ -324,14 +342,14 @@ const VariantCard = ({
                         <TouchableOpacity
                             style={styles.createBtn}
                             onPress={() => {
-                                if (
-                                    !productValidateForm(
-                                        Number(activeTab),
-                                        state,
-                                        true,
-                                    )
-                                )
-                                    return;
+                                // if (
+                                //     !productValidateForm(
+                                //         Number(activeTab),
+                                //         state,
+                                //         true,
+                                //     )
+                                // )
+                                //     return;
                                 updateState({
                                     activeTab:
                                         STEPS[

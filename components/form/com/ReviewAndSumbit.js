@@ -16,7 +16,90 @@ import CompletionChecklist from "./CompletionChecklist";
 import ErrorBox from "./ErrorBox";
 import SubmitBox from "./SubmitBox";
 
-const ReviewAndSumbit = ({ value }) => {
+const ReviewAndSumbit = ({ value, onSubmit = () => {} }) => {
+    const {
+        categoryId,
+        brandId,
+        //
+        title,
+        modelName,
+        sku,
+        slug,
+        ean,
+        gtin,
+        quantityPerBox,
+        boxMrp,
+        discountValue,
+        boxSellingPrice,
+        minOrderQuantity,
+        listingStatus,
+        stock,
+        fulfilledBy,
+        pickupPointsList,
+        //
+        regularAttributes,
+        //
+        description, //bullets
+        fullDescriptionHtmlContent,
+        dynamicSection,
+        //
+        mainImageUrl,
+        galleryImageUrls,
+        shortVideoUrl,
+        //
+        hsn,
+        complianceDocuments,
+        //
+        productDimension,
+        packageDimension,
+        country,
+        manufacturer,
+        packer,
+        importer,
+    } = value;
+    // console.log(
+    //     "Details,",
+    //     JSON.stringify({
+    //         categoryId,
+    //         brandId,
+    //         //
+    //         title,
+    //         modelName,
+    //         sku,
+    //         slug,
+    //         ean,
+    //         gtin,
+    //         quantityPerBox,
+    //         boxMrp,
+    //         discountValue,
+    //         boxSellingPrice,
+    //         minOrderQuantity,
+    //         listingStatus,
+    //         stock,
+    //         fulfilledBy,
+    //         pickupPointsList,
+    //         //
+    //         regularAttributes,
+    //         //
+    //         description, //bullets
+    //         fullDescriptionHtmlContent,
+    //         dynamicSection,
+    //         //
+    //         mainImageUrl,
+    //         galleryImageUrls,
+    //         shortVideoUrl,
+    //         //
+    //         hsn,
+    //         complianceDocuments,
+    //         //
+    //         productDimension,
+    //         packageDimension,
+    //         country,
+    //         manufacturer,
+    //         packer,
+    //         importer,
+    //     }),
+    // );
     return (
         <View style={{}}>
             <InfoBox
@@ -33,7 +116,7 @@ const ReviewAndSumbit = ({ value }) => {
                         <View style={styles.card}>
                             {/* Left Image */}
                             <View style={styles.imageBox}>
-                                <View style={styles.brandTag}>
+                                {/* <View style={styles.brandTag}>
                                     <Text style={styles.brandText}>Sony</Text>
                                 </View>
 
@@ -49,24 +132,32 @@ const ReviewAndSumbit = ({ value }) => {
                                     <Text style={styles.uploadedText}>
                                         UPLOADED
                                     </Text>
-                                </View>
+                                </View> */}
+                                <Image
+                                    source={{
+                                        uri: value?.mainImageUrl,
+                                    }}
+                                    style={{
+                                        flex: 1,
+                                    }}
+                                />
                             </View>
 
                             {/* Right Content */}
                             <View style={styles.content}>
                                 {/* Breadcrumb */}
                                 <Text style={styles.breadcrumb}>
-                                    Electronics {"  "} Sony
+                                    {value?.categoryId?.label} {"  "}
+                                    {value?.brandId?.name}
                                 </Text>
 
                                 {/* Title */}
-                                <Text style={styles.title}>
-                                    WH-1000XM5 Wireless Noise Canceling
-                                    Headphones
-                                </Text>
+                                <Text style={styles.title}>{value?.title}</Text>
 
                                 {/* Price */}
-                                <Text style={styles.price}>₹348</Text>
+                                <Text style={styles.price}>
+                                    ₹{value?.boxSellingPrice}
+                                </Text>
 
                                 {/* Status Row */}
                                 <View style={styles.statusRow}>
@@ -76,7 +167,8 @@ const ReviewAndSumbit = ({ value }) => {
                                         </Text>
                                     </View>
                                     <Text style={styles.galleryText}>
-                                        3 gallery images
+                                        {value?.galleryImageUrls?.length || 0}{" "}
+                                        gallery images
                                     </Text>
                                 </View>
                             </View>
@@ -88,25 +180,29 @@ const ReviewAndSumbit = ({ value }) => {
                         <View style={styles.infoGrid}>
                             <View style={styles.infoItem}>
                                 <Text style={styles.label}>SKU</Text>
-                                <Text style={styles.value}>WH-1000XM5/B</Text>
+                                <Text style={styles.value}>{value?.sku}</Text>
                             </View>
 
                             <View style={styles.infoItem}>
                                 <Text style={styles.label}>HSN Code</Text>
-                                <Text style={styles.value}>-</Text>
+                                <Text style={styles.value}>
+                                    {value?.hsn?.name}
+                                </Text>
                             </View>
 
                             <View style={styles.infoItem}>
                                 <Text style={styles.label}>
                                     Country of Origin
                                 </Text>
-                                <Text style={styles.value}>Japan</Text>
+                                <Text style={styles.value}>
+                                    {value?.country}
+                                </Text>
                             </View>
 
                             <View style={styles.infoItem}>
                                 <Text style={styles.label}>Manufacturer</Text>
                                 <Text style={styles.value}>
-                                    Sony Corporation
+                                    {value?.manufacturer}
                                 </Text>
                             </View>
 
@@ -117,7 +213,9 @@ const ReviewAndSumbit = ({ value }) => {
 
                             <View style={styles.infoItem}>
                                 <Text style={styles.label}>Video</Text>
-                                <Text style={styles.value}>-</Text>
+                                <Text style={styles.value}>
+                                    {value?.videoUrl ? "Uploaded" : "-"}
+                                </Text>
                             </View>
                         </View>
                     </View>
@@ -125,7 +223,7 @@ const ReviewAndSumbit = ({ value }) => {
             />
             <CompletionChecklist />
             {/* <ErrorBox /> */}
-            <SubmitBox />
+            <SubmitBox onPress={onSubmit} />
         </View>
     );
 };
@@ -144,8 +242,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#e5e7eb",
         backgroundColor: "#f9fafb",
-        padding: 8,
         justifyContent: "space-between",
+        overflow: "hidden",
     },
 
     brandTag: {

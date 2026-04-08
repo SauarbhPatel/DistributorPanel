@@ -318,10 +318,41 @@ const __getHSNByCategoryIdList = async (categoryId) => {
         .then((res) => {
             console.log(res);
             if (res.success) {
-                return res?.data?.map((item) => ({
+                return res?.data?.records?.map((item) => ({
                     ...item,
                     id: item?._id,
+                    name: item?.code,
                 }));
+            }
+            return [];
+        })
+        .catch((error) => {
+            return [];
+        });
+};
+const __getRegularAttributeByAttributeSetList = async (categoryId) => {
+    console.log("getRegularAttributeByAttributeSet");
+    return __getApiData(
+        `/attributeSet/getRegularAttributeByAttributeSet/${categoryId}`,
+    )
+        .then((res) => {
+            console.log("getRegularAttributeByAttributeSet", res);
+            if (res.success) {
+                return res?.data?.attributeSets[0];
+            }
+            return null;
+        })
+        .catch((error) => {
+            return null;
+        });
+};
+const __getSelectedVarinetAttributesList = async (categoryId) => {
+    return __getApiData(
+        `/categories/getSelectedVarinetAttributesByCategoryId/${categoryId}`,
+    )
+        .then((res) => {
+            if (res.success) {
+                return res?.data?.variantAttributes;
             }
             return [];
         })
@@ -386,6 +417,20 @@ const __getTaxKindList = async () => {
             return [];
         });
 };
+const __getDistributorPickupPointsList = async () => {
+    return __getApiData(`/users/distributor/pickupPoints`)
+        .then((res) => {
+            if (res.success) {
+                return res?.data?.pickupPoints?.map((item) => ({
+                    ...item,
+                }));
+            }
+            return [];
+        })
+        .catch((error) => {
+            return [];
+        });
+};
 
 export {
     __uploadImage,
@@ -410,4 +455,7 @@ export {
     __getTaxKindList,
     __getBrandByCategoryIdList,
     __getHSNByCategoryIdList,
+    __getDistributorPickupPointsList,
+    __getRegularAttributeByAttributeSetList,
+    __getSelectedVarinetAttributesList,
 };

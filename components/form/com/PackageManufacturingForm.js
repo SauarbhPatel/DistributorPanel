@@ -323,7 +323,7 @@ const PackageManufacturingForm = ({ value = {}, onChange = () => {} }) => {
                             value={value.manufacturer}
                             valuekey="text"
                             onChangeText={(val) =>
-                                updateState({ manufacturer: val })
+                                updateState({ manufacturer: val?.text })
                             }
                             inputCustomStyle={inputStyle}
                             titleCustomStyle={titleStyle}
@@ -334,7 +334,9 @@ const PackageManufacturingForm = ({ value = {}, onChange = () => {} }) => {
                             placeholder="Enter packer name and address"
                             value={value.packer}
                             valuekey="text"
-                            onChangeText={(val) => updateState({ packer: val })}
+                            onChangeText={(val) =>
+                                updateState({ packer: val?.text })
+                            }
                             multiline
                             inputCustomStyle={inputStyle}
                             titleCustomStyle={titleStyle}
@@ -346,7 +348,7 @@ const PackageManufacturingForm = ({ value = {}, onChange = () => {} }) => {
                             value={value.importer}
                             valuekey="text"
                             onChangeText={(val) =>
-                                updateState({ importer: val })
+                                updateState({ importer: val?.text })
                             }
                             multiline
                             inputCustomStyle={inputStyle}
