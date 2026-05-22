@@ -11,7 +11,7 @@ const MobileTabs = ({ activeStep, setActiveStep, STEPS = [] }) => {
         <View style={styles.container}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 {STEPS.map((step, index) => {
-                    const isActive = activeStep >= index + 1;
+                    const isActive = activeStep >= step.key;
 
                     return (
                         <TouchableOpacity

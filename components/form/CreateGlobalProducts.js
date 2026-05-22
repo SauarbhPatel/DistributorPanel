@@ -63,11 +63,11 @@ const VariantSTEPS = [
         label: "Variation Attributes",
         subTitle: "Define variations",
     },
-    {
-        key: "4",
-        label: "Review & Submit",
-        subTitle: "Final check",
-    },
+    // {
+    //     key: "4",
+    //     label: "Review & Submit",
+    //     subTitle: "Final check",
+    // },
 ];
 const initalState = {
     activeTab: "1",
@@ -599,8 +599,8 @@ const CreateGlobalProducts = ({
                         if (
                             activeTab !== (state?.isVariableProduct ? "3" : "8")
                         ) {
-                            // if (!productValidateForm(Number(activeTab), state))
-                            //     return;
+                            if (!productValidateForm(Number(activeTab), state))
+                                return;
                             updateState({
                                 activeTab: state?.isVariableProduct
                                     ? VariantSTEPS[

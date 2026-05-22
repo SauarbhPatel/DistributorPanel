@@ -58,9 +58,17 @@ export const productValidateForm = (
         // TAB 6
         productDimension = {},
         packageDimension = {},
+        country,
+        manufacturer,
+        packer,
+        importer,
+
+        //
+        variants,
     },
     variantCard = false,
 ) => {
+    return true;
     // if ([2].includes(tab)) return true;
     /* ---------------- TAB 1 ---------------- */
     if (tab === 1) {
@@ -87,8 +95,6 @@ export const productValidateForm = (
                     "Model name is required",
                 );
 
-            if (!sku?.trim())
-                return Alert.alert("Validation Error", "SKU is required");
             if (!slug?.trim())
                 return Alert.alert("Validation Error", "Slug is required");
         }
@@ -98,6 +104,8 @@ export const productValidateForm = (
            ONLY when product is NOT variable
         -------------------------------------------------- */
         if (!isVariableProduct) {
+            if (!sku?.trim())
+                return Alert.alert("Validation Error", "SKU is required");
             if (!ean?.trim())
                 return Alert.alert("Validation Error", "EAN is required");
 
@@ -154,21 +162,21 @@ export const productValidateForm = (
                     "Minimum order quantity must be greater than 0",
                 );
 
-            if (!stock || Number(stock) < 0)
+            // if (!stock || Number(stock) < 0)
+            //     return Alert.alert(
+            //         "Validation Error",
+            //         "Stock cannot be negative",
+            //     );
+            if (!metaTitle?.trim())
                 return Alert.alert(
                     "Validation Error",
-                    "Stock cannot be negative",
+                    "Meta Title is Required",
                 );
-            // if (!metaTitle?.trim())
-            //     return Alert.alert(
-            //         "Validation Error",
-            //         "Meta Title is Required",
-            //     );
-            // if (!metaDescription?.trim())
-            //     return Alert.alert(
-            //         "Validation Error",
-            //         "meta Description is Required",
-            //     );
+            if (!metaDescription?.trim())
+                return Alert.alert(
+                    "Validation Error",
+                    "meta Description is Required",
+                );
         }
 
         /* ---------- Listing Status ---------- */
@@ -184,17 +192,42 @@ export const productValidateForm = (
             return Alert.alert("Validation Error", "Invalid listing status");
     }
 
-    /* ---------------- TAB 3 ---------------- */
+    if (isVariableProduct && tab === 3) {
+        if (variants.length === 0) {
+            return Alert.alert(
+                "Validation Error",
+                "At least one variant is required",
+            );
+        }
+
+        const FindIncomplete = variants.find(
+            (variant) => !variant?.variationData,
+        );
+        console.log(FindIncomplete);
+        if (FindIncomplete) {
+            const variantSlug = Object.entries(FindIncomplete)
+                .filter(([k]) => k !== "variationData")
+                .map(([k, v]) => `${k}:${v}`)
+                .join("|");
+            return Alert.alert(
+                "Validation Error",
+                `Please complete ${variantSlug} variant details`,
+            );
+        }
+    }
     if (!isVariableProduct && tab === 3) {
         for (const attr of regularAttributes) {
-            if (!Array.isArray(attr.values) || attr.values.length === 0) {
+            if (!Array.isArray(attr.newvalues) || attr.newvalues.length === 0) {
+                console.log("attr", attr);
                 return Alert.alert(
                     "Validation Error",
-                    "Attribute values cannot be empty",
+                    `Attribute values cannot be empty for ${attr.name}`,
                 );
             }
         }
-
+    }
+    /* ---------------- TAB 3 ---------------- */
+    if (!isVariableProduct && tab === 4) {
         for (const section of dynamicSection) {
             if (!section.sectionTitle?.trim())
                 return Alert.alert(
@@ -221,7 +254,7 @@ export const productValidateForm = (
             );
     }
     /* ---------------- TAB 4 ---------------- */
-    if (!isVariableProduct && tab === 4) {
+    if (!isVariableProduct && tab === 5) {
         if (!mainImageUrl?.trim())
             return Alert.alert(
                 "Validation Error",
@@ -235,7 +268,7 @@ export const productValidateForm = (
             );
     }
     /* ---------------- TAB 5 ---------------- */
-    if (!isVariableProduct && tab === 5) {
+    if (!isVariableProduct && tab === 6) {
         if (!hsn) return Alert.alert("Validation Error", "hsn is required");
         for (const doc of complianceDocuments) {
             if (doc.isMandatory) {
@@ -254,27 +287,7 @@ export const productValidateForm = (
         }
     }
     /* ---------------- TAB 6 ---------------- */
-    if (!isVariableProduct && tab === 6) {
-        // const validateDimension = (dim, label) => {
-        //     const { length, width, height, weight, lengthUnit, weightUnit } =
-        //         dim;
-
-        //     if (!length || !width || !height || !weight)
-        //         return Alert.alert(
-        //             "Validation Error",
-        //             `${label} dimensions are required`,
-        //         );
-
-        //     if (!lengthUnit || !weightUnit)
-        //         return Alert.alert(
-        //             "Validation Error",
-        //             `${label} units are required`,
-        //         );
-        // };
-
-        // validateDimension(productDimension, "Product");
-        // validateDimension(packageDimension, "Package");
-
+    if (!isVariableProduct && tab === 7) {
         const validateDimension = (dim, label) => {
             const { length, width, height, weight, lengthUnit, weightUnit } =
                 dim;
@@ -300,6 +313,28 @@ export const productValidateForm = (
 
         const isPackageValid = validateDimension(packageDimension, "Package");
         if (!isPackageValid) return;
+
+        if (!country)
+            return Alert.alert(
+                "Validation Error",
+                "Please select Country of Origin",
+            );
+
+        if (!manufacturer)
+            return Alert.alert(
+                "Validation Error",
+                "Please Enter Manufacturer Name",
+            );
+        if (!packer)
+            return Alert.alert(
+                "Validation Error",
+                "Enter packer name and address",
+            );
+        if (!importer)
+            return Alert.alert(
+                "Validation Error",
+                "Enter importer name and address",
+            );
     }
     console.log("passed");
 

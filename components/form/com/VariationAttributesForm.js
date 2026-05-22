@@ -19,7 +19,8 @@ const generateSku = () =>
 const VariationAttributesForm = ({
     attributes = [],
     variations = [],
-
+    pickupPointsList = [],
+    parentValue,
     onChange = () => {},
 }) => {
     const [state, setState] = useState({
@@ -253,6 +254,42 @@ const VariationAttributesForm = ({
             variants: variations.filter((variat) => variat[key] != val),
         });
     };
+    // const removeValue = (id, val, attrName) => {
+    //     // 1. Safely remove from local state
+    //     const updatedValues = (state.values[id] || []).filter((v) => v !== val);
+
+    //     const newValuesState = {
+    //         ...state.values,
+    //         [id]: updatedValues,
+    //     };
+
+    //     // 2. Update attributes list
+    //     const updatedAttributes = attributes.map((attr) => {
+    //         if (attr._id === id) {
+    //             return {
+    //                 ...attr,
+    //                 values: (attr.values || []).filter((v) => v !== val),
+    //             };
+    //         }
+    //         return attr;
+    //     });
+
+    //     // 3. Remove affected variations
+    //     const updatedVariations = variations.filter((variation) => {
+    //         return variation[attrName] !== val;
+    //     });
+
+    //     // 4. Update local state
+    //     updateState({
+    //         values: newValuesState,
+    //     });
+
+    //     // 5. Sync to parent
+    //     onChange({
+    //         variantAttributes: updatedAttributes,
+    //         variants: updatedVariations,
+    //     });
+    // };
 
     return (
         <View>
@@ -533,6 +570,7 @@ const VariationAttributesForm = ({
                                     return (
                                         <VariationsCard
                                             key={variantKey}
+                                            parentValue={parentValue}
                                             variation={variation}
                                             state={state}
                                             index={index}
@@ -546,6 +584,21 @@ const VariationAttributesForm = ({
                                                 console.log(cloneData);
                                                 onChange({
                                                     variants: cloneData,
+                                                });
+                                            }}
+                                            onDelete={() => {
+                                                const updatedVariants =
+                                                    variations.filter(
+                                                        (_, i) => i !== index,
+                                                    );
+
+                                                const newSku = { ...state.sku };
+                                                delete newSku[variantKey];
+
+                                                updateState({ sku: newSku });
+
+                                                onChange({
+                                                    variants: updatedVariants,
                                                 });
                                             }}
                                         />
@@ -742,6 +795,8 @@ const VariationsCard = ({
     state,
     updateState,
     onDataCompleted,
+    onDelete,
+    parentValue,
 }) => {
     const variantObject = Object.fromEntries(
         Object.entries(variation).filter(([k]) => k !== "variationData"),
@@ -783,6 +838,7 @@ const VariationsCard = ({
                             ""
                         }
                         defaultData={variation?.variationData || null}
+                        parentValue={parentValue}
                         onDone={(value) => {
                             setisShowBasicInfo(false);
 
@@ -902,18 +958,36 @@ const VariationsCard = ({
                         marginRight: 10,
                     }}
                 >
-                    <Text>Basic Info</Text>
+                    <Text style={{ color: "#000000", fontWeight: "600" }}>
+                        Basic Info
+                    </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
+                    onPress={() => {
+                        Alert.alert(
+                            "Delete Variant",
+                            "Are you sure you want to delete this variation?",
+                            [
+                                { text: "Cancel", style: "cancel" },
+                                {
+                                    text: "Delete",
+                                    style: "destructive",
+                                    onPress: onDelete,
+                                },
+                            ],
+                        );
+                    }}
                     style={{
-                        backgroundColor: "#f3f4f6",
+                        backgroundColor: "#fee2e2",
                         paddingHorizontal: 14,
                         paddingVertical: 8,
                         borderRadius: 8,
                     }}
                 >
-                    <Text>Other Info</Text>
+                    <Text style={{ color: "#b91c1c", fontWeight: "600" }}>
+                        Delete
+                    </Text>
                 </TouchableOpacity>
             </View>
         </View>

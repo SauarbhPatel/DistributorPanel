@@ -1,27 +1,27 @@
 const STEPS = [
     {
-        key: "1",
+        key: "2",
         label: "Basic Info & Pricing",
         subTitle: "Price and SKU",
     },
-    { key: "2", label: "Attribute Mapping", subTitle: "Category attributes" },
-    { key: "3", label: "Description", subTitle: "Detailed info" },
-    { key: "4", label: "Media Upload", subTitle: "Images & Video" },
+    { key: "3", label: "Attribute Mapping", subTitle: "Category attributes" },
+    { key: "4", label: "Description", subTitle: "Detailed info" },
+    { key: "5", label: "Media Upload", subTitle: "Images & Video" },
     {
-        key: "5",
+        key: "6",
         label: "Tax & Compliance",
         subTitle: "HSN & Origin",
     },
     {
-        key: "6",
+        key: "7",
         label: "Package & Manufacturing",
         subTitle: "Dimensions",
     },
-    {
-        key: "7",
-        label: "Review & Submit",
-        subTitle: "Final check",
-    },
+    // {
+    //     key: "7",
+    //     label: "Review & Submit",
+    //     subTitle: "Final check",
+    // },
 ];
 
 import React, { useEffect, useState } from "react";
@@ -39,8 +39,9 @@ import {
 } from "../../../utils/api/commonApi";
 import { Loader } from "../../../modules";
 import { productValidateForm } from "../functions";
+import AttributeForm from "./AttributeForm";
 const initalState = {
-    activeTab: "1",
+    activeTab: "2",
     productName: "",
     code: "",
     displayOrder: "1",
@@ -64,7 +65,7 @@ const initalState = {
     discountValue: "0",
     minOrderQuantity: "1",
     stock: "0",
-    listingStatus: "DRAFT",
+    listingStatus: "ACTIVE",
     fulfilledBy: "SELLER",
     // tab 3
     regularAttributes: [],
@@ -114,6 +115,7 @@ const VariantCard = ({
     onDone = () => {},
     defaultSku,
     defaultData,
+    parentValue,
 }) => {
     const [state, setState] = useState({
         ...initalState,
@@ -123,27 +125,16 @@ const VariantCard = ({
 
     const { activeTab, loading } = state;
 
-    const __handleGetData = async () => {
-        try {
-            updateState({
-                loading: true,
-            });
-            const [hsn, compliance] = await Promise.all([
-                __getHsnCodeList(),
-                __getAllComplianceDocumentList(),
-            ]);
-
-            updateState({
-                hsnCodeList: hsn || [],
-                complianceDocumentList: compliance || [],
-                loading: false,
-            });
-        } catch {}
-    };
-
     useEffect(() => {
-        __handleGetData();
-    }, []);
+        if (parentValue?.pickupPointsList.length) {
+            updateState({
+                pickupPointsList: parentValue?.pickupPointsList,
+                regularAttributes: parentValue?.regularAttributes,
+                complianceDocumentList: parentValue?.complianceDocumentList,
+                hsnCodeList: parentValue?.hsnCodeList,
+            });
+        }
+    }, [parentValue]);
 
     const __handleComplete = (productStatus) => {
         if (!productValidateForm(Number(activeTab), state, true)) return;
@@ -163,6 +154,13 @@ const VariantCard = ({
                 minOrderQuantity: Number(state?.minOrderQuantity),
                 stock: Number(state?.stock),
             },
+            inventoryByPickup: state?.pickupPointsList?.map((attr) => {
+                return {
+                    pickupPointId: attr._id,
+                    quantity: Number(attr?.quantity || 0),
+                    pickupPointName: attr?.label,
+                };
+            }),
             listingStatus: state?.listingStatus,
             fulfilledBy: state?.fulfilledBy,
 
@@ -171,11 +169,40 @@ const VariantCard = ({
             metaDescription: state?.metaDescription,
 
             // tab 3
-            regularAttributes: state?.regularAttributes.map((attr) => {
-                delete attr._id;
-                delete attr.isMandatory;
-                return { ...attr };
-            }),
+            regularAttributeSet: [
+                {
+                    order: 1,
+                    attributeSetId:
+                        parentValue?.regularAttributesList?.attributeSetId,
+                    attributeSetName:
+                        parentValue?.regularAttributesList?.attributeSetName,
+                    regularAttributes: state?.regularAttributes.map((attr) => {
+                        let formattedValues =
+                            attr?.newvalues || attr?.values || [];
+
+                        if (attr?.type === "UNIT_RANGE") {
+                            formattedValues = formattedValues.flatMap((val) => {
+                                const nums = val.match(/\d+(\.\d+)?/g); // extract numbers
+
+                                if (nums && nums.length >= 2) {
+                                    return [Number(nums[0]), Number(nums[1])];
+                                }
+
+                                return []; // skip invalid
+                            });
+                        }
+
+                        return {
+                            attributeId: attr?.attributeId,
+                            name: attr?.name,
+                            values: formattedValues,
+                            type: attr?.type,
+                            isMandatory: attr?.isMandatory,
+                            isVariant: attr?.isVariant,
+                        };
+                    }),
+                },
+            ],
             dynamicSection: state?.dynamicSection,
             description: state?.description,
             fullDescriptionHtmlContent: state?.fullDescriptionHtmlContent,
@@ -225,8 +252,7 @@ const VariantCard = ({
     };
 
     useEffect(() => {
-        console.log(defaultData);
-
+        updateState({ sku: defaultSku || "" });
         defaultData &&
             updateState({
                 ...defaultData,
@@ -270,9 +296,9 @@ const VariantCard = ({
                     width: String(defaultData?.productDimension?.width),
                 },
             });
-    }, [defaultData]);
+    }, [defaultData, defaultSku]);
 
-    // console.log(JSON.stringify(state));
+    console.log(activeTab);
     return (
         <View style={{ backgroundColor: Colors.whiteColor }}>
             <Loader isShow={loading} />
@@ -282,31 +308,38 @@ const VariantCard = ({
                 STEPS={STEPS}
             />
             <View style={{ paddingHorizontal: 10, paddingBottom: 100 }}>
-                {activeTab === "1" && (
+                {activeTab === "2" && (
                     <VariantBasicInfoPricingForm
                         value={{ ...state, defaultSku }}
                         onChange={(data) => updateState(data)}
                     />
                 )}
-                {activeTab === "2" && (
+
+                {activeTab === "3" && (
+                    <AttributeForm
+                        value={state}
+                        updateFinal={(data) => updateState(data)}
+                    />
+                )}
+                {activeTab === "4" && (
                     <ProductDescriptionComponent
                         value={state}
                         onChange={(data) => updateState(data)}
                     />
                 )}
-                {activeTab === "3" && (
+                {activeTab === "5" && (
                     <MediaUploadComponent
                         value={state}
                         onChange={updateState}
                     />
                 )}
-                {activeTab === "4" && (
+                {activeTab === "6" && (
                     <TaxComplianceComponent
                         value={state}
                         onChange={updateState}
                     />
                 )}
-                {activeTab === "5" && (
+                {activeTab === "7" && (
                     <PackageManufacturingForm
                         value={state}
                         onChange={updateState}
@@ -320,7 +353,7 @@ const VariantCard = ({
                         <Text style={Fonts.blackColor14Medium}>Cancel</Text>
                     </TouchableOpacity>
 
-                    {activeTab !== "2" && (
+                    {activeTab !== "1" && (
                         <TouchableOpacity
                             style={styles.createBtn}
                             onPress={() =>
@@ -328,7 +361,7 @@ const VariantCard = ({
                                     activeTab:
                                         STEPS[
                                             STEPS.findIndex(
-                                                (s) => s.key === activeTab,
+                                                (s) => s?.key === activeTab,
                                             ) - 1
                                         ].key,
                                 })
@@ -338,18 +371,18 @@ const VariantCard = ({
                         </TouchableOpacity>
                     )}
 
-                    {activeTab !== "6" ? (
+                    {activeTab !== "7" ? (
                         <TouchableOpacity
                             style={styles.createBtn}
                             onPress={() => {
-                                // if (
-                                //     !productValidateForm(
-                                //         Number(activeTab),
-                                //         state,
-                                //         true,
-                                //     )
-                                // )
-                                //     return;
+                                if (
+                                    !productValidateForm(
+                                        Number(activeTab),
+                                        state,
+                                        true,
+                                    )
+                                )
+                                    return;
                                 updateState({
                                     activeTab:
                                         STEPS[

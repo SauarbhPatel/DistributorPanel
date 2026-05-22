@@ -9,6 +9,8 @@ const VariationAttributes = React.memo(({ value, onChange = () => {} }) => {
             <VariationAttributesForm
                 attributes={value?.variantAttributes || []}
                 variations={value?.variants || []}
+                pickupPointsList={value?.pickupPointsList || []}
+                parentValue={value}
                 onChange={(data) => {
                     console.log(JSON.stringify(data));
                     onChange(data);
