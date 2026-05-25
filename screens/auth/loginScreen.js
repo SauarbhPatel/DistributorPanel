@@ -47,7 +47,7 @@ const LoginScreen = ({ navigation }) => {
         }, 1000);
     }
 
-    const [phone, setPhone] = useState("9876543210");
+    const [phone, setPhone] = useState("9876543219");
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false);
 
@@ -66,6 +66,7 @@ const LoginScreen = ({ navigation }) => {
         }
         // navigation.push("KycScreen");
         setLoading(true);
+
         __postApiData("/users/admin/verifyOtpAdmin", {
             countryCode: "+91",
             phoneNumber: phone,
@@ -117,6 +118,7 @@ const LoginScreen = ({ navigation }) => {
                 setLoading(false);
             })
             .catch((error) => {
+                console.log(error);
                 setError("Login failed");
                 setLoading(false);
             });
