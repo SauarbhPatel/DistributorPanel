@@ -14,7 +14,6 @@ import DeliveryScreen from "./screens/delivery/deliveryScreen";
 import FaqScreen from "./screens/faq/faqScreen";
 import FilterScreen from "./screens/filter/filterScreen";
 import HomeScreen from "./screens/home/homeScreen";
-import NotificationsScreen from "./screens/notifications/notificationsScreen";
 import OnBoardingScreen from "./screens/onboarding/onBoardingScreen";
 import OrdersScreen from "./screens/orders/ordersScreen";
 import PaymentScreen from "./screens/payment/paymentScreen";
@@ -104,7 +103,6 @@ import Onboarding from "./screens/manufacturers/onboarding";
 import OnboardingDetails from "./screens/manufacturers/onboardingDetails";
 import AllMaster from "./screens/master/AllMaster";
 import UomMaster from "./screens/master/uomMaster";
-import OrderHub from "./screens/orderHub/orderHub";
 import OrdersManagement from "./screens/orderHub/OrdersManagement";
 import AbandonedOrders from "./screens/orderHub/AbandonedOrders";
 import B2BOrders from "./screens/orderHub/B2BOrders";
@@ -194,10 +192,7 @@ function App() {
                 />
                 <Stack.Screen name="Home" component={DrawerNavigation} />
                 <Stack.Screen name="Search" component={SearchScreen} />
-                <Stack.Screen
-                    name="Notifications"
-                    component={NotificationsScreen}
-                />
+
                 <Stack.Screen name="Wishlist" component={WishlistScreen} />
                 <Stack.Screen name="Bag" component={BagScreen} />
                 <Stack.Screen name="Delivery" component={DeliveryScreen} />
@@ -422,7 +417,6 @@ function App() {
                     name="CheckoutTemplates"
                     component={CheckoutTemplates}
                 />
-                <Stack.Screen name="OrderHub" component={OrderHub} />
                 <Stack.Screen
                     name="OrdersManagement"
                     component={OrdersManagement}
