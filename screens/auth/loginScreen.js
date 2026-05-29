@@ -54,7 +54,7 @@ const LoginScreen = ({ navigation }) => {
     const [isShowOtp, setIsShowOtp] = useState(false);
 
     const [phoneFocus, setPhoneFocus] = useState(false);
-    const [password, setPassword] = useState("1234");
+    const [password, setPassword] = useState("2505");
     const [passwordFocus, setPasswordFocus] = useState(false);
     const [backClickCount, setBackClickCount] = useState(0);
     const [error, setError] = useState("");

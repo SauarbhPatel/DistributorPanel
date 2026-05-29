@@ -459,3 +459,7 @@ export {
     __getRegularAttributeByAttributeSetList,
     __getSelectedVarinetAttributesList,
 };
+
+// ─── Orders ───────────────────────────────────────────────────────────────────
+export const getOrderStatusCounts = () =>
+    __getApiData(`/order/counts/status-substatus`);

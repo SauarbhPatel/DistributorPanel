@@ -115,7 +115,34 @@ const TaxManagment = ({ navigation }) => {
                         {renderMetricCard("TAX SLABS", "4")}
                         {renderMetricCard("HSN Codes", "5")}
                     </View>
-
+                    {renderSectionHeader("Configuration")}
+                    {renderStepItem(
+                        "percent",
+                        "Tax Types",
+                        "GST, VAT, CGST+SGST, IGST.",
+                        "Step 2",
+                        "#1D4ED8",
+                        "#DBEAFE",
+                        "TaxTypes",
+                    )}
+                    {renderStepItem(
+                        "chart-bar",
+                        "Tax Slabs",
+                        "Tax percentage groups and effective dates.",
+                        "Step 3",
+                        "#1D4ED8",
+                        "#DBEAFE",
+                        "TaxMaster",
+                    )}
+                    {renderStepItem(
+                        "pound",
+                        "HSN / SAC Master",
+                        "Code master and default tax slab mapping.",
+                        "Step 4",
+                        "#1D4ED8",
+                        "#DBEAFE",
+                        "HsnCodes",
+                    )}
                     {renderSectionHeader("Setup Phase")}
                     {renderStepItem(
                         "tag-outline",
@@ -145,34 +172,6 @@ const TaxManagment = ({ navigation }) => {
                         "TaxJurisdiction",
                     )}
 
-                    {renderSectionHeader("Configuration")}
-                    {renderStepItem(
-                        "percent",
-                        "Tax Types",
-                        "GST, VAT, CGST+SGST, IGST.",
-                        "Step 2",
-                        "#1D4ED8",
-                        "#DBEAFE",
-                        "TaxTypes",
-                    )}
-                    {renderStepItem(
-                        "chart-bar",
-                        "Tax Slabs",
-                        "Tax percentage groups and effective dates.",
-                        "Step 3",
-                        "#1D4ED8",
-                        "#DBEAFE",
-                        "TaxMaster",
-                    )}
-                    {renderStepItem(
-                        "pound",
-                        "HSN / SAC Master",
-                        "Code master and default tax slab mapping.",
-                        "Step 4",
-                        "#1D4ED8",
-                        "#DBEAFE",
-                        "HsnCodes",
-                    )}
                     {renderSectionHeader("Mapping Rules")}
                     {renderStepItem(
                         "vector-combine",

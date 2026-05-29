@@ -46,18 +46,36 @@ const B2BAdvancedSearchFilterBar = ({ onClearFilters }) => {
 
             <View style={styles.filterItem}>
                 <TouchableOpacity style={styles.dropdown}>
-                    <Text style={styles.dropdownValue}>SKU</Text>
-                    <Feather name="chevron-down" size={18} color="#64748b" />
-                </TouchableOpacity>
-            </View>
-
-            <View style={styles.filterItem}>
-                <TouchableOpacity style={styles.dropdown}>
                     <Text style={styles.dropdownValue}>Category</Text>
                     <Feather name="chevron-down" size={18} color="#64748b" />
                 </TouchableOpacity>
             </View>
-
+            <View style={styles.filterItem}>
+                <TouchableOpacity style={styles.dropdown}>
+                    <Text style={styles.dropdownValue}>All Sources</Text>
+                    <Feather name="chevron-down" size={18} color="#64748b" />
+                </TouchableOpacity>
+            </View>
+            <View style={styles.filterItem}>
+                <TouchableOpacity style={styles.dropdown}>
+                    <Text style={styles.dropdownValue}>All Platforms</Text>
+                    <Feather name="chevron-down" size={18} color="#64748b" />
+                </TouchableOpacity>
+            </View>
+            {/* <View
+                style={{
+                    flex: 1,
+                    width: "100%",
+                }}
+            /> */}
+            <TouchableOpacity
+                style={[styles.clearButton, { backgroundColor: "#0284c7" }]}
+                onPress={onClearFilters}
+            >
+                <Text style={[styles.clearText, { color: "#ffffff" }]}>
+                    Apply
+                </Text>
+            </TouchableOpacity>
             <TouchableOpacity
                 style={styles.clearButton}
                 onPress={onClearFilters}
@@ -128,6 +146,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderWidth: 1,
         borderColor: "#e0f2fe",
+        flex: 1,
+        minWidth: 140,
     },
     clearText: {
         color: "#0284c7",
