@@ -113,6 +113,7 @@ const DashboardSkeleton = () => (
 const B2BOrderStatusDashboard = ({
     onStatusSelect = () => {},
     selectedStatus,
+    selectedVerification,
 }) => {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
@@ -121,6 +122,7 @@ const B2BOrderStatusDashboard = ({
         try {
             setLoading(true);
             const res = await getOrderStatusCounts();
+            console.log(JSON.stringify(res));
             if (res?.success) {
                 setData(res.data);
             }
@@ -190,16 +192,18 @@ const B2BOrderStatusDashboard = ({
                             bgColor="#FFF7ED"
                             label="New Orders"
                             count={statusMap["PENDING"] ?? 0}
-                            onPress={() => onStatusSelect("PENDING")}
+                            onPress={() => onStatusSelect("PENDING", "NEW")}
                             active={selectedStatus == "PENDING"}
                         />
                         <StatCard
-                            icon="hourglass"
+                            icon="timer-sand"
                             iconColor="#EA580C"
                             bgColor="#FFF7ED"
                             label="Processing"
                             count={statusMap["PROCESSING"] ?? 0}
-                            onPress={() => onStatusSelect("PROCESSING")}
+                            onPress={() =>
+                                onStatusSelect("PROCESSING", "LABELING")
+                            }
                             active={selectedStatus == "PROCESSING"}
                         />
                     </View>
@@ -229,7 +233,12 @@ const B2BOrderStatusDashboard = ({
                             bgColor="#FEF2F2"
                             label="Ready To Pick"
                             count={statusMap["READY_TO_PICKUP"] ?? 0}
-                            onPress={() => onStatusSelect("READY_TO_PICKUP")}
+                            onPress={() =>
+                                onStatusSelect(
+                                    "READY_TO_PICKUP",
+                                    "PRINT_MANIFEST",
+                                )
+                            }
                             active={selectedStatus == "READY_TO_PICKUP"}
                         />
                         <StatCard
@@ -238,7 +247,9 @@ const B2BOrderStatusDashboard = ({
                             bgColor="#F0FDF4"
                             label="In Transit"
                             count={statusMap["IN_TRANSIT"] ?? 0}
-                            onPress={() => onStatusSelect("IN_TRANSIT")}
+                            onPress={() =>
+                                onStatusSelect("IN_TRANSIT", "IN_TRANSIT")
+                            }
                             active={selectedStatus == "IN_TRANSIT"}
                         />
                         <StatCard
@@ -287,7 +298,7 @@ const B2BOrderStatusDashboard = ({
                             label="All Orders"
                             count={totalOrders}
                             isBlue
-                            onPress={() => onStatusSelect(null)}
+                            onPress={() => onStatusSelect(null, null)}
                             active={selectedStatus == null}
                         />
                     </View>
@@ -310,21 +321,28 @@ const B2BOrderStatusDashboard = ({
                                 <FilterBtn
                                     label={`New Orders (${verifyMap["NEW"] ?? 0})`}
                                     color="#0369A1"
-                                    onPress={() => onStatusSelect(null, "NEW")}
+                                    onPress={() =>
+                                        onStatusSelect("PENDING", "NEW")
+                                    }
+                                    active={selectedVerification == "NEW"}
                                 />
                                 <FilterBtn
                                     label={`Unverified Orders (${verifyMap["UNVERIFIED"] ?? 0})`}
                                     color="#EF4444"
                                     onPress={() =>
-                                        onStatusSelect(null, "UNVERIFIED")
+                                        onStatusSelect("PENDING", "UNVERIFIED")
+                                    }
+                                    active={
+                                        selectedVerification == "UNVERIFIED"
                                     }
                                 />
                                 <FilterBtn
                                     label={`Verified Orders (${verifyMap["VERIFIED"] ?? 0})`}
                                     color="#01A78F"
                                     onPress={() =>
-                                        onStatusSelect(null, "VERIFIED")
+                                        onStatusSelect("PENDING", "VERIFIED")
                                     }
+                                    active={selectedVerification == "VERIFIED"}
                                 />
                             </>
                         ) : null}
@@ -333,14 +351,31 @@ const B2BOrderStatusDashboard = ({
                                 <FilterBtn
                                     label={`Labeling (6)`}
                                     color="#2B99D9"
+                                    onPress={() =>
+                                        onStatusSelect("PROCESSING", "LABELING")
+                                    }
+                                    active={selectedVerification == "LABELING"}
                                 />
                                 <FilterBtn
                                     label={`Packing(6)`}
                                     color="#795ABD"
+                                    onPress={() =>
+                                        onStatusSelect("PROCESSING", "PACKING")
+                                    }
+                                    active={selectedVerification == "PACKING"}
                                 />
                                 <FilterBtn
                                     label={`Manifesting(5)`}
                                     color="#00BBA2"
+                                    onPress={() =>
+                                        onStatusSelect(
+                                            "PROCESSING",
+                                            "MANIFESTING",
+                                        )
+                                    }
+                                    active={
+                                        selectedVerification == "MANIFESTING"
+                                    }
                                 />
                             </>
                         ) : null}
@@ -349,10 +384,28 @@ const B2BOrderStatusDashboard = ({
                                 <FilterBtn
                                     label={`Print Manifest (6)`}
                                     color="#2B99D9"
+                                    onPress={() =>
+                                        onStatusSelect(
+                                            "READY_TO_PICKUP",
+                                            "PRINT_MANIFEST",
+                                        )
+                                    }
+                                    active={
+                                        selectedVerification == "PRINT_MANIFEST"
+                                    }
                                 />
                                 <FilterBtn
                                     label={`Manifesting(5)`}
                                     color="#00BBA2"
+                                    onPress={() =>
+                                        onStatusSelect(
+                                            "READY_TO_PICKUP",
+                                            "MANIFESTED",
+                                        )
+                                    }
+                                    active={
+                                        selectedVerification == "MANIFESTED"
+                                    }
                                 />
                             </>
                         ) : null}
@@ -361,11 +414,37 @@ const B2BOrderStatusDashboard = ({
                                 <FilterBtn
                                     label={`Transit(6)`}
                                     color="#2B99D9"
+                                    onPress={() =>
+                                        onStatusSelect(
+                                            "IN_TRANSIT",
+                                            "IN_TRANSIT",
+                                        )
+                                    }
+                                    active={
+                                        selectedVerification == "IN_TRANSIT"
+                                    }
                                 />
-                                <FilterBtn label={`RTO (5)`} color="#00BBA2" />
+                                <FilterBtn
+                                    label={`RTO (5)`}
+                                    color="#00BBA2"
+                                    onPress={() =>
+                                        onStatusSelect("IN_TRANSIT", "RTO")
+                                    }
+                                    active={selectedVerification == "RTO"}
+                                />
                                 <FilterBtn
                                     label={`Out of Delivery (6)`}
                                     color="#795ABD"
+                                    onPress={() =>
+                                        onStatusSelect(
+                                            "IN_TRANSIT",
+                                            "OUT_FOR_DELIVERY",
+                                        )
+                                    }
+                                    active={
+                                        selectedVerification ==
+                                        "OUT_FOR_DELIVERY"
+                                    }
                                 />
                             </>
                         ) : null}
@@ -388,21 +467,26 @@ const B2BOrderStatusDashboard = ({
                         {selectedStatus == "CANCELLED" ? (
                             <>
                                 <FilterBtn
-                                    label={`Canceled (5)`}
+                                    label={`Canceled (${statusMap["CANCELLED"] ?? 0})`}
                                     color="#795ABD"
+                                    active={selectedStatus == "CANCELLED"}
                                 />
                             </>
                         ) : null}
                         {selectedStatus == null ? (
                             <>
                                 <FilterBtn
-                                    label={`New Orders (${verifyMap["NEW"] ?? 0})`}
+                                    label={`All Orders (${totalOrders})`}
                                     color="#0369A1"
-                                    onPress={() => onStatusSelect(null, "NEW")}
+                                    active={selectedVerification == null}
+                                    onPress={() => onStatusSelect(null, null)}
                                 />
                                 <FilterBtn
                                     label={`Unverified Orders (${verifyMap["UNVERIFIED"] ?? 0})`}
                                     color="#EF4444"
+                                    active={
+                                        selectedVerification == "UNVERIFIED"
+                                    }
                                     onPress={() =>
                                         onStatusSelect(null, "UNVERIFIED")
                                     }
@@ -410,8 +494,19 @@ const B2BOrderStatusDashboard = ({
                                 <FilterBtn
                                     label={`Verified Orders (${verifyMap["VERIFIED"] ?? 0})`}
                                     color="#01A78F"
+                                    active={selectedVerification == "VERIFIED"}
                                     onPress={() =>
                                         onStatusSelect(null, "VERIFIED")
+                                    }
+                                />
+                                <FilterBtn
+                                    label={`Payment Failed (${0})`}
+                                    color="#EF4444"
+                                    active={
+                                        selectedVerification == "PAYMENT_FAILED"
+                                    }
+                                    onPress={() =>
+                                        onStatusSelect(null, "PAYMENT_FAILED")
                                     }
                                 />
                             </>
@@ -487,7 +582,15 @@ const StatCard = ({
             />
         ) : null}
         <View style={[styles.iconBox, { backgroundColor: bgColor }]}>
-            <Feather name={icon} size={18} color={iconColor} />
+            {icon == "timer-sand" ? (
+                <MaterialCommunityIcons
+                    name={icon}
+                    size={18}
+                    color={iconColor}
+                />
+            ) : (
+                <Feather name={icon} size={18} color={iconColor} />
+            )}
         </View>
         <View style={styles.statContent}>
             <Text style={styles.statLabel}>{label}</Text>
@@ -498,12 +601,25 @@ const StatCard = ({
     </TouchableOpacity>
 );
 
-const FilterBtn = ({ label, color, onPress }) => (
+const FilterBtn = ({ label, color, onPress, active }) => (
     <TouchableOpacity
         activeOpacity={0.8}
         onPress={onPress}
         style={[styles.filterBtn, { backgroundColor: color }]}
     >
+        {active ? (
+            <View
+                style={{
+                    width: 8,
+                    height: 8,
+                    position: "absolute",
+                    top: 5,
+                    right: 5,
+                    backgroundColor: "#fff",
+                    borderRadius: 5,
+                }}
+            />
+        ) : null}
         <Text style={styles.btnText}>{label}</Text>
     </TouchableOpacity>
 );

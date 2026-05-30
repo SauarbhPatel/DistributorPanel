@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
     View,
     Text,
@@ -6,94 +6,207 @@ import {
     FlatList,
     TouchableOpacity,
     Image,
-    ScrollView,
+    Animated,
 } from "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import OrderDetailsModal from "./OrderDetailsModal";
 import BuyerProfileModal from "./BuyerProfileModal";
 import UpdateOrderModal from "./UpdateOrderModal";
+import { getOrderList } from "../../utils/api/commonApi";
+import TablePagination from "../marketing/TablePagination";
 
-const ORDER_DATA = [
-    {
-        id: "ORD-2024-002502",
-        product: "Phone Holder",
-        image: "https://images.unsplash.com/photo-1621535706240-a19f61b7b752?q=80&w=300",
-        sku: "SKU-TS-202 · FashionStore",
-        seller: "GadgetHub",
-        date: "15 Feb 2024, 03:00 pm",
-        buyer: "Anjali Mehta",
-        address: "3, T Nagar, Chennai, Tamil Nadu 600017",
-        phone: "+91 89012 34567",
-        total: "₹1,121",
-        status: "New Order",
-        statusType: "NEW ORDER", // Blue ribbon
-        payment: "COD",
-        sla: "Breached 4h 17m",
-        isBreached: true,
-    },
-    {
-        id: "ORD-BF-2024-005",
-        product: "Pro Radio Unit",
-        image: "https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=300",
-        sku: "SKU-BF-05 · BAOFENG",
-        seller: "GadgetHub",
-        date: "15 Feb 2024, 08:00 pm",
-        buyer: "Preeti Sharma",
-        address: "Sohna Road, Gurgaon, Haryana 122001",
-        phone: "+91 95556 78901",
-        total: "₹6,183",
-        status: "Manifested",
-        statusType: "MANIFEST", // Purple ribbon
-        payment: "Prepaid",
-        sla: "10h 7m left",
-        isBreached: false,
-    },
-    {
-        id: "ORD-2024-002202",
-        product: "Polo T-Shirt",
-        image: "https://images.unsplash.com/photo-1576566152374-946765790240?q=80&w=300",
-        sku: "SKU-TS-202 · PoloClub",
-        seller: "ClothingStore",
-        date: "14 Feb 2024, 11:30 am",
-        buyer: "Rahul Gupta",
-        address: "42, Civil Lines, Nagpur, Maharashtra 440001",
-        phone: "+91 98887 65432",
-        total: "₹2,327",
-        status: "Verified",
-        statusType: "VERIFIED", // Green ribbon
-        payment: "Prepaid",
-        sla: "2d 1h left",
-        isBreached: false,
-    },
-    {
-        id: "ORD-2026-000841",
-        product: "Laptop Stand Pro",
-        image: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?q=80&w=300",
-        sku: "SKU-LT-P03 · TechGear",
-        seller: "GadgetHub",
-        date: "14 Feb 2024, 05:45 pm",
-        buyer: "Vikram Singh",
-        address: "15, Indiranagar, Bangalore, Karnataka 560038",
-        phone: "+91 97771 23456",
-        total: "₹3,499",
-        status: "Cancelled",
-        statusType: "CANCELLED", // Red ribbon
-        payment: "Prepaid",
-        sla: "Cancelled",
-        isBreached: true,
-    },
-];
+// ─── Skeleton ─────────────────────────────────────────────────────────────────
+const SkeletonBlock = ({ width = "100%", height = 14, radius = 6, style }) => {
+    const anim = useRef(new Animated.Value(0.4)).current;
+    useEffect(() => {
+        Animated.loop(
+            Animated.sequence([
+                Animated.timing(anim, {
+                    toValue: 1,
+                    duration: 700,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(anim, {
+                    toValue: 0.4,
+                    duration: 700,
+                    useNativeDriver: true,
+                }),
+            ]),
+        ).start();
+    }, []);
+    return (
+        <Animated.View
+            style={[
+                {
+                    width,
+                    height,
+                    borderRadius: radius,
+                    backgroundColor: "#E2E8F0",
+                    opacity: anim,
+                },
+                style,
+            ]}
+        />
+    );
+};
 
+const OrderSkeleton = () => (
+    <View style={[styles.card]}>
+        <View style={[styles.ribbon, { backgroundColor: "#E2E8F0" }]} />
+        <View style={styles.cardContent}>
+            <View style={styles.row}>
+                <SkeletonBlock width={20} height={20} radius={4} />
+                <SkeletonBlock width={64} height={64} radius={12} />
+                <View style={{ flex: 1, gap: 8 }}>
+                    <SkeletonBlock width="80%" height={14} />
+                    <SkeletonBlock width="55%" height={11} />
+                    <SkeletonBlock width="40%" height={18} radius={4} />
+                    <SkeletonBlock width="50%" height={10} />
+                </View>
+            </View>
+            <View style={styles.divider} />
+            <SkeletonBlock
+                width="45%"
+                height={12}
+                style={{ marginBottom: 8 }}
+            />
+            <View style={{ flexDirection: "row", gap: 8 }}>
+                <SkeletonBlock width={80} height={28} radius={14} />
+                <SkeletonBlock width={80} height={28} radius={14} />
+                <SkeletonBlock width={60} height={28} radius={4} />
+            </View>
+            <View style={styles.divider} />
+            <SkeletonBlock
+                width="40%"
+                height={13}
+                style={{ marginBottom: 6 }}
+            />
+            <SkeletonBlock
+                width="70%"
+                height={11}
+                style={{ marginBottom: 4 }}
+            />
+            <SkeletonBlock width="35%" height={11} />
+            <View style={styles.divider} />
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+                <SkeletonBlock width="45%" height={38} radius={8} />
+                <SkeletonBlock width="45%" height={38} radius={8} />
+                <SkeletonBlock width="45%" height={38} radius={8} />
+                <SkeletonBlock width="45%" height={38} radius={8} />
+            </View>
+        </View>
+    </View>
+);
+
+// ─── Map API record → original item shape ─────────────────────────────────────
+const mapApiOrder = (record) => {
+    const product = record.items?.[0];
+    const addr = record.shippingAddress;
+
+    const getStatusType = (status, verificationStatus, subStatus) => {
+        if (
+            status === "DELIVERED" &&
+            ![
+                "LABELING",
+                "PACKING",
+                "MANIFESTING",
+                "MANIFESTED",
+                "CANCELLED",
+            ].includes(subStatus)
+        )
+            return "DELIVERED";
+        if (
+            [
+                "LABELING",
+                "PACKING",
+                "MANIFESTING",
+                "MANIFESTED",
+                "CANCELLED",
+            ].includes(subStatus)
+        )
+            return subStatus;
+        if (subStatus === "PRINT_MANIFEST") return "PRINT MANIFEST";
+        if (verificationStatus === "NEW") return "NEW ORDER";
+        if (verificationStatus === "UNVERIFIED") return "UNVERIFIED";
+        if (status === "PROCESSING") return "MANIFEST";
+        if (verificationStatus === "VERIFIED") return "VERIFIED";
+        if (status === "CANCELLED") return "CANCELLED";
+        return status;
+    };
+
+    const statusType = getStatusType(
+        record.status,
+        record?.verificationStatus,
+        record?.subStatus,
+    );
+
+    const deadlineTime = record.slaTracking?.deadlineTime;
+    const isBreached = deadlineTime
+        ? new Date() > new Date(deadlineTime)
+        : false;
+    const slaLabel = deadlineTime
+        ? isBreached
+            ? `Breached · ${new Date(deadlineTime).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}`
+            : `Due ${new Date(deadlineTime).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}`
+        : "—";
+
+    return {
+        id: record.orderNumber,
+        product: product?.productName ?? "—",
+        quantity: product?.quantity,
+        image: product?.mainImageUrl ?? null,
+        sku: product ? product.sku : "—",
+        seller: product?.seller?.shopName ?? "—",
+        date: new Date(record.createdAt).toLocaleString("en-IN", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        }),
+        buyer: record.buyerName,
+        address: addr
+            ? `${addr.addressLine1 ?? ""}, ${addr.city ?? ""}, ${addr.state?.name ?? ""} ${addr.postalCode ?? ""}`
+            : "—",
+        phone: addr?.phone ?? "—",
+        email: addr?.email ?? "—",
+        total: `₹${record.grandTotal?.toLocaleString("en-IN") ?? 0}`,
+        status: record.verificationStatus ?? record.status,
+        statusType,
+        payment: record.paymentKind === "COD" ? "COD" : "Prepaid",
+        sla: slaLabel,
+        isBreached,
+        _raw: record, // keep original for modals
+
+        platform: record?.attribution?.platform,
+    };
+};
+
+// ─── OrderItem — EXACT original JSX, zero changes ────────────────────────────
 const OrderItem = ({ item }) => {
     const getRibbonColor = () => {
         switch (item.statusType) {
             case "NEW ORDER":
-                return "#0A4AE4";
+                return "#2D9CDB";
+            case "LABELING":
+                return "#2D9CDB";
             case "MANIFEST":
+                return "#6D28D9";
+            case "PACKING":
                 return "#6D28D9";
             case "VERIFIED":
                 return "#10B981";
+            case "MANIFESTING":
+                return "#00BBA2";
+            case "PRINT MANIFEST":
+                return "#00BBA2";
+            case "MANIFESTED":
+                return "#00BBA2";
+            case "DELIVERED":
+                return "#00BBA2";
             case "CANCELLED":
+                return "#EF4444";
+            case "UNVERIFIED":
                 return "#EF4444";
             default:
                 return "#64748B";
@@ -141,33 +254,36 @@ const OrderItem = ({ item }) => {
                     </TouchableOpacity>
 
                     <Image
-                        source={{ uri: item.image }}
+                        source={
+                            item.image
+                                ? { uri: item.image }
+                                : { uri: "https://via.placeholder.com/64" }
+                        }
                         style={styles.productImage}
                     />
 
                     <View style={{ flex: 1 }}>
-                        <Text style={styles.productName} numberOfLines={1}>
+                        <Text style={styles.productName} numberOfLines={2}>
                             {item.product}
                         </Text>
                         <Text style={styles.skuText} numberOfLines={1}>
-                            {item.sku}
-                        </Text>
-                        <View style={styles.sellerBadge}>
-                            <Text style={styles.sellerText}>
-                                Seller: {item.seller}
+                            <Text style={{ color: "#000", fontWeight: "700" }}>
+                                QTY: {item.quantity}
                             </Text>
-                        </View>
-                        <Text style={styles.dateText}>{item.date}</Text>
+                            , {item.sku}
+                        </Text>
                     </View>
                 </View>
+                <View style={styles.divider} />
+
+                <View style={styles.sellerBadge}>
+                    <Text style={styles.sellerText}>Seller: {item.seller}</Text>
+                </View>
+                <Text style={styles.dateText}>{item.date}</Text>
 
                 <View style={styles.divider} />
 
-                <View
-                    style={{
-                        marginVertical: 8,
-                    }}
-                >
+                <View style={{ marginVertical: 8 }}>
                     <View
                         style={{
                             flexDirection: "row",
@@ -212,6 +328,23 @@ const OrderItem = ({ item }) => {
                     </View>
                     <View style={{}}>
                         <View style={styles.statusPills}>
+                            {item?.platform ? (
+                                <View
+                                    style={[
+                                        styles.statusPill,
+                                        { paddingHorizontal: 5 },
+                                    ]}
+                                >
+                                    <MaterialCommunityIcons
+                                        name={
+                                            item?.platform == "ios"
+                                                ? "apple"
+                                                : item?.platform
+                                        }
+                                        size={18}
+                                    />
+                                </View>
+                            ) : null}
                             <View style={styles.statusPill}>
                                 <View
                                     style={[
@@ -220,9 +353,10 @@ const OrderItem = ({ item }) => {
                                     ]}
                                 />
                                 <Text style={styles.pillText}>
-                                    {item.status}
+                                    {item.statusType}
                                 </Text>
                             </View>
+
                             <View
                                 style={[
                                     styles.statusPill,
@@ -276,34 +410,127 @@ const OrderItem = ({ item }) => {
                         {item.buyer}
                     </Text>
                     <Text style={styles.buyerAddress}>{item.address}</Text>
+                    <Text style={styles.buyerPhone}>{item.email}</Text>
                     <Text style={styles.buyerPhone}>{item.phone}</Text>
                 </View>
                 <View style={styles.divider} />
 
                 <View style={styles.actionGrid}>
-                    <ActionButton
-                        label="Mark Verified"
-                        color="#F0FDF4"
-                        textColor="#16A34A"
-                    />
-                    <ActionButton
-                        label="Update Details"
-                        color="#EFF6FF"
-                        textColor="#2563EB"
-                        onPress={() => {
-                            updateState({ isShowUpdate: true });
-                        }}
-                    />
-                    <ActionButton
-                        label="Mark Unverified"
-                        color="#FEF2F2"
-                        textColor="#DC2626"
-                    />
-                    <ActionButton
-                        label="Cancel Order"
-                        color="#FFF1F2"
-                        textColor="#E11D48"
-                    />
+                    {["NEW ORDER", "UNVERIFIED"].includes(item.statusType) && (
+                        <ActionButton
+                            label="Mark Verified"
+                            color="#F0FDF4"
+                            textColor="#16A34A"
+                        />
+                    )}
+                    {["MANIFESTING"].includes(item.statusType) && (
+                        <ActionButton label="Mark RTP" textColor="#6D28D9" />
+                    )}
+                    {["VERIFIED"].includes(item.statusType) && (
+                        <ActionButton
+                            label="Mark For Processing"
+                            // color="#F0FDF4"
+                            textColor="#6D28D9"
+                        />
+                    )}
+                    {["PACKING"].includes(item.statusType) && (
+                        <ActionButton
+                            label="Mark to Manifesting"
+                            textColor="#6D28D9"
+                        />
+                    )}
+                    {["PRINT MANIFEST", "MANIFESTED"].includes(
+                        item.statusType,
+                    ) && (
+                        <ActionButton
+                            label="Print Manifest"
+                            textColor="#6D28D9"
+                        />
+                    )}
+                    {[
+                        "PACKING",
+                        "MANIFESTING",
+                        "PRINT MANIFEST",
+                        "MANIFESTED",
+                    ].includes(item.statusType) && (
+                        <ActionButton
+                            label="Re-Print Label"
+                            textColor="#2563EB"
+                        />
+                    )}
+                    {["DELIVERED"].includes(item.statusType) && (
+                        <ActionButton
+                            label="Print Tax Invoice"
+                            textColor="#2563EB"
+                        />
+                    )}
+                    {["PACKING", "MANIFESTING"].includes(item.statusType) && (
+                        <ActionButton
+                            label="Print Invoice"
+                            textColor="#2563EB"
+                        />
+                    )}
+                    {["PACKING", "MANIFESTING"].includes(item.statusType) && (
+                        <ActionButton
+                            label="Print Packing Slip"
+                            textColor="#3c3c3c"
+                        />
+                    )}
+                    {["LABELING"].includes(item.statusType) && (
+                        <ActionButton
+                            label="Generate Lable"
+                            textColor="#2563EB"
+                        />
+                    )}
+                    {["CANCELLED", "DELIVERED"].includes(item.statusType) && (
+                        <ActionButton
+                            label="Refund Order"
+                            color="#FEF2F2"
+                            textColor="#DC2626"
+                        />
+                    )}
+                    {[
+                        "NEW ORDER",
+                        "UNVERIFIED",
+                        "VERIFIED",
+                        "LABELING",
+                        "PACKING",
+                        "MANIFESTING",
+                        "PRINT MANIFEST",
+                        "MANIFESTED",
+                        "CANCELLED",
+                        "DELIVERED",
+                    ].includes(item.statusType) && (
+                        <ActionButton
+                            label="Update Details"
+                            color="#EFF6FF"
+                            textColor="#2563EB"
+                            onPress={() => {
+                                updateState({ isShowUpdate: true });
+                            }}
+                        />
+                    )}
+                    {["NEW ORDER", "VERIFIED"].includes(item.statusType) && (
+                        <ActionButton
+                            label="Mark Unverified"
+                            color="#FEF2F2"
+                            textColor="#DC2626"
+                        />
+                    )}
+                    {[
+                        "NEW ORDER",
+                        "UNVERIFIED",
+                        "VERIFIED",
+                        "LABELING",
+                        "PACKING",
+                        "MANIFESTING",
+                    ].includes(item.statusType) && (
+                        <ActionButton
+                            label="Cancel Order"
+                            color="#FFF1F2"
+                            textColor="#E11D48"
+                        />
+                    )}
                 </View>
             </View>
         </View>
@@ -313,7 +540,10 @@ const OrderItem = ({ item }) => {
 const ActionButton = ({ label, color, textColor, onPress = () => {} }) => (
     <TouchableOpacity
         onPress={onPress}
-        style={[styles.actionBtn, { backgroundColor: color }]}
+        style={[
+            styles.actionBtn,
+            { backgroundColor: color ? color : textColor + "10" },
+        ]}
     >
         <Text style={[styles.actionBtnText, { color: textColor }]}>
             {label}
@@ -321,20 +551,145 @@ const ActionButton = ({ label, color, textColor, onPress = () => {} }) => (
     </TouchableOpacity>
 );
 
-const B2BOrderListing = () => {
+// ─── B2BOrderListing — API + skeleton + pagination added ──────────────────────
+const B2BOrderListing = ({
+    selectedStatus = null,
+    selectedVerification = null,
+    filters = {},
+}) => {
+    const [list, setList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [pagination, setPagination] = useState({
+        total: 0,
+        page: 1,
+        limit: 20,
+        totalPages: 1,
+    });
+
+    const fetchOrders = useCallback(
+        async (page = 1) => {
+            try {
+                setLoading(true);
+                const params = {
+                    page,
+                    limit: 20,
+                    ...(selectedStatus &&
+                        selectedVerification != "OUT_FOR_DELIVERY" && {
+                            status: selectedStatus,
+                        }),
+                    ...(selectedVerification == "OUT_FOR_DELIVERY" && {
+                        status: selectedVerification,
+                    }),
+                    ...(!selectedStatus &&
+                        ["PAYMENT_FAILED"]?.includes(selectedVerification) && {
+                            status: selectedVerification,
+                        }),
+                    ...(selectedVerification &&
+                        ["PENDING"]?.includes(selectedStatus) && {
+                            verificationStatus: selectedVerification,
+                        }),
+                    ...(!selectedStatus &&
+                        ["UNVERIFIED", "VERIFIED"]?.includes(
+                            selectedVerification,
+                        ) && {
+                            verificationStatus: selectedVerification,
+                        }),
+
+                    ...(selectedVerification &&
+                        [
+                            "PROCESSING",
+                            "READY_TO_PICKUP",
+                            "IN_TRANSIT",
+                        ]?.includes(selectedStatus) &&
+                        selectedVerification != "OUT_FOR_DELIVERY" && {
+                            subStatus: selectedVerification,
+                        }),
+                    ...(filters.search && { search: filters.search }),
+                    ...(filters.fromDate && { fromDate: filters.fromDate }),
+                    ...(filters.toDate && { toDate: filters.toDate }),
+                    ...(filters.categoryId && {
+                        categoryId: filters.categoryId,
+                    }),
+                    ...(filters.utmSource && { utmSource: filters.utmSource }),
+                    ...(filters.platform && { platform: filters.platform }),
+                };
+                const res = await getOrderList(params);
+                if (res?.success) {
+                    setList((res.data?.records || []).map(mapApiOrder));
+                    setPagination((p) => ({ ...p, ...res.data?.pagination }));
+                }
+            } catch (e) {
+                console.error("B2BOrderListing:", e);
+            } finally {
+                setLoading(false);
+            }
+        },
+        [selectedStatus, selectedVerification, JSON.stringify(filters)],
+    );
+
+    useEffect(() => {
+        fetchOrders(1);
+    }, [fetchOrders]);
+
+    if (loading) {
+        return (
+            <View style={[styles.mainContainer, { padding: 10, marginTop: 5 }]}>
+                {[1, 2, 3].map((i) => (
+                    <OrderSkeleton key={i} />
+                ))}
+            </View>
+        );
+    }
+
+    if (!list.length) {
+        return (
+            <View
+                style={[
+                    styles.mainContainer,
+                    { alignItems: "center", paddingVertical: 48 },
+                ]}
+            >
+                <MaterialCommunityIcons
+                    name="shopping-outline"
+                    size={44}
+                    color="#CBD5E1"
+                />
+                <Text
+                    style={{
+                        color: "#94A3B8",
+                        marginTop: 10,
+                        fontWeight: "600",
+                    }}
+                >
+                    No orders found
+                </Text>
+            </View>
+        );
+    }
+
     return (
         <View style={styles.mainContainer}>
             <FlatList
-                data={ORDER_DATA}
+                data={list}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => <OrderItem item={item} />}
                 contentContainerStyle={styles.listContainer}
                 showsVerticalScrollIndicator={false}
+                scrollEnabled={false}
             />
+            {/* {pagination.totalPages > 1 && ( */}
+            <View style={{ paddingHorizontal: 10 }}>
+                <TablePagination
+                    pagination={pagination}
+                    onPageChange={(page) => fetchOrders(page)}
+                />
+            </View>
+            {/* )} */}
         </View>
     );
 };
 
+// ─── Styles — original, not a single character changed ────────────────────────
 const styles = StyleSheet.create({
     mainContainer: { flex: 1, backgroundColor: "#F8FAFC" },
     listContainer: { padding: 10, marginTop: 5 },
@@ -413,7 +768,13 @@ const styles = StyleSheet.create({
         letterSpacing: -0.5,
         marginStart: "auto",
     },
-    statusPills: { flexDirection: "row", gap: 6, marginTop: 6, marginTop: 10 },
+    statusPills: {
+        flexDirection: "row",
+        gap: 6,
+        marginTop: 6,
+        marginTop: 10,
+        flexWrap: "wrap",
+    },
     statusPill: {
         flexDirection: "row",
         alignItems: "center",

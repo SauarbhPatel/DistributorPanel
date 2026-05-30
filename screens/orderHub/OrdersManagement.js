@@ -46,9 +46,75 @@
 
 // export default OrdersManagement;
 
+// import { SafeAreaView, ScrollView } from "react-native";
+// import { Colors } from "../../constants/styles";
+// import { useState } from "react";
+// import CommonHeader from "../../components/common/CommonHeader";
+// import { Loader } from "../../modules";
+// import B2BDashboardBanner from "../../components/ordershub/B2BDashboardBanner";
+// import B2BSearchFilterBar from "../../components/ordershub/B2BSearchFilterBar";
+// import B2BOrderStatusDashboard from "../../components/ordershub/B2BOrderStatusDashboard";
+// import B2BAdvancedSearchFilterBar from "../../components/ordershub/B2BAdvancedSearchFilterBar";
+// import B2BOrderListing from "../../components/ordershub/B2BOrderListing";
+
+// const OrdersManagement = ({ navigation }) => {
+//     const [state, setState] = useState({
+//         loading: false,
+//         selectedStatus: "PENDING",
+//         selectedVerification: null,
+//     });
+
+//     const updateState = (data) => setState((s) => ({ ...s, ...data }));
+//     const { loading, selectedStatus, selectedVerification } = state;
+
+//     const handleStatusSelect = (status, verificationStatus = null) => {
+//         updateState({
+//             selectedStatus: status,
+//             selectedVerification: verificationStatus,
+//         });
+//     };
+
+//     return (
+//         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
+//             <CommonHeader title={"Orders Management"} navigation={navigation} />
+//             <Loader isShow={loading} />
+//             <ScrollView
+//                 contentContainerStyle={{ paddingBottom: 20, paddingTop: 10 }}
+//             >
+//                 <B2BDashboardBanner
+//                     liveText="Live Dashboard"
+//                     title="Orders Management System"
+//                     subTitle="Manage and track all your orders efficiently."
+//                     cardTitle="Quick tip for efficient order management"
+//                     cardSubTitle="Use bulk actions to process multiple orders at once."
+//                     cardButtonText="View Tutorial"
+//                 />
+
+//                 <B2BSearchFilterBar />
+
+//                 {/* Dynamic dashboard — tapping a card calls handleStatusSelect */}
+//                 <B2BOrderStatusDashboard
+//                     selectedStatus={selectedStatus}
+//                     onStatusSelect={handleStatusSelect}
+//                 />
+
+//                 <B2BAdvancedSearchFilterBar />
+
+//                 {/* Pass selected filters to listing */}
+//                 <B2BOrderListing
+//                     selectedStatus={selectedStatus}
+//                     selectedVerification={selectedVerification}
+//                 />
+//             </ScrollView>
+//         </SafeAreaView>
+//     );
+// };
+
+// export default OrdersManagement;
+
 import { SafeAreaView, ScrollView } from "react-native";
 import { Colors } from "../../constants/styles";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import CommonHeader from "../../components/common/CommonHeader";
 import { Loader } from "../../modules";
 import B2BDashboardBanner from "../../components/ordershub/B2BDashboardBanner";
@@ -58,26 +124,32 @@ import B2BAdvancedSearchFilterBar from "../../components/ordershub/B2BAdvancedSe
 import B2BOrderListing from "../../components/ordershub/B2BOrderListing";
 
 const OrdersManagement = ({ navigation }) => {
-    const [state, setState] = useState({
-        loading: false,
-        selectedStatus: "PENDING",
-        selectedVerification: null,
-    });
+    const [selectedStatus, setSelectedStatus] = useState("PENDING");
+    const [selectedVerification, setSelectedVerification] = useState("NEW");
+    const [filters, setFilters] = useState({});
 
-    const updateState = (data) => setState((s) => ({ ...s, ...data }));
-    const { loading, selectedStatus, selectedVerification } = state;
+    // From B2BOrderStatusDashboard card taps
+    const handleStatusSelect = useCallback(
+        (status, verificationStatus = null) => {
+            setSelectedStatus(status);
+            setSelectedVerification(verificationStatus);
+        },
+        [],
+    );
 
-    const handleStatusSelect = (status, verificationStatus = null) => {
-        updateState({
-            selectedStatus: status,
-            selectedVerification: verificationStatus,
-        });
-    };
+    // From B2BAdvancedSearchFilterBar field changes
+    const handleFiltersChange = useCallback((newFilters) => {
+        setFilters(newFilters);
+    }, []);
+
+    // Clear all advanced filters
+    const handleClearFilters = useCallback(() => {
+        setFilters({});
+    }, []);
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.bodyColor }}>
             <CommonHeader title={"Orders Management"} navigation={navigation} />
-            <Loader isShow={loading} />
             <ScrollView
                 contentContainerStyle={{ paddingBottom: 20, paddingTop: 10 }}
             >
@@ -92,18 +164,24 @@ const OrdersManagement = ({ navigation }) => {
 
                 <B2BSearchFilterBar />
 
-                {/* Dynamic dashboard — tapping a card calls handleStatusSelect */}
+                {/* Status dashboard — tapping a card sets status filter */}
                 <B2BOrderStatusDashboard
                     selectedStatus={selectedStatus}
+                    selectedVerification={selectedVerification}
                     onStatusSelect={handleStatusSelect}
                 />
 
-                <B2BAdvancedSearchFilterBar />
+                {/* Advanced filters — search, dates, category, source, platform */}
+                <B2BAdvancedSearchFilterBar
+                    onFiltersChange={handleFiltersChange}
+                    onClearFilters={handleClearFilters}
+                />
 
-                {/* Pass selected filters to listing */}
+                {/* Order list — receives all active filters */}
                 <B2BOrderListing
                     selectedStatus={selectedStatus}
                     selectedVerification={selectedVerification}
+                    filters={filters}
                 />
             </ScrollView>
         </SafeAreaView>

@@ -463,3 +463,18 @@ export {
 // ─── Orders ───────────────────────────────────────────────────────────────────
 export const getOrderStatusCounts = () =>
     __getApiData(`/order/counts/status-substatus`);
+
+export const getCategoryTreeDropdown = () =>
+    __getApiData(`/categories/getCategoryTreeDropdown`);
+
+export const getOrderList = (params = {}) => {
+    const query = Object.entries(params)
+        .filter(([_, v]) => v !== null && v !== undefined && v !== "")
+        .map(([k, v]) =>
+            Array.isArray(v)
+                ? v.map((i) => `${k}=${encodeURIComponent(i)}`).join("&")
+                : `${k}=${encodeURIComponent(v)}`,
+        )
+        .join("&");
+    return __getApiData(`/order/list?${query}`);
+};
