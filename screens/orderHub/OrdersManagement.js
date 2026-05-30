@@ -122,6 +122,7 @@ import B2BSearchFilterBar from "../../components/ordershub/B2BSearchFilterBar";
 import B2BOrderStatusDashboard from "../../components/ordershub/B2BOrderStatusDashboard";
 import B2BAdvancedSearchFilterBar from "../../components/ordershub/B2BAdvancedSearchFilterBar";
 import B2BOrderListing from "../../components/ordershub/B2BOrderListing";
+import OrderListing from "../../components/ordershub/OrderListing";
 
 const OrdersManagement = ({ navigation }) => {
     const [selectedStatus, setSelectedStatus] = useState("PENDING");
@@ -178,7 +179,12 @@ const OrdersManagement = ({ navigation }) => {
                 />
 
                 {/* Order list — receives all active filters */}
-                <B2BOrderListing
+                {/* <B2BOrderListing
+                    selectedStatus={selectedStatus}
+                    selectedVerification={selectedVerification}
+                    filters={filters}
+                /> */}
+                <OrderListing
                     selectedStatus={selectedStatus}
                     selectedVerification={selectedVerification}
                     filters={filters}
